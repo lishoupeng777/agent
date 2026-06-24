@@ -5,7 +5,6 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-.eggs/
 
 # Virtual environment
 venv/
@@ -29,3 +28,17 @@ Thumbs.db
 # Maven / Java
 target/
 *.class
+pom.xml
+src/main/
+
+# Compiled/test artifacts
+app.log
+compile*.log
+full_compile.log
+compile_result.txt
+Test.class
+
+# Binary/docx/doc files
+*.docx
+*.pdf
+*.doc

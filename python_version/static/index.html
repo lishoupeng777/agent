@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容保真度与治理质量评估智能体</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --pass: #10b981;
+            --review: #f59e0b;
+            --fail: #ef4444;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --tag-bg: #f3f4f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #fff;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+        .header .status-dot {
+            display: inline-block; width:8px; height:8px; border-radius:50%;
+            background: #10b981; margin-right: 6px; vertical-align: middle;
+        }
+
+        /* 主体容器 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--primary); background: #f5f3ff; }
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* 卡片 */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card h3 .icon { font-size: 22px; }
+
+        /* 表单 */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-group label .required { color: #ef4444; }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.2s;
+            background: #fafafa;
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+        textarea { min-height: 80px; }
+        textarea.large { min-height: 140px; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 16px; height: 16px; accent-color: var(--primary);
+        }
+
+        /* 按钮 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,0.35); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: var(--tag-bg);
+            color: var(--text);
+        }
+        .btn-secondary:hover { background: #e5e7eb; }
+
+        .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+        }
+        .loading.active { display: block; }
+        .spinner {
+            display: inline-block;
+            width: 36px; height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-bottom: 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 结果卡片 */
+        .result-card { display: none; }
+        .result-card.active { display: block; }
+
+        .verdict-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .verdict-pass { background: var(--pass); }
+        .verdict-review { background: var(--review); }
+        .verdict-fail { background: var(--fail); }
+
+        .score-big {
+            font-size: 48px;
+            font-weight: 800;
+            text-align: center;
+            margin: 12px 0;
+        }
+        .score-label { text-align: center; color: var(--text-secondary); font-size: 13px; }
+
+        .dimension-list { margin-top: 16px; }
+        .dimension-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .dimension-item:last-child { border-bottom: none; }
+        .dim-name {
+            width: 140px;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .dim-score-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .dim-score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .dim-score-num {
+            width: 48px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .dim-reason {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            margin-left: 152px;
+        }
+
+        /* 瑕疵列表 */
+        .flaw-item {
+            background: #fef2f2;
+            border-left: 4px solid var(--fail);
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+        }
+        .flaw-item.critical { border-color: #dc2626; background: #fef2f2; }
+        .flaw-item.major { border-color: #f59e0b; background: #fffbeb; }
+        .flaw-item.minor { border-color: #3b82f6; background: #eff6ff; }
+        .flaw-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .flaw-category {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .cat-over_clean { background: #dbeafe; color: #1d4ed8; }
+        .cat-mis_edit { background: #fce7f3; color: #be185d; }
+        .cat-readability { background: #fef3c7; color: #b45309; }
+        .cat-structure { background: #e0e7ff; color: #4338ca; }
+        .flaw-severity {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .sev-critical { background: #fee2e2; color: #dc2626; }
+        .sev-major { background: #fef3c7; color: #d97706; }
+        .sev-minor { background: #dbeafe; color: #2563eb; }
+        .flaw-desc { font-size: 14px; margin-bottom: 6px; }
+        .flaw-snippet {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .flaw-suggestion {
+            font-size: 12px;
+            color: #059669;
+            margin-top: 4px;
+        }
+
+        .no-flaws {
+            text-align: center;
+            padding: 24px;
+            color: var(--pass);
+            font-weight: 600;
+        }
+
+        .token-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        /* 稳定性结果 */
+        .stability-chart {
+            display: flex;
+            align-items: end;
+            gap: 8px;
+            height: 120px;
+            padding: 16px 0;
+            justify-content: center;
+        }
+        .stability-bar {
+            width: 40px;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+            padding-bottom: 4px;
+            font-weight: 600;
+            transition: height 0.5s ease;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            text-align: center;
+        }
+        .stat-item {
+            background: #f9fafb;
+            padding: 14px 8px;
+            border-radius: 8px;
+        }
+        .stat-value { font-size: 22px; font-weight: 700; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .stat-pass { color: #10b981; }
+        .stat-warn { color: #f59e0b; }
+
+        /* 校准结果 */
+        .cal-metrics {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 640px) {
+            .row { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2,1fr); }
+            .cal-metrics { grid-template-columns: repeat(2,1fr); }
+            .dim-name { width: 100px; }
+        }
+
+        /* 健康状态 */
+        .health-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot { width:10px; height:10px; border-radius:50%; }
+        .dot.ok { background: #10b981; }
+        .dot.off { background: #ef4444; }
+
+        .raw-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Consolas','Courier New',monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .error-msg.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📋 内容保真度与治理质量评估智能体</h1>
+    <p><span class="status-dot" id="statusDot"></span> 服务状态：<span id="statusText">检测中...</span> &nbsp;|&nbsp; LLM-as-Judge 评测服务 &nbsp;|&nbsp; 端口 8081</p>
+</div>
+
+<div class="container">
+
+    <!-- 标签页 -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="evaluate">📝 核心评估</button>
+        <button class="tab-btn" data-tab="stability">📊 稳定性分析</button>
+        <button class="tab-btn" data-tab="calibrate">🎯 一致性校准</button>
+        <button class="tab-btn" data-tab="metrics">📐 指标计算</button>
+        <button class="tab-btn" data-tab="about">ℹ️ 使用说明</button>
+    </div>
+
+    <!-- ==================== 标签页1：核心评估 ==================== -->
+    <div class="tab-content active" id="tab-evaluate">
+        <div class="card">
+            <h3><span class="icon">📝</span> 核心评估 —— 对比治理前后文本</h3>
+
+            <div class="form-group">
+                <label>请求ID <span style="color:#6b7280;font-weight:400;">（自动生成）</span></label>
+                <input type="text" id="evalRequestId" placeholder="留空自动生成" />
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理前原文</label>
+                    <textarea class="large" id="evalBefore" placeholder="请输入治理前的原始文本……"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理后文本</label>
+                    <textarea class="large" id="evalAfter" placeholder="请输入治理后的文本……"></textarea>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="evalStabilize" />
+                <label for="evalStabilize">启用多次采样稳定化（多次评估取均值，更准确但更慢）</label>
+            </div>
+            <div class="form-group" id="sampleCountGroup" style="display:none;">
+                <label>采样次数</label>
+                <input type="number" id="evalSampleCount" value="3" min="1" max="5" style="width:100px;" />
+            </div>
+
+            <button class="btn btn-primary" id="btnEvaluate" onclick="doEvaluate()">🚀 开始评估</button>
+            <div class="loading" id="evalLoading"><div class="spinner"></div><p>AI 正在分析中，请稍候……</p></div>
+            <div class="error-msg" id="evalError"></div>
+        </div>
+
+        <!-- 评估结果 -->
+        <div class="card result-card" id="evalResult">
+            <h3>📋 评估结果</h3>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span id="evalVerdict" class="verdict-badge"></span>
+                <span style="font-size:14px;color:var(--text-secondary);">请求ID：<strong id="evalRid"></strong></span>
+            </div>
+
+            <div class="score-big" id="evalOverall">--</div>
+            <div class="score-label">加权综合得分（0 ~ 1.0）</div>
+
+            <!-- 各维度评分 -->
+            <h4 style="margin-top:20px;margin-bottom:12px;">📊 各维度评分</h4>
+            <div class="dimension-list" id="evalDims"></div>
+
+            <!-- 瑕疵清单 -->
+            <h4 style="margin-top:24px;margin-bottom:12px;">🔍 瑕疵清单</h4>
+            <div id="evalFlaws"></div>
+
+            <!-- 可复现令牌 -->
+            <div class="token-text" style="margin-top:16px;">🔑 可复现令牌：<span id="evalToken"></span></div>
+
+            <!-- LLM 原始输出 -->
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer;color:var(--primary);font-weight:600;">查看 LLM 原始输出</summary>
+                <div class="raw-output" id="evalRaw" style="margin-top:8px;"></div>
+            </details>
+        </div>
+    </div>
+
+    <!-- ==================== 标签页2：稳定性分析 ==================== -->
+    <div class="tab-content" id="tab-stability">
+        <div class="card">
+            <h3><span class="icon">📊</span> 评分稳定性分析</h3>
+            <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">
+                对同一输入进行多次独立评估，检测评分的一致性（方差越小越稳定）。
+            </p>
+
+            <div class="row">
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理前原文</label>
+                    <textarea class="large" id="stabBefore" placeholder="请输入治理前的原始文本……"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理后文本</label>
+                    <textarea class="large" id="stabAfter" placeholder="请输入治理后的文本……"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>采样次数（建议 3~5 次）</label>
+                <input type="number" id="stabSampleCount" value="3" min="1" max="5" style="width:100px;" />
+            </div>
+
+            <button class="btn btn-primary" id="btnStability" onclick="doStability()">📊 开始稳定性分析</button>
+            <div class="loading" id="stabLoading"><div class="spinner"></div><p>多次评估中，请稍候……</p></div>
+            <div class="error-msg" id="stabError"></div>
+        </div>
+
+        <div class="card result-card" id="stabResult">
+            <h3>📊 稳定性分析结果</h3>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="stabMean">--</div>
+                    <div class="stat-label">均值</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stabStd">--</div>
+                    <div class="stat-label">标准差</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stabVar">--</div>
+                    <div class="stat-label">方差</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stabStable">--</div>
+                    <div class="stat-label">是否稳定</div>
+                </div>
+            </div>
+            <h4 style="margin-top:20px;margin-bottom:8px;">各次采样得分</h4>
+            <div class="stability-chart" id="stabChart"></div>
+            <div id="stabSamples" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 标签页3：一致性校准 ==================== -->
+    <div class="tab-content" id="tab-calibrate">
+        <div class="card">
+            <h3><span class="icon">🎯</span> 一致性校准 —— 与人工标注对比</h3>
+            <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">
+                上传多组"治理前/后文本 + 人工评分"，系统评估后计算与人工标注的相关性。
+            </p>
+
+            <div class="form-group">
+                <label><span class="required">*</span> 校准数据（JSON 数组格式）</label>
+                <textarea class="large" id="calData" placeholder='[
+  {
+    "request_id": "cal-001",
+    "before_text": "治理前原文……",
+    "after_text": "治理后文本……",
+    "human_label": {"score": 0.85}
+  },
+  {
+    "request_id": "cal-002",
+    "before_text": "另一段原文……",
+    "after_text": "另一段治理后文本……",
+    "human_label": {"score": 0.6}
+  }
+]'></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="btnCalibrate" onclick="doCalibrate()">🎯 开始校准</button>
+            <div class="loading" id="calLoading"><div class="spinner"></div><p>批量评估中，请稍候……</p></div>
+            <div class="error-msg" id="calError"></div>
+        </div>
+
+        <div class="card result-card" id="calResult">
+            <h3>🎯 校准结果</h3>
+            <div class="cal-metrics">
+                <div class="stat-item">
+                    <div class="stat-value" id="calPearson">--</div>
+                    <div class="stat-label">Pearson 相关系数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="calSpearman">--</div>
+                    <div class="stat-label">Spearman 秩相关系数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="calMae">--</div>
+                    <div class="stat-label">平均绝对误差 (MAE)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="calRmse">--</div>
+                    <div class="stat-label">均方根误差 (RMSE)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="calConsistency">--</div>
+                    <div class="stat-label">一致率</div>
+                </div>
+            </div>
+            <div id="calDetails" style="margin-top:16px;"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 标签页4：指标计算 ==================== -->
+    <div class="tab-content" id="tab-metrics">
+        <!-- 瑕疵检出指标 -->
+        <div class="card">
+            <h3><span class="icon">📐</span> 瑕疵检出指标 —— Precision / Recall / F1</h3>
+            <div class="row">
+                <div class="form-group">
+                    <label><span class="required">*</span> 预测瑕疵列表（JSON 数组）</label>
+                    <textarea id="flawPredicted" placeholder='[{"category":"over_clean","severity":"major","description":"..."}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label><span class="required">*</span> 人工标注瑕疵列表（JSON 数组）</label>
+                    <textarea id="flawGroundTruth" placeholder='[{"category":"over_clean","severity":"major","description":"..."}]'></textarea>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="doFlawMetrics()">📐 计算指标</button>
+            <div class="loading" id="flawLoading"><div class="spinner"></div><p>计算中……</p></div>
+            <div class="error-msg" id="flawError"></div>
+            <div class="result-card" id="flawResult" style="margin-top:16px;">
+                <div class="stats-row">
+                    <div class="stat-item"><div class="stat-value" id="flawPrecision">--</div><div class="stat-label">Precision（精确率）</div></div>
+                    <div class="stat-item"><div class="stat-value" id="flawRecall">--</div><div class="stat-label">Recall（召回率）</div></div>
+                    <div class="stat-item"><div class="stat-value" id="flawF1">--</div><div class="stat-label">F1 值</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 锚点准确率 -->
+        <div class="card">
+            <h3><span class="icon">📍</span> 锚点定位准确率</h3>
+            <div class="row">
+                <div class="form-group">
+                    <label><span class="required">*</span> 预测瑕疵（含 location）</label>
+                    <textarea id="anchorPredicted" placeholder='[{"location":{"start_char":0,"end_char":10}},...]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label><span class="required">*</span> 人工标注（含 location）</label>
+                    <textarea id="anchorGroundTruth" placeholder='[{"location":{"start_char":0,"end_char":10}},...]'></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>字符容差</label>
+                <input type="number" id="anchorTolerance" value="10" min="0" style="width:100px;" />
+            </div>
+            <button class="btn btn-primary" onclick="doAnchorMetrics()">📍 计算准确率</button>
+            <div class="loading" id="anchorLoading"><div class="spinner"></div><p>计算中……</p></div>
+            <div class="error-msg" id="anchorError"></div>
+            <div class="result-card" id="anchorResult" style="margin-top:16px;">
+                <div class="stat-item" style="max-width:200px;margin:0 auto;">
+                    <div class="stat-value" id="anchorAccuracy">--</div>
+                    <div class="stat-label">锚点定位准确率</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 标签页5：使用说明 ==================== -->
+    <div class="tab-content" id="tab-about">
+        <div class="card">
+            <h3><span class="icon">💡</span> 项目介绍</h3>
+            <p style="margin-bottom:12px;">
+                本系统是一个基于大语言模型（LLM）的<strong>内容质量评估智能体</strong>，用于判断文本治理（清洗、规范化等）的质量。
+            </p>
+            <p style="margin-bottom:12px;">
+                从以下<strong>四个维度</strong>对比治理前后文本，给出科学评分：
+            </p>
+            <ul style="padding-left:24px;margin-bottom:12px;">
+                <li><strong>语义一致性</strong>（权重 0.4）—— 治理后是否保留了原意？信息是否丢失？</li>
+                <li><strong>过度清洗/误改识别</strong>（权重 0.3）—— 是否误删有效信息或错误改写？</li>
+                <li><strong>可读性</strong>（权重 0.15）—— 句子是否通顺、段落是否连贯？</li>
+                <li><strong>结构质量</strong>（权重 0.15）—— 格式是否规范、层次是否清晰？</li>
+            </ul>
+            <p><strong>综合判定：</strong></p>
+            <ul style="padding-left:24px;">
+                <li>≥ 0.8 → <span style="color:#10b981;font-weight:700;">通过 (pass)</span></li>
+                <li>0.5~0.8 → <span style="color:#f59e0b;font-weight:700;">需复审 (review)</span></li>
+                <li>< 0.5 → <span style="color:#ef4444;font-weight:700;">不通过 (fail)</span></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3><span class="icon">📖</span> 操作流程</h3>
+            <ol style="padding-left:24px;line-height:2.2;">
+                <li>确保后端服务已启动（运行 <code>python_version\run.bat</code>）</li>
+                <li>在 <strong>「核心评估」</strong> 标签页输入治理前和治理后的文本</li>
+                <li>点击 <strong>「开始评估」</strong> 按钮</li>
+                <li>查看各维度评分、瑕疵清单和综合判定</li>
+                <li>如需更可靠的结果，可勾选 <strong>「启用多次采样稳定化」</strong></li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h3><span class="icon">🛠️</span> 技术栈</h3>
+            <p>后端：Python + FastAPI + LangChain + DeepSeek API</p>
+            <p>前端：纯 HTML/CSS/JS（本页面）</p>
+            <p>端口：8081</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ==================== 全局状态 ====================
+const API_BASE = 'http://localhost:8081/api/v1';
+
+// ==================== 标签页切换 ====================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+// 稳定化复选框切换
+document.getElementById('evalStabilize').addEventListener('change', function() {
+    document.getElementById('sampleCountGroup').style.display = this.checked ? 'block' : 'none';
+});
+
+// ==================== 健康检查 ====================
+async function checkHealth() {
+    try {
+        const res = await fetch(API_BASE + '/health');
+        const data = await res.json();
+        document.getElementById('statusDot').classList.add('ok');
+        document.getElementById('statusText').textContent = '运行中 ✅ (服务: ' + data.service + ')';
+        document.getElementById('statusText').style.color = '#10b981';
+    } catch(e) {
+        document.getElementById('statusDot').classList.add('off');
+        document.getElementById('statusText').textContent = '未启动 ❌ —— 请先运行 run.bat';
+        document.getElementById('statusText').style.color = '#fca5a5';
+    }
+}
+checkHealth();
+setInterval(checkHealth, 30000);
+
+// ==================== 工具函数 ====================
+function getScoreColor(score) {
+    if (score >= 0.8) return '#10b981';
+    if (score >= 0.5) return '#f59e0b';
+    return '#ef4444';
+}
+
+function getVerdictClass(verdict) {
+    if (verdict === 'pass') return 'verdict-pass';
+    if (verdict === 'review') return 'verdict-review';
+    return 'verdict-fail';
+}
+
+function getVerdictText(verdict) {
+    if (verdict === 'pass') return '✅ 通过';
+    if (verdict === 'review') return '⚠️ 需复审';
+    return '❌ 不通过';
+}
+
+// ==================== 核心评估 ====================
+async function doEvaluate() {
+    const before = document.getElementById('evalBefore').value.trim();
+    const after = document.getElementById('evalAfter').value.trim();
+    if (!before || !after) {
+        showError('evalError', '请输入治理前和治理后的文本');
+        return;
+    }
+
+    const btn = document.getElementById('btnEvaluate');
+    const loading = document.getElementById('evalLoading');
+    const result = document.getElementById('evalResult');
+    const error = document.getElementById('evalError');
+
+    error.classList.remove('active');
+    result.classList.remove('active');
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    let requestId = document.getElementById('evalRequestId').value.trim();
+    if (!requestId) requestId = 'eval-' + Date.now();
+
+    const stabilize = document.getElementById('evalStabilize').checked;
+    const sampleCount = parseInt(document.getElementById('evalSampleCount').value) || 3;
+
+    try {
+        const res = await fetch(API_BASE + '/evaluate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                request_id: requestId,
+                before_text: before,
+                after_text: after,
+                stabilize: stabilize,
+                sample_count: sampleCount
+            })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()));
+        const data = await res.json();
+        renderEvalResult(data);
+    } catch(e) {
+        showError('evalError', '请求失败：' + e.message + '\n请确认后端服务已启动（运行 run.bat）');
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function renderEvalResult(data) {
+    document.getElementById('evalResult').classList.add('active');
+    document.getElementById('evalRid').textContent = data.request_id;
+    document.getElementById('evalOverall').textContent = data.overall_score.toFixed(4);
+    document.getElementById('evalOverall').style.color = getScoreColor(data.overall_score);
+    document.getElementById('evalToken').textContent = data.reproducibility_token;
+
+    // 综合判定
+    const v = document.getElementById('evalVerdict');
+    v.textContent = getVerdictText(data.verdict);
+    v.className = 'verdict-badge ' + getVerdictClass(data.verdict);
+
+    // 维度评分
+    let dimsHtml = '';
+    (data.dimensions || []).forEach(d => {
+        const pct = (d.score * 100).toFixed(0);
+        dimsHtml += `
+            <div class="dimension-item">
+                <div class="dim-name">${d.dimension}</div>
+                <div class="dim-score-bar">
+                    <div class="dim-score-fill" style="width:${pct}%;background:${getScoreColor(d.score)};"></div>
+                </div>
+                <div class="dim-score-num">${d.score.toFixed(3)}</div>
+            </div>
+            <div class="dim-reason">${d.reason || ''}（权重：${d.weight}）</div>
+        `;
+    });
+    document.getElementById('evalDims').innerHTML = dimsHtml;
+
+    // 瑕疵清单
+    const flaws = data.flaws || [];
+    let flawsHtml = '';
+    if (flaws.length === 0) {
+        flawsHtml = '<div class="no-flaws">✅ 未发现瑕疵，治理质量良好</div>';
+    } else {
+        flaws.forEach(f => {
+            flawsHtml += `
+                <div class="flaw-item ${f.severity || 'minor'}">
+                    <div class="flaw-header">
+                        <span class="flaw-category cat-${f.category || 'unknown'}">${getCategoryText(f.category)}</span>
+                        <span class="flaw-severity sev-${f.severity || 'minor'}">${getSeverityText(f.severity)}</span>
+                    </div>
+                    <div class="flaw-desc">${f.description || ''}</div>
+                    ${f.location && f.location.snippet ? `<span class="flaw-snippet">📍 ${f.location.snippet}</span>` : ''}
+                    ${f.suggestion ? `<div class="flaw-suggestion">💡 ${f.suggestion}</div>` : ''}
+                </div>
+            `;
+        });
+    }
+    document.getElementById('evalFlaws').innerHTML = flawsHtml;
+
+    // 原始输出
+    document.getElementById('evalRaw').textContent = data.raw_llm_output || '(无)';
+
+    // 滚动到结果
+    document.getElementById('evalResult').scrollIntoView({behavior:'smooth'});
+}
+
+function getCategoryText(cat) {
+    const map = {over_clean:'过度清洗',mis_edit:'误改',readability:'可读性差',structure:'结构问题'};
+    return map[cat] || cat || '未知';
+}
+function getSeverityText(sev) {
+    const map = {critical:'🔴 严重',major:'🟡 主要',minor:'🔵 次要'};
+    return map[sev] || sev || '未知';
+}
+
+// ==================== 稳定性分析 ====================
+async function doStability() {
+    const before = document.getElementById('stabBefore').value.trim();
+    const after = document.getElementById('stabAfter').value.trim();
+    if (!before || !after) {
+        showError('stabError', '请输入治理前和治理后的文本');
+        return;
+    }
+
+    const btn = document.getElementById('btnStability');
+    const loading = document.getElementById('stabLoading');
+    const error = document.getElementById('stabError');
+    error.classList.remove('active');
+    document.getElementById('stabResult').classList.remove('active');
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    const sampleCount = parseInt(document.getElementById('stabSampleCount').value) || 3;
+
+    try {
+        const res = await fetch(API_BASE + '/stability', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                request_id: 'stab-' + Date.now(),
+                before_text: before,
+                after_text: after,
+                stabilize: false,
+                sample_count: sampleCount
+            })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        renderStabilityResult(data);
+    } catch(e) {
+        showError('stabError', '请求失败：' + e.message);
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function renderStabilityResult(data) {
+    document.getElementById('stabResult').classList.add('active');
+    document.getElementById('stabMean').textContent = data.mean_score.toFixed(4);
+    document.getElementById('stabStd').textContent = data.std_dev.toFixed(4);
+    document.getElementById('stabVar').textContent = data.variance.toFixed(6);
+    const stableEl = document.getElementById('stabStable');
+    stableEl.textContent = data.is_stable ? '✅ 稳定' : '⚠️ 不稳定';
+    stableEl.className = data.is_stable ? 'stat-pass' : 'stat-warn';
+
+    // 柱状图
+    const samples = data.samples || [];
+    const maxScore = Math.max(...samples.map(s => s.score || s.overall_score || 0), 0.1);
+    document.getElementById('stabChart').innerHTML = samples.map(s => {
+        const sc = s.score || s.overall_score || 0;
+        const h = (sc / maxScore * 100).toFixed(0);
+        return `<div class="stability-bar" style="height:${h}%">${sc.toFixed(2)}</div>`;
+    }).join('');
+
+    document.getElementById('stabSamples').innerHTML = samples.map((s,i) =>
+        `<span style="font-size:12px;background:#f3f4f6;padding:4px 8px;border-radius:4px;">第${i+1}次：${(s.score||s.overall_score||0).toFixed(4)}</span>`
+    ).join('');
+
+    document.getElementById('stabResult').scrollIntoView({behavior:'smooth'});
+}
+
+// ==================== 一致性校准 ====================
+async function doCalibrate() {
+    const raw = document.getElementById('calData').value.trim();
+    if (!raw) { showError('calError', '请输入校准数据'); return; }
+
+    let payload;
+    try { payload = JSON.parse(raw); } catch(e) { showError('calError', 'JSON 格式错误：' + e.message); return; }
+    if (!Array.isArray(payload)) { showError('calError', '请输入 JSON 数组'); return; }
+
+    const btn = document.getElementById('btnCalibrate');
+    const loading = document.getElementById('calLoading');
+    const error = document.getElementById('calError');
+    error.classList.remove('active');
+    document.getElementById('calResult').classList.remove('active');
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    try {
+        const res = await fetch(API_BASE + '/calibrate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        renderCalibrateResult(data);
+    } catch(e) {
+        showError('calError', '请求失败：' + e.message);
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function renderCalibrateResult(data) {
+    document.getElementById('calResult').classList.add('active');
+    document.getElementById('calPearson').textContent = data.pearson_r.toFixed(4);
+    document.getElementById('calSpearman').textContent = data.spearman_rho.toFixed(4);
+    document.getElementById('calMae').textContent = data.mae.toFixed(4);
+    document.getElementById('calRmse').textContent = data.rmse.toFixed(4);
+    document.getElementById('calConsistency').textContent = (data.consistency_rate*100).toFixed(1) + '%';
+    document.getElementById('calResult').scrollIntoView({behavior:'smooth'});
+}
+
+// ==================== 瑕疵指标 ====================
+async function doFlawMetrics() {
+    const pred = document.getElementById('flawPredicted').value.trim();
+    const gt = document.getElementById('flawGroundTruth').value.trim();
+    if (!pred || !gt) { showError('flawError', '请填写预测和标注数据'); return; }
+
+    let pArr, gArr;
+    try { pArr = JSON.parse(pred); gArr = JSON.parse(gt); } catch(e) { showError('flawError', 'JSON 格式错误'); return; }
+
+    const btn = document.querySelector('#tab-metrics button');
+    const loading = document.getElementById('flawLoading');
+    const error = document.getElementById('flawError');
+    error.classList.remove('active');
+    loading.classList.add('active');
+
+    try {
+        const res = await fetch(API_BASE + '/metrics/flaw-detection', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({predicted: pArr, ground_truth: gArr})
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        document.getElementById('flawResult').classList.add('active');
+        document.getElementById('flawPrecision').textContent = (data.precision||0).toFixed(4);
+        document.getElementById('flawRecall').textContent = (data.recall||0).toFixed(4);
+        document.getElementById('flawF1').textContent = (data.f1||0).toFixed(4);
+    } catch(e) {
+        showError('flawError', '请求失败：' + e.message);
+    } finally {
+        loading.classList.remove('active');
+    }
+}
+
+// ==================== 锚点准确率 ====================
+async function doAnchorMetrics() {
+    const pred = document.getElementById('anchorPredicted').value.trim();
+    const gt = document.getElementById('anchorGroundTruth').value.trim();
+    if (!pred || !gt) { showError('anchorError', '请填写预测和标注数据'); return; }
+
+    let pArr, gArr;
+    try { pArr = JSON.parse(pred); gArr = JSON.parse(gt); } catch(e) { showError('anchorError', 'JSON 格式错误'); return; }
+
+    const tolerance = parseInt(document.getElementById('anchorTolerance').value) || 10;
+    const loading = document.getElementById('anchorLoading');
+    const error = document.getElementById('anchorError');
+    error.classList.remove('active');
+    loading.classList.add('active');
+
+    try {
+        const res = await fetch(API_BASE + '/metrics/anchor-accuracy?char_tolerance=' + tolerance, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({predicted: pArr, ground_truth: gArr})
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        document.getElementById('anchorResult').classList.add('active');
+        document.getElementById('anchorAccuracy').textContent = ((data.accuracy||0)*100).toFixed(1) + '%';
+    } catch(e) {
+        showError('anchorError', '请求失败：' + e.message);
+    } finally {
+        loading.classList.remove('active');
+    }
+}
+
+// ==================== 错误显示 ====================
+function showError(id, msg) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = '⚠️ ' + msg; el.classList.add('active'); }
+}
+</script>
+
+</body>
+</html>
