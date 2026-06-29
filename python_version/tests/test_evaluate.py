@@ -8,6 +8,9 @@ import sys
 # 将项目根目录加入 path 以便导入 app 模块
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+
 from app.models import EvalRequest
 from app.engine import evaluate
 from app.calibration import calibrate

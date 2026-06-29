@@ -182,7 +182,8 @@ def _render_flaws_table(flaws: list[dict]) -> None:
 # ── 侧边栏 ────────────────────────────────────────────────────────────────
 
 PRESET_MODELS = {
-    "DeepSeek Chat（默认）": ("https://api.deepseek.com/v1", "deepseek-chat"),
+    "DeepSeek V4 Flash（默认）": ("https://api.deepseek.com/v1", "deepseek-v4-flash"),
+    "DeepSeek V4 Pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro"),
     "DeepSeek Reasoner": ("https://api.deepseek.com/v1", "deepseek-reasoner"),
     "智谱 GLM-4-Flash（免费）": ("https://open.bigmodel.cn/api/paas/v4", "glm-4-flash"),
     "智谱 GLM-4-Plus": ("https://open.bigmodel.cn/api/paas/v4", "glm-4-plus"),

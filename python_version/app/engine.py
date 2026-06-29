@@ -20,10 +20,15 @@ from .models import (
 from .prompts import build_system_prompt, build_user_prompt
 from .profiles import get_profile_config, PROFILE_GENERAL
 
-# ---------- LLM 配置（可通过环境变量覆盖） ----------
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+# ---------- LLM 配置（延迟读取环境变量，兼容 load_dotenv） ----------
+def _get_base_url() -> str:
+    return os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+
+def _get_api_key() -> str:
+    return os.getenv("DEEPSEEK_API_KEY", "")
+
+def _get_model() -> str:
+    return os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
 
 # ---------- LLM 初始化 ----------
 _llm: Optional[ChatOpenAI] = None
@@ -34,11 +39,11 @@ def get_llm(temperature: float = 0.0) -> ChatOpenAI:
     global _llm
     if _llm is None or _llm.temperature != temperature:
         _llm = ChatOpenAI(
-            model=DEEPSEEK_MODEL,
+            model=_get_model(),
             temperature=temperature,
             max_tokens=4096,
-            base_url=DEEPSEEK_BASE_URL,
-            api_key=DEEPSEEK_API_KEY,
+            base_url=_get_base_url(),
+            api_key=_get_api_key(),
         )
     return _llm
 
@@ -58,7 +63,7 @@ def _build_token(request: EvalRequest, temperature: float) -> str:
             "before": request.before_text,
             "after": request.after_text,
             "temperature": temperature,
-            "model": DEEPSEEK_MODEL,
+            "model": _get_model(),
             "prompt_version": _prompt_version(),
             "evaluation_profile": request.evaluation_profile,
         },
@@ -337,7 +342,7 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         flaws=flaws,
         verdict=verdict,
         reproducibility_token=_build_token(request, temperature),
-        model_version=DEEPSEEK_MODEL,
+        model_version=_get_model(),
         prompt_version=_prompt_version(),
         raw_llm_output=raw_output,
     )

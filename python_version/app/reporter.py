@@ -9,7 +9,7 @@ from .engine import evaluate
 from .models import EvalRequest, EvalResponse
 from .calibration import calibrate
 from .metrics import compute_flaw_metrics, compute_anchor_accuracy
-from .stability import run_stability
+from .stability import run_stability as _run_stability_fn
 from .debias import detect_length_bias, detect_position_bias, compute_bias_mitigation_score
 
 
@@ -17,6 +17,7 @@ def run_full_evaluation(
     requests: list[EvalRequest],
     stability_samples: int = 3,
     char_tolerance: int = 10,
+    run_stability: bool = False,
 ) -> dict[str, Any]:
     """
     运行完整评估流程，输出符合课题12验收标准的综合报告。
@@ -42,8 +43,9 @@ def run_full_evaluation(
         "report_meta": {
             "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "total_samples": len(requests),
-            "stability_samples": stability_samples,
+            "stability_samples": stability_samples if run_stability else 0,
             "char_tolerance": char_tolerance,
+            "run_stability": run_stability,
         },
         "per_sample_results": [],
         "calibration": {},
@@ -128,24 +130,25 @@ def run_full_evaluation(
                 "bias_mitigation_score": bms,
             })
 
-            # 稳定性分析
-            try:
-                stab = run_stability(req, sample_count=stability_samples)
-                sample_result["stability"] = {
-                    "mean_score": stab.mean_score,
-                    "variance": stab.variance,
-                    "std_dev": stab.std_dev,
-                    "is_stable": stab.is_stable,
-                    "samples": stab.samples,
-                }
-                stability_reports.append({
-                    "request_id": req.request_id,
-                    "mean_score": stab.mean_score,
-                    "variance": stab.variance,
-                    "is_stable": stab.is_stable,
-                })
-            except Exception as e:
-                sample_result["stability"] = {"error": str(e)}
+            # 稳定性分析（默认关闭，run_stability=True 时启用）
+            if run_stability:
+                try:
+                    stab = _run_stability_fn(req, sample_count=stability_samples)
+                    sample_result["stability"] = {
+                        "mean_score": stab.mean_score,
+                        "variance": stab.variance,
+                        "std_dev": stab.std_dev,
+                        "is_stable": stab.is_stable,
+                        "samples": stab.samples,
+                    }
+                    stability_reports.append({
+                        "request_id": req.request_id,
+                        "mean_score": stab.mean_score,
+                        "variance": stab.variance,
+                        "is_stable": stab.is_stable,
+                    })
+                except Exception as e:
+                    sample_result["stability"] = {"error": str(e)}
 
             # 可复现性验证：同输入再评估一次
             try:
@@ -352,22 +355,31 @@ def print_report_summary(report: dict[str, Any]) -> None:
 
     cal = report.get("calibration", {})
     print(f"\n[一致性校准]")
-    print(f"   Pearson r：{cal.get('pearson_r', 'N/A'):.4f}  {'[达标]' if cal.get('pass_threshold_0_8') else '[未达标]'}（目标 >= 0.8）")
-    print(f"   Spearman rho：{cal.get('spearman_rho', 'N/A'):.4f}")
-    print(f"   MAE：{cal.get('mae', 'N/A'):.4f}")
-    print(f"   RMSE：{cal.get('rmse', 'N/A'):.4f}")
-    print(f"   一致率：{cal.get('consistency_rate', 0)*100:.1f}%")
+    if cal.get("error"):
+        print(f"   校准失败：{cal['error']}")
+    else:
+        print(f"   Pearson r：{cal.get('pearson_r', 0):.4f}  {'[达标]' if cal.get('pass_threshold_0_8') else '[未达标]'}（目标 >= 0.8）")
+        print(f"   Spearman rho：{cal.get('spearman_rho', 0):.4f}")
+        print(f"   MAE：{cal.get('mae', 0):.4f}")
+        print(f"   RMSE：{cal.get('rmse', 0):.4f}")
+        print(f"   一致率：{cal.get('consistency_rate', 0)*100:.1f}%")
 
     fm = report.get("flaw_metrics", {})
     print(f"\n[瑕疵检出指标]")
-    print(f"   Precision：{fm.get('precision', 'N/A'):.4f}")
-    print(f"   Recall：{fm.get('recall', 'N/A'):.4f}")
-    print(f"   F1：{fm.get('f1', 'N/A'):.4f}  {'[达标]' if fm.get('pass_threshold_0_8') else '[未达标]'}（目标 >= 0.8）")
+    if fm.get("error"):
+        print(f"   指标计算失败：{fm['error']}")
+    else:
+        print(f"   Precision：{fm.get('precision', 0):.4f}")
+        print(f"   Recall：{fm.get('recall', 0):.4f}")
+        print(f"   F1：{fm.get('f1', 0):.4f}  {'[达标]' if fm.get('pass_threshold_0_8') else '[未达标]'}（目标 >= 0.8）")
 
     am = report.get("anchor_metrics", {})
     print(f"\n[锚点定位准确率]")
-    print(f"   准确率：{am.get('accuracy', 0)*100:.1f}%  {'[达标]' if am.get('pass_threshold_0_9') else '[未达标]'}（目标 >= 90%）")
-    print(f"   正确/总数：{am.get('correct', 0)}/{am.get('total', 0)}")
+    if am.get("error"):
+        print(f"   计算失败：{am['error']}")
+    else:
+        print(f"   准确率：{am.get('accuracy', 0)*100:.1f}%  {'[达标]' if am.get('pass_threshold_0_9') else '[未达标]'}（目标 >= 90%）")
+        print(f"   正确/总数：{am.get('correct', 0)}/{am.get('total', 0)}")
 
     ss = report.get("stability_summary", {})
     print(f"\n[评分稳定性]")
