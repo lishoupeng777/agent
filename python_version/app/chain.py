@@ -37,17 +37,26 @@ from .profiles import get_profile_config, PROFILE_GENERAL
 _llm_instance: Optional[ChatOpenAI] = None
 
 
-def create_llm(temperature: float = 0.0) -> ChatOpenAI:
-    """创建 LLM 实例（延迟读取环境变量）"""
+def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
+    """创建 LLM 实例（延迟读取环境变量）
+
+    Args:
+        temperature: 温度参数
+        json_mode: 是否启用 JSON mode（强制输出合法 JSON）
+    """
     global _llm_instance
     if _llm_instance is not None and _llm_instance.temperature == temperature:
         return _llm_instance
+    kwargs: dict[str, Any] = {}
+    if json_mode:
+        kwargs["model_kwargs"] = {"response_format": {"type": "json_object"}}
     _llm_instance = ChatOpenAI(
         model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         temperature=temperature,
         max_tokens=4096,
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.getenv("DEEPSEEK_API_KEY", ""),
+        **kwargs,
     )
     return _llm_instance
 
@@ -81,11 +90,46 @@ def build_prompt_messages(
 
 
 # ============================================================
-# 3. 输出解析（结构化提取）
+# 3. 输出解析（Pydantic 验证 + 结构化提取）
 # ============================================================
 
+from pydantic import BaseModel, Field
+
+
+class LLMDimensionScore(BaseModel):
+    """LLM 输出的维度评分"""
+    dimension: str
+    score: float = Field(ge=0.0, le=1.0)
+    weight: float = Field(ge=0.0, le=1.0)
+    reason: str = ""
+
+
+class LLMAnchorSpan(BaseModel):
+    """LLM 输出的锚点信息"""
+    segment_id: str = ""
+    start_char: int = 0
+    end_char: int = 0
+    snippet: str = ""
+
+
+class LLMFlawItem(BaseModel):
+    """LLM 输出的瑕疵项"""
+    category: str
+    severity: str = "minor"
+    description: str = ""
+    location: LLMAnchorSpan = LLMAnchorSpan()
+    suggestion: str | None = None
+
+
+class LLMOutput(BaseModel):
+    """LLM 输出的完整结构（Pydantic 验证）"""
+    dimensions: list[LLMDimensionScore] = Field(default_factory=list)
+    overall_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    flaws: list[LLMFlawItem] = Field(default_factory=list)
+
+
 def parse_llm_output(raw: str) -> dict[str, Any]:
-    """从 LLM 原始输出中提取 JSON（三级降级策略）"""
+    """从 LLM 原始输出中提取 JSON（三级降级策略 + Pydantic 验证）"""
     # 1) 直接解析
     try:
         return json.loads(raw)
@@ -106,6 +150,15 @@ def parse_llm_output(raw: str) -> dict[str, Any]:
         except json.JSONDecodeError:
             pass
     return {}
+
+
+def validate_llm_output(parsed: dict[str, Any]) -> LLMOutput:
+    """用 Pydantic 验证 LLM 输出结构，容错处理异常字段"""
+    try:
+        return LLMOutput(**parsed)
+    except Exception:
+        # 验证失败时返回默认值
+        return LLMOutput()
 
 
 def _normalize_score(val: float) -> float:
@@ -349,15 +402,17 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         segments_after=request.segments_after,
     )
 
-    # Step 2: 调用 LLM（带 callback）
-    llm = create_llm(temperature=temperature)
+    # Step 2: 调用 LLM（带 callback，启用 JSON mode）
+    llm = create_llm(temperature=temperature, json_mode=True)
     response = llm.invoke(messages, config={"callbacks": [callback]})
     raw_output = str(response.content) if hasattr(response, "content") else str(response)
 
-    # Step 3: 解析输出
+    # Step 3: 解析输出 + Pydantic 验证
     parsed = parse_llm_output(raw_output)
-    dimensions = extract_dimensions(parsed)
-    flaws = extract_flaws(parsed)
+    validated = validate_llm_output(parsed)
+    # 用验证后的数据（Pydantic 已做类型/范围校验）
+    dimensions = extract_dimensions(validated.model_dump())
+    flaws = extract_flaws(validated.model_dump())
     overall_score = compute_overall_score(dimensions)
 
     # Step 4: 后处理
