@@ -1,0 +1,1286 @@
+[
+  {
+    "id": "FactCheck-GPT-76",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Combinatorial optimization is a subfield of mathematical optimization that consists of finding an optimal object from a finite set of objects, [1] where the set of feasible solutions is discrete or can be reduced to a discrete set. Typical combinatorial optimization problems are the travelling salesman problem (\"TSP\"), the minimum spanning tree problem (\"MST\"), and the knapsack problem . In many such problems, such as the ones previously mentioned, exhaustive search is not tractable, and so specialized algorithms that quickly rule out large parts of the search space or approximation algorithms must be resorted to instead. Combinatorial optimization is related to operations research , algorithm theory , and computational complexity theory . It has important applications in several fields, including artificial intelligence , machine learning , auction theory , software engineering , VLSI , applied mathematics and theoretical computer science .",
+    "after_text": "Combinatorial optimisation is a branch of computer science.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-5",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Johnny McGurk, 49, appeared in court in County Londonderry accused of theft from quarry firm Patrick Bradley Ltd. Mr McGurk, an accountant, was released on bail and will appear in court again on 19 November. He won an All-Ireland football championship and All-Star award in 1993. Mr McGurk also captained his club Lavey to an All-Ireland senior club championship in 1991. The accused's name was given to Coleraine Magistrates Court as John Malachy McGurk of Oakland Crescent in Knockloughrim, Magherafelt, County Londonderry. He was charged with stealing £572,206 from Patrick Bradley Ltd, based in Kilrea, also in County Londonderry. Mr McGurk was also accused of 36 counts of fraud relating to sums of allegedly stolen money lodged in his bank account. All the offences are alleged to have happened between 1 July 2006 and 31 December 2011.",
+    "after_text": "A former All - Ireland footballer has been charged with stealing more than £ 500,000.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-71",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Where did patatas bravas originate from? The History of Patatas Bravas The original recipe called for irregular, bite-sized chunks of fried potatoes which were dressed with a spicy tomato sauce and served piping hot. Bravas refers to the fieriness in the heat and spice of the sauce Who created patatas bravas? Gonzxe1lez disputes the story that Bar Tomxe1s invented the bravas. His considerable research along the bravas trail has found that although Barcelona is now seen as the capital of patatas bravas, the dish was actually first served in Madrid or Toledo in the 1950s.",
+    "after_text": "Patatas bravas as we know them today could not have existed in 1490.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-82",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Much like former Democratic Gov. Deval Patrick invested state funds to help make Massachusetts a center for biotech , Healey said she wants to make the state a center of renewable energy technology. A former Harvard basketball player, Healey said she has relied on teamwork as attorney general and will bring that same sense of a shared mission into the governor’s office. Healey is hoping to work closely with the Democrat-controlled Massachusetts House and Senate. Democratic Senate President Karen Spilka delivered the oaths of office to Healey and Driscoll. “No matter what challenges we face, no matter what lies ahead, we will stay true to the best of ourselves,” Healey said.",
+    "after_text": "Marcus Morton served as Governor of Massachusetts.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Marcus Morton served as Governor of Massachusetts."
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-18",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Media playback is not supported on this device. The 24-year-old missed the Indian Premier League (IPL) auction last month in order to concentrate on his international future. Vince has played three T20 matches so far for England, scoring 125 runs, with a strike-rate of 119.04. \"If it's a platform to go on and play other formats for England, then that'll be ideal,\" he told BBC South Today. \"First and foremost, I'm going to try and help England win the World Cup and try to learn off some very good players when I am out there. \"It will be a good experience and one I cannot wait to start.\" County team-mates Liam Dawson and Reece Topley have also travelled to Mumbai with the England T20 squad. All-rounder Dawson, 26, was included despite head coach Trevor Bayliss admitting he had never seen the all-rounder play competitively, while left-arm paceman Topley was preferred to Chris Woakes. Led by captain Eoin Morgan, England's first match will be against the West Indies on 16 March, with Sri Lanka and South Africa and a group winner from the first-round qualifiers their other Super-10 opponents. \"I think having it in the unofficial home of cricket is massively exciting,\" said Topley, 22. \"It's going to be brilliant and it's definitely going to be testing.\" \"Everybody talks about the size of the grounds being a little smaller. They talk about the heat and the dew at night having an effect. It will be a great occasion.\"",
+    "after_text": "Leicestershire batsman James Vince has been included in England's squad for the World Twenty20, which starts in India in March.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Leicestershire batsman James Vince has been includ"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-44",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Police Scotland said two men broke into the farm house near to Corsock, Castle Douglas, between 23:30 on Thursday and 01:00 on Friday. They stole items including a number of war medals, gold watches and antiques. Officers have appealed for information and said the robbers may have been \"casing\" the property before the raid. Det Sgt Graeme Robertson said: \"I believe that whoever broke into this house knew what they were looking for - that is the medals, watches and antiques. \"Thankfully the householder, a woman, who was in the house at the time, was not injured but she is very upset by what has happened.\" The men were described as being well spoken, with Scottish accents, of average height and build and wearing dark clothing. One of the men was wearing a balaclava and gloves. \"Due to the rural location of the house and the items taken, we believe that the two men would have had to have the use of a car. \"It is also entirely possible that they may have been in the area before the break in 'casing' the house so I would ask anyone who may have witnessed any suspicious behaviour around the area during this time, or anyone who may have been offered these items for sale, to contact police.\"",
+    "after_text": "World War Two medals have been stolen in a raid on a house in the Highlands.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "World War Two medals have been stolen in a raid on"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-85",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Eise Eisinga was an autodidact who built this small Planetarium or Orrery in 1781. It is the oldest of its kind that still works. He constructed his model of the galaxy on the ceiling of his living room. It is a sky-blue wooden structure, with moving elements steared by an intricate mechanical clockwork structure on the attic above. He received a lot of visitors in his time who came to see this, both prominents and schoolchildren.",
+    "after_text": "Eise Eisinga was a Dutch amateur astronomer.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Eise Eisinga was a Dutch amateur astronomer."
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-9",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "The rural grave, discovered last November in the town of Tetelcingo, consists of two 10m (33ft) deep pits.\nProsecutors say that the bodies may have been dumped illegally by morgue officials, but the investigation into who is responsible is ongoing.\nMorelos is among the worst-affected states in Mexico's epidemic of drug-related violence.\nAt least 20,000 people have disappeared across Mexico, the UN estimates - other organisation put the number far higher.\nInvestigators at Tetelcingo worked under a yellow tent as families of missing persons and National Human Rights Commission representatives looked on.\nGenetic samples will be taken from each set of remains to attempt identification before they are reburied in marked graves.\nThe exhumation is expected to take about five days.\nState prosecutor Javier Perez Duron said an investigation was under way into who was responsible for the illegal mass burial.\n\"It is extremely important and the highest responsibility to count the bodies and give them a dignified burial,\" Mr Duron said.\nExperts from the Autonomous University of the state of Morelos (UAEM) have been called in to help with DNA testing.\nAlejandro Vera, rector of UAEM, said: \"We recognize the tireless struggle of the relatives and victims' organisations of the more than 30,000 missing in this country that's sinking into barbarism.\"\nMr Vera founded a program to help those whose loved ones have disappeared in Mexico's drug war.\nAt least 20,000 people are thought to have disappea",
+    "after_text": "Prosecutors in the mexican state of morelos have begun exhuming more than 100 bodies from a mass grave.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-63",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Drivers from the Rail, Maritime and Transport union have unanimously backed the deal.\nAslef officer Finn Brennan said the new agreement offered \"real improvements in conditions\".\nMaintenance workers represented by the TSSA and RMT have rejected the proposal, as have Unite members.\nAslef said its members voted by almost nine to one to accept the deal, clearing another hurdle in plans for a Night Tube.\nThe service was due to start on some lines at weekends last September but has been delayed because of failure to reach agreement with the unions over pay and conditions.\nAslef officer Finn Brennan said union members' \"strength and solidarity have achieved an above-inflation pay rise and real improvements in conditions that will give drivers, and other grades, much more flexibility and control over their work-life balance\".\nSteve Griffiths, London Underground's chief operating officer, said: \"I'm pleased that Aslef members have voted to accept our offer.\n\"This is a fair and affordable pay deal.\"\nMr Griffiths added LU wanted to \"deliver the night Tube for London as quickly as possible\".",
+    "after_text": "The London Underground has agreed to pay drivers a pay rise of more than £20,000 for the first time.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The London Underground has agreed to pay drivers a"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-49",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The local authority said Richard Ellis was leaving on Friday at the end of his contract. Ciaran Monaghan and Ewan Sutherland are both going under a voluntary redundancy and early retirement scheme. Stephen Flynn, the leader of the opposition SNP group, said the departures were indicative of the council's inability to hold on to senior staff. He said he expected further departures in the coming months. Mr Ellis is the council's former interim director of corporate governance, and has also been acting as deputy chief executive for several months. Mr Monaghan is head of the chief executive's office, while Mr Sutherland is head of human resources and customer services. Council chief executive Angela Scott thanked the trio for their \"dedication and professionalism\".",
+    "after_text": "Three senior council staff have left the local authority in Dundee.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Three senior council staff have left the local aut"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-94",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Of this area, 49.7% is used for agricultural purposes, while 31.4% is forested. The rest of the land, (18.9%) is settled. [5] The municipality is located in the Bremgarten district, and is located on the Mutschellenhöhe . It consists of the originally separate villages of Ober- and Unter-Berikon. Coat of arms [ edit ]",
+    "after_text": "Mutschelleben is now part of Saale-Holzland-Kreis.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Mutschelleben is now part of Saale-Holzland-Kreis."
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-73",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Can you explain this answer? Verified Answer The compound formed by dissolving elemental gold in aqua regia is:a)Au... Aqua regia is a mixture of conc. HNO3 and conc. HCl in the ratio 1:3.",
+    "after_text": "Aqua regia dissolved with gold forms chloroauric acid (HAuCl4) as a product.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-74",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Compound formed by dissolving elemental gold in aqua regia is H[AuCl4]. Explanation: - Aqua regia is a mixture of hydrochloric acid (HCl) and nitric acid (HNO3) in the ratio of 3:1. - Elemental gold (Au) is a noble metal and does not react with most acids, but it readily dissolves in aqua regia due to the presence of nitric acid, which oxidizes the gold to form Au3+ ions. - The Au3+ ions then react with the chloride ions (Cl-) from hydrochloric acid to form a complex ion called tetrachloroaurate (III) ion, [AuCl4]-. - The H+ ions from hydrochloric acid combine with the remaining nitrate ions (NO3-) from nitric acid to form nitric acid, HNO3. -",
+    "after_text": "Aqua regia dissolved with gold forms chloroauric acid (HAuCl4) as a product.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-24",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Media playback is not supported on this device. Dusmatov, 23, was awarded a unanimous points victory - two judges scoring the fight 30-27, and one 29-28. Martinez, 24, is the first Olympic boxing finalist from Colombia. The United States' Nico Hernandez, 20, and 19-year-old Cuban world champion Joahnys Argilagos took bronze after losing in the semi-finals. Find out how to get into boxing with our special guide. Subscribe to the BBC Sport newsletter to get our pick of news, features and video sent to your inbox.",
+    "after_text": "Colombia's Carlos Martinez lost to Kazakhstan's Islam Dusmatov in the Olympic men's bantamweight final, losing to the former world champion in Rio.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Colombia's Carlos Martinez lost to Kazakhstan's Is"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-83",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Mey Eden has also started to product water coolers , water container holders as well as eco-friendly disposable cups made with compostable plant-based materials. [2] Organisations boycotting purchases of produce from Israeli-occupied territories have from time to time boycotted Mey Eden water. [1] [3] [4] Mey Eden was sold to Rhone Capitol in July, 2013. [5] References [ edit ] ^ a b Scottish Palestine Solidarity Campaign, Eden Springs , accessed 4 January 2022 ^",
+    "after_text": "Mey Eden offers still water products.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Mey Eden offers still water products."
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-19",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The Fire and Rescue Service said they received a call just before 08:30 GMT on Thursday. The man was found dead in an upstairs bedroom, after fire crews arrived at the house in Drumgay Close, in the Kilmacormick area. They wore breathing apparatus and used thermal imaging cameras to locate the occupant. The Fire and Rescue Service are working to establish the cause of the fire.",
+    "after_text": "A man has died following a fire at a house in the Kilmacormick area of west Belfast.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A man has died following a fire at a house in the "
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-90",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Jing Jiang may be virtuous and cultivated, but Confucius is uninterested in this. For Confucius at least, her virtue is only of interest to the extent that it impacts upon the hapless Wenbo. Politics, weaving and gender: Nevertheless, Jing Jiang is interesting precisely because of the force of her arguments, which are effective and carefully woven, and which find ways round the gendered expectations of her time. The most famous example of this is the advice she gives Wenbo after he has become a minister.",
+    "after_text": "Jing Jiang has made significant contributions to the advancement of the field.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Jing Jiang has made significant contributions to t"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-46",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "North Wales Police claimed Owen Jones, 52, of Caernarfon, Gwynedd, was not fit to hold a firearms certificate after officers looked at his profile. Mr Jones, who had held a licence for more than 30 years, appealed against the decision and won. Caernarfon Crown Court heard on Friday that he was not a cause for concern despite the posts. The hearing was told a senior police officer regarded the posts as \"highly offensive\", prompting the licence to be revoked. Judge Niclas Parry said Mr Jones was ignorant about the subject of the Muslim faith, but added: \"None of those messages were created by the appellant. \"The appellant has liked certain messages that appeared on his Facebook profile. He has then effectively re-published the message.\"",
+    "after_text": "A man who posted offensive comments about Muslims on Facebook has had his firearms licence revoked.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A man who posted offensive comments about Muslims "
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-22",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Neil Aspin's promotion-chasing hosts have not lost in nine National League matches while Adam Lockwood's side are unbeaten in five. Guiseley went ahead on 15 minutes against the run of play when a throw-in found James Hurst who squared to Jake Lawlor to stroke into an empty net. Gateshead defender Liam Hogan superbly blocked Jordan Preston's effort and Guiseley keeper Jonny Maxted then saved well from Wesley York's shot just before the break. The hosts, who started the second half well, levelled on 62 minutes when a slip by half-time substitute Derek Asamoah let York curl sweetly into the top-right corner from the edge of the box. Match report supplied by the Press Association. Match ends, Gateshead 1, Guiseley 1. Second Half ends, Gateshead 1, Guiseley 1. Substitution, Guiseley. Michael Rankine replaces Jordan Preston. Substitution, Gateshead. Luke Hannant replaces Gus Mafuta. Gus Mafuta (Gateshead) is shown the yellow card. Substitution, Guiseley. Adam Boyes replaces Jake Cassidy. Goal!  Gateshead 1, Guiseley 1. Wes York (Gateshead). Substitution, Guiseley. Derek Asamoah replaces Kevan Hurst. Second Half begins Gateshead 0, Guiseley 1. First Half ends, Gateshead 0, Guiseley 1. Simon Walton (Guiseley) is shown the yellow card. Goal!  Gateshead 0, Guiseley 1. Jake Lawlor (Guiseley). First Half begins. Lineups are announced and players are warming up.",
+    "after_text": "Gateshead and Guiseley maintained their unbeaten starts to the season with a 1 - 1 draw at the International Stadium.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Gateshead and Guiseley maintained their unbeaten s"
+        }
+      }
+    ]
+  },
+  {
+    "id": "Seahorse-53",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Talk to your family about the appropriate actions to take in order to stay safe during a landslide, especially if you live in a vulnerable area. Be sure to discuss evacuation procedures, as well as safe locations and areas to avoid. Make sure everyone knows how to get emergency alerts from local officials, whether it be via phone, television, or radio. Talk to your local emergency management agency to see how alerts are delivered in your area. Don't forget to emphasize the importance of listening to the local news station for emergency updates in the event of a landslide! Write down each family member's phone number, email, social media, medical facilities, and school or workplace. Having this information on hand will make it easier for family members to get in touch in the event of the landslide or other emergencies. In the event of a landslide or other emergency, choose a place where the family will meet to reunite. Select a location in your neighborhood and your town. Make sure everyone is aware of the location.  Choose a location that is accessible for everyone in your family, particularly for members with disabilities. If you have pets, pick a pet-friendly area. You might choose to meet at a neighbor's house or your mailbox for your neighborhood location, and at a community center or a place of worship for your town location. Compile contact information, landslide safety protocol, and your emergency meeting places on a single document. This is your emergency plan. Give e",
+    "after_text": "Discuss landslide safety protocols with your family. Make a list of emergency contacts. Choose a meeting place. Create an emergency plan.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-20",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "It would make the disused Fawley power station chimney the tallest such attraction south of London's Shard. Developers Fawley Waterside said it would be the centrepiece of a \"merchant city\" development. The power station closed in 2013 after more than 40 years in operation. Architects plans show a petal-shaped glass structure at the centre of a Â£1bn development featuring a marina, housing and restaurants. It also includes fast ferry links to Southampton and Portsmouth. With an application for outline planning permission due later this year, building could start in 2018. The oil-fired Fawley Power Station, on the western side of Southampton Water, was commissioned in 1971 and was capable of powering one million homes. The 300-acre site was sold to Fawley Waterside developers in 2016. Aldred Drummond of the company said: \"We'd be mad to knock the chimney down - its our signature piece of infrastructure. \"If you think of the money spent building the i360 in Brighton, or the Spinnaker Tower in Portsmouth, this building is already there so with relatively little investment we can do something very spectacular.\" 1971 Commissioned on the western shore of Southampton Water 2,000 megawatt oil-fired power station fuelled by nearby Esso refinery 198 metre-high chimney dominates the Solent sykline 1,100  miles of cable were laid within the power station One million homes were powered by Fawley",
+    "after_text": "Plans have been unveiled for a 198 metre - high (656 ft) glass chimney at a former power station site in Southampton.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Plans have been unveiled for a 198 metre - high (6"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_cnndm-29",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Porto's defence was not the only thing to be ripped apart at the Allianz Arena on Tuesday night as a jubilant Bayern Munich manager Pep Guardiola was left with a hole in his trousers. Guardiola managed to tear the left trouser leg of his grey garments during an incredibly exciting night for Bayern, who led their opponents 5-0 at half-time. The Spanish tactician's underwear was on show after the incident, and he joked after the Champions League clash: 'I'll have to buy new ones for the next match.' Bayern Munich manager Pep Guardiola ripped a hole during the Champions League match in Germany . Guardiola's underwear were on show after the Bayern boss managed to rip a small hole in his trousers . The excitement of a 6-1 win against Porto appeared to get the better of Guardiola's left trouser leg . Away from Guardiola's clothing, Bayern managed to book a place in the Champions League semi-finals thanks to goals by Thiago Alcantara, Jerome Boateng, Thomas Muller, Xabi Alonso and a brace from Robert Lewandowski. Porto went into the match with a two-goal lead following their 3-1 victory in Portugal, however they were swept aside by the Bundesliga giants. Bayern's European rivals will be running scared after their outstanding display as Guardiola's side showed they were a cut above a shell-shocked Porto side. Guardiola's trousers before the rip (left) and after the rip (right) during Bayern Munich's 6-1 victory over Porto . The former Barcelona boss (far right) also decided to ditch ",
+    "after_text": "A: The Bayern Munich manager was left with a hole in his trousers after a 6-1 win against Porto.\n\nB: The Bayern Munich manager decided to ditch his suit blazer during the latter stages of the match.\n\nC: The Bayern Munich manager decided to ditch his trousers after the Champions League match in Germany.\n\nD: The Bayern Munich manager decided to ditch his underwear after the Champions League match in Germany.\n\nE: The Bayern Munich manager decided to ditch his underwear after the Champions League match in Germany.\n\nF: The Bayern Munich manager decided to ditch his underwear after the Champions",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-89",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Byte Pair Encoding (BPE) Algorithm BPE was originally a data compression algorithm that you use to find the best way to represent data by identifying the common byte pairs. We now use it in NLP to find the best representation of text using the smallest number of tokens. Here's how it works: Add an identifier ( </w> ) at the end of each word to identify the end of a word and then calculate the word frequency in the text. Split the word into characters and then calculate the character frequency. From the character tokens, for a predefined number of iterations, count the frequency of the consecutive byte pairs and merge the most frequently occurring byte pairing.",
+    "after_text": "Byte Pair Encoding can be used for encryption purposes.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Byte Pair Encoding can be used for encryption purp"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-23",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Domenico Masciopinto, 35, was sentenced to 14 years in 2012 for drug-dealing. From prison he told his now estranged wife Giulia Masciopinto, 37, to unearth cash buried in their Bedford garden. She has been jailed for nine months. Her mother Caterina De Filippo, 58, and sister Palma De Filippo, 28, were given 12-month sentences for helping her. Domenico Masciopinto was sentenced to 22 months, after admitting concealing criminal property, to run consecutively to his 14-year term. His wife also pleaded guilty to the charge, but the De Filippos, who she enlisted but who denied the accusations, were found guilty last month. Judge Kristina Montgomery QC, sitting at Amersham Law Courts for Aylesbury Crown Court, said the Masciopintos would have been jailed for longer if they had not admitted the crime. Cash was found by police stuffed around the Bedford homes of Giulia Masciopinto, in Redhall Close, and her mother's in Harrowden Road, in March 2013. Officers were alerted by Masciopinto's recorded prison calls to his wife, as he feared the buried cash would perish as it was not in watertight containers. A holdall containing £237,000 was discovered, while thousands of pounds were also found in a handbag, plastic bag and foil-wrapped bundles. Other money had been paid into bank accounts. Palma De Filippo, of High St, Acton, west London, helped by hiding some of the cash in her car boot and laundering it. Det Insp Pushpa Guild, of Bedfordshire Police, called it a \"sophisticated attempt\"",
+    "after_text": "A husband and wife have been jailed for conspiring to hide more than £300,000 in a \"sophisticated\" attempt to hide criminal proceeds from police.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A husband and wife have been jailed for conspiring"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-92",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Open in app Sign up Sign In Write Sign up Sign In Byte Pair Encoding — The Dark Horse of Modern NLP A simple data compression algorithm first introduced in 1994 supercharging almost all advanced NLP models of today (including BERT). Akashdeep Singh Jaswal · Follow Published in Towards Data Science · 3 min read · Nov 22, 2019 -- 8 Listen Share Background The last few years have been an exciting time to be in the field of NLP. The evolution from sparse frequency-based word vectors to dense semantic word representation pre-trained models like Word2vec and GloVe set the foundation for learning the meaning of words. For many years, they served as reliable embedding layer initializations to train models in the absence of large amounts of task-specific data. Today, subword tokenization schemes inspired by BPE have become the norm in most advanced models including the very popular family of contextual language models like BERT , GPT-2 , RoBERTa , etc.",
+    "after_text": "Byte Pair Encoding offers benefits in terms of efficiency.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Byte Pair Encoding offers benefits in terms of eff"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-80",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Some microsatellites, for example, the STRV-1d launched in 2000, the PROBA launched in 2001, and the ST-5 launched in 2006, firstly used lithium-ion batteries to power the load. Compared with the applications on the ground, aerospace products put forward higher requirement in reliability and safety. Generally, failure of batteries will affect the normal operation of satellite loadings and even lead to catastrophic accidents. For example, batteries accidental failure resulted in the halting problem of the Mars Global Surveyor in 2006 [ 3 ] and Boeing 787 in 2013 [ 4 ]. Therefore, the techniques of life prediction play an increasingly significant role in satellite lithium-ion batteries.",
+    "after_text": "Reliability is an important attribute of spacecraft batteries.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-65",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Trams ran in the city between 1904 and 1953 before being replaced by buses.\nIn December, they returned to the streets with the opening of the Midland Metro service - the first part of a £128m project.\nOnce complete, trams from Wolverhampton will continue in to Birmingham, terminating at New Street station.\nRoger Lawrence, chairman of the West Midlands Integrated Transport Authority said: \"This is an opportunity to expand. Not just into the city centre but out to the airport.\n\"We will have a network to rival the best ones, like Manchester and Nottingham and even south London. Our network will equal those\".\nAt its peak, the original tram network ran 230 million passenger journeys every year from Yardley to Dudley, and from Erdington down to the Lickey Hills.\nElsie Field, now 91, began working on the trams as a conductress when she was 18. Part of her job was using a pole to connect the tramcar to the overhead power lines.\nShe said although she was short-sighted she was \"too proud to wear her glasses, so the connection was sometimes a bit hit-and-miss\".\nTram enthusiast Geoffrey Claydon grew up in Birmingham and said he was disappointed when his regular commute was replaced by a bus service.\n\"I said why have the trams gone and was told 'Oh, they're old fashioned'. From that moment I thought I would be very supportive of trams, I would do my best to try and keep them where I can for the rest of my life\".\nWhen working as a government lawyer, Mr Claydon helped design the Transport a",
+    "after_text": "A tram network which ran hundreds of journeys from Birmingham has been opened in Birmingham.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A tram network which ran hundreds of journeys from"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-11",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "\"Hope made a poor decision that has resulted in a negative impact on US Soccer and her team-mates,\" head coach Jill Ellis said. Solo, 33, will now miss matches on 8 February against France and 13 February against England. This month, domestic violence charges against Solo were dropped. In 2012, Solo, tested positive for a banned substance a month before winning a second Olympic gold medal. She maintained she was not aware the pre-menstrual medication she had been prescribed contained a banned substance and she was cleared of any wrongdoing. The US are preparing for the Women's World Cup in Canada in June when they will aim to win their third title following victories in 1991 and 1999. The latest incident surrounding Solo concerns a training camp being held by the team in Carson, California. Solo's husband, former Seattle Seahawks NFL player Jerramy Stevens, was arrested on suspicion of driving under the influence in Los Angeles in the early hours of Monday morning. Media reports claimed Solo was in the car but she was not cited in the incident by Manhattan Beach police officials. Solo tweeted: \"I think it's best for me to take a break, decompress from the stress of the last several months and come back mentally and physically ready to positively contribute to the team.\"",
+    "after_text": "Olympic gold medallist Hope Solo has been suspended for two matches by the United States women's national team after she was arrested on suspicion of driving under the influence on Monday.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-41",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "They include a new water sports park, railway station and a sliproad from the M77. The City Deal scheme will see eight council areas around Glasgow receive about £1bn from the UK and Scottish governments. The councils also have the power to borrow extra cash. The Glasgow and Clyde Valley City Deal involved massive investment by both the Scottish and UK governments last year. Eight councils - Glasgow, East Renfrewshire, Renfrewshire, Inverclyde, North and South Lanarkshire and East and West Dunbartonshire - are involved. The City Deal scheme will see Westminster and Holyrood give £500m each in additional grant funding to the eight council areas. The councils will supplement this by borrowing £130m. Councillors from across all eight areas will meet to discuss some of the schemes. Several of the projects being discussed later are in East Renfrewshire, where £44m is expected to be invested over the next few years, with much of the money coming from the City Deal funding. One is a water sports park at the Dams to Darnley Country Park. It would open in 2017 and include a centre offering wakeboarding, the fastest-growing extreme sport in the world. A new railway station in Barrhead and sliproad from the M77 would serve an area which could become one of East Renfrewshire's fastest growth areas. The council expects 1,000 new homes to be built there. Another project would transform the Levern Works site in Barrhead. A site formerly occupied by Nestle, where pet food was once made, woul",
+    "after_text": "A £1bn City Deal will see a new water sports park, railway station and sliproad from the M77 built in East Renfrewshire.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-48",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The 29-year-old was arrested on suspicion of attempted murder and wounding with intent. Previously, a 30-year-old, 27-year-old and 20-year-old, all from Rugby, were arrested. All four men have been bailed until the end of April. It follows an incident on Oxford Street on 17 March in which a 17-year-old was shot and an 18-year-old knifed. More on this and other Warwickshire stories",
+    "after_text": "The Warwickshire Police have released the following statement:\n\n\"On Saturday, 17 March, at approximately 3.30pm, Warwickshire Police received a report of a man being assaulted in the area of Oxford Street, Warwickshire.\n\n\"Officers attended the scene and located",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The Warwickshire Police have released the followin"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-52",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The 35-year-old's Mercedes was stopped by police after it almost hit a lorry in north London on 20 December. Carlisle admitted failing to provide a sample to police and driving otherwise than in accordance with a licence. He was also ordered to carry out 150 hours' unpaid work at Highbury Corner Magistrates' Court. District judge Susan Williams also ordered him to pay Â£145 in costs and charges. She said that, although Carlisle had made a \"positive contribution\" to others through football, she had to sentence him for the risk his \"erratic\" driving had created. \"If you are not in control of your vehicle in a road in central London you represent a danger to people,\" she said. At a hearing in March, the court heard Carlisle's Mercedes had been spotted \"swerving\" and \"almost mounting the pavement\" in Pentonville Road. After his arrest, the court heard, he refused to give a breath sample and demanded to speak to his solicitor. Lisa Judge, defending, said he allowed the matter to \"escalate out of all control\" and \"unfortunately\" believed he had the right to see a lawyer, instead of being breathalysed. Carlisle has revealed he attempted to take his own life two days afterwards, when he was hit by a lorry on the A64 near York. Miss Judge described the arrest as having happened while he was \"in an extremely dark place in terms of his own life\". Carlisle is now so sorry about what happened that the court-ordered medical report on him \"utterly oozes remorse\", Miss Judge said. The court ",
+    "after_text": "Former footballer Paul Carlisle has been banned from driving for 18 months after he was caught drink-driving.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Former footballer Paul Carlisle has been banned fr"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-6",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "The 34-year-old - nicknamed 'The Beast' and recognised for his immense physical strength on the Fifa series of video games - joined Wycombe on Sunday. But during the first game of their pre-season trip to France, he saw red for a scuffle after an opponent shoved Wycombe's Luke O'Nien to the ground. Striker Akinfenwa later said on Twitter: \"The sending off was dubious.\" However, he continued: \"I should have known better but guess every day is a learning day.\" The Le Havre player also saw red for the incident, but both sides continued to play 11 v 11 on the request of both managers.",
+    "after_text": "Wycombe Wanderers' new signing Adebayo Akinfenwa has apologised after being sent off during their pre-season friendly against Le Havre.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-12",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Craig Hughes, 33, of Flint, was arrested by North Wales Police in August after he chatted online with the Hope Line Crisis Centre in Tennessee. Fears were raised over a planned murder bid involving police being ambushed after reports of a non-existent crime. Hughes admitted two charges at Mold Crown Court on Friday. He will be sentenced next week. Hughes said he was planning to make a false report to the police so that officers would come to the scene, prosecutors said while outlining the case earlier in the proceedings. He said he would then shoot them on the Dee Estuary. The threats were made on two occasions, late at night, while Hughes was drunk. Judge Niclas Parry, who was told the defendant had a previous conviction for possessing a firearm in 2009, remanded him in custody pending sentence. During a previous hearing, Hughes's legal team said he had not intended to kill himself and would not have carried out any threat to kill police officers. The court heard at the time, North Wales Police was particularly concerned because the defendant was on bail, awaiting trial for firearms offences, of which he was subsequently cleared. The Hope Line centre offers confidential support and counselling to people experiencing difficulty.",
+    "after_text": "A Flintshire man has admitted making threats to kill himself and police officers by shooting them on the Dee Estuary, a court has heard.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-26",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Evidence of suspected match-fixing in elite tennis was revealed this week by a BBC and BuzzFeed News investigation. \"Future players will see the headlines and see it's not an option at all,\" doubles representative Fleming told BBC Scotland on Wednesday. \"I think if anyone is found to be doing it, that should be them. They shouldn't be playing again.\" Fleming, 31, and his partner Jonathan Erlich, were beaten 6-4, 3-6, 6-3 in the first round of the Australian Open on Wednesday by Robin Haase and Fernando Verdasco. \"The key thing about sport is that it's pure, you don't know the outcome of any given match, and that's what people pay to come and watch,\" he added. \"You never know what's going to happen. That's key  and they have to preserve that. \"I've never been approached to take money or anything to fix a match or lose a match. It does go on because people have been banned at lower levels. I'm surprised to see the article come out and talk about higher levels; I certainly haven't been aware of anything going on there.\" The Scot said he had no idea as to the identity of the suspected match-fixers, and suggested additional funding could be granted to the Tennis Integrity Unit (TIU), set-up to police the sport. \"Your guess is as good as mine,\" he said of those involved. \"There were no names in the article because it's very difficult to prove anything. I think that's the issue the TIU has in that a match can be reported or look suspicious, but it doesn't necessarily mean players ar",
+    "after_text": "Former British number one Ian Fleming says anyone found guilty of match-fixing should be banned from tennis.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Former British number one Ian Fleming says anyone "
+        }
+      }
+    ]
+  },
+  {
+    "id": "Seahorse-58",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Reading charity BookTrust said the initiative was part of a drive to increase the diversity of voices in children's literature. \n\nThe collection, called Happy Here, is aimed at children aged seven and older and will be published on 5 August. \n\nIt will feature writers including Yomi Sode, Clare Weze, Dean Atta, Patrice Lawrence and Sharna Jackson.\n\nThe project is a collaboration between BookTrust, publisher Knights Of and charity Centre for Literacy in Primary Education (CLPE).\n\nJill Coleman, director of children's books at BookTrust, said: \"Happy Here is going to thrill and inspire children in families and schools across the country and we want to make sure it is read by thousands of children.\n\n\"We are proud to be working with Knights Of and CLPE as part of our effort to drive a long-term, sustainable increase in the diversity of voices published in children's literature.\"\n\nAimee Felone, co-founder of Knights Of, said: \"Being able to commission work that has no motive other than to amplify, uplift and celebrate what it means to exist in the UK today as black British is liberating for our team.\n\n\"Each and every author and illustrator has focused not on the trauma or hardship of their existence, which is too often highlighted in children's fiction, but the experience and possibility of happiness for their characters.\"\n\n",
+    "after_text": "A free collection of black authors is to be given to all primary schools in England.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-78",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "[ clarification needed ] Applications [ edit ] Applications of combinatorial optimization include, but are not limited to: Logistics [3] Supply chain optimization [5] Methods [ edit ] There is a large amount of literature on polynomial-time algorithms for certain special classes of discrete optimization. A considerable amount of it is unified by the theory of linear programming .",
+    "after_text": "Combinatorial optimisation has applications in logistics.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-93",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "[83] [84] [85] Hawking radiation [ edit ] Main article: Hawking radiation Hawking radiation is black-body radiation that is predicted to be released by black holes , due to quantum effects near the event horizon. This radiation reduces the mass and energy of black holes, causing them to shrink and ultimately vanish. If black holes evaporate via Hawking radiation , a non-rotating and uncharged stupendously large black hole with a mass of 1 × 10 11 M ☉ will evaporate in around 2.1 × 10 100 years . [86] [16] Black holes formed during the predicted collapse of superclusters of galaxies in the far future with 1 × 10 14 M ☉ would evaporate over a timescale of up to 2.1 × 10 109 years .",
+    "after_text": "The energy of two black holes merging is released in the form of gravitational waves.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The energy of two black holes merging is released "
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-38",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Transactions carried out in European markets were previously recorded in Luxembourg, with which Amazon had a low-tax agreement. Now sales made through subsidiaries in the UK, Germany, Spain and Italy will be registered in those countries, the retailer has said. Amazon had received heavy criticism for its tax avoidance policies. \"More than two years ago, we began the process of establishing local country branches of Amazon EU Sarl, our primary retail operating company in Europe,\" the company said in a statement. \"As of 1 May, Amazon EU Sarl is recording retail sales made to customers through these branches in the UK, Germany, Spain and Italy. \"Previously, these retail sales were recorded in Luxembourg.\" Amazon added that it was \"working on opening a branch for France\". In recent years, the European Union has intensified its investigations into the tax deals negotiated by global companies with countries such as Ireland, Luxembourg and the Netherlands. It suspects that such deals amount to illegal state aid and distort competition. Last year, the European Commission - the EU's executive arm - launched a formal investigation into Amazon's tax arrangements with Luxembourg. And the EU is also looking into tech giant Apple's tax dealings in Ireland, coffee-shop chain Starbucks' dealings in the Netherlands, and Italian carmaker Fiat's agreement with Luxembourg.",
+    "after_text": "Amazon has said it is recording sales made through subsidiaries in the UK, Germany, Spain and Italy in those countries.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-36",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "The man, who was from Staffordshire, collapsed while riding on the A5 near Chirk, Wrexham, at about 10:45 BST on Sunday. He had been raising money for the Douglas Macmillan Hospice. North Wales Police said officers attended, along with a road and air ambulance, and tried to help members of the public to save the cyclist. \"I am very sad to say that their efforts were not successful,\" temporary Supt Nick Evans said. Douglas Macmillan Hospice - known as Dougie Mac - is a specialist palliative care provider in north Staffordshire for adults, the majority of whom are affected by cancer. A number of charity bike rides for the hospice were being held on Sunday taking in routes from Stoke-on-Trent to Llangollen and back.",
+    "after_text": "A cyclist, who was raising money for a hospice, died after collapsing while riding on a road in North Wales.\n\nHow would you rate the writing and overall quality?\n\nExcellent (4/5)\n\nHow relevant is the article?\n\nVery Relevant (5/5)",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-64",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Two former Welsh secretaries, Lord Peter Hain and Paul Murphy, want to change the law to ensure all candidates are on the Wales electoral register.\nLord Hain said being represented by people who live outside the country was \"insulting to the people of Wales\".\nUKIP's assembly group leader AM Neil Hamilton - who lives in Wiltshire - was asked to comment.\nMr Hamilton was elected on the regional list as AM for Mid and West Wales last May.\nAt the time Mr Hamilton became group leader he said he lived \"less than an hour from Cardiff\".\n\"For the time being I'm living where I lived for the last 10 years,\" he said, adding there was a \"big logistical problem to solve\" about where he based himself.\nUnder current rules there is nothing to stop people living outside of Wales standing as a candidate for the assembly.\nThe proposed amendment says a person may not stand as a candidate unless they are recorded on the Welsh electoral register as \"living in Wales\".\nLord Hain said the current rules were an \"anomaly\" in the Government of Wales Act 2006 - which he said he was responsible for as Welsh secretary at the time.\nLord Hain, who moved from London when he was elected as an MP for Neath, did not criticise Mr Hamilton directly, saying he would not \"personalise\" the issue.\nThe Assembly's independent Remuneration Board is considering a change in the rules to allow AMs to claim more than £8,000 for Cardiff accommodation expenses if they live in England.\nThe board - which sets pay and expenses - wi",
+    "after_text": "Neil Hamilton lives in Wiltshire, not Wales. People want to change the rules in Wales so it is illegal to stand for office (like the assembly) if you do not live there. There have been lots of angry responses. (The law is for the WHOLE of the UK and not specific to Wales, hence the confusion.)",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Neil Hamilton lives in Wiltshire, not Wales. Peopl"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-34",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Thames Valley Police caught 12 drivers on the A34 and M40 in Oxfordshire using phones on a single day during the operation. It comes after a lorry driver was sentenced to four years for killing a family-of-four by getting distracted when using his phone on the A34. Police said that one driver was filmed for 30 seconds driving with no hands on the steering wheel. Chief inspector Henry Parsons said: \"Sometimes HGV drivers think as they are high up we cannot see them using a device, but with this tactic we definitely can.\" On 31 October Tomasz Kroker was sentenced to four years after he pleaded guilty to using his phone while in charge of a lorry. After getting distracted he ploughed into a number of cars killing Tracey Houghton, her two sons and her stepdaughter.",
+    "after_text": "Lorry drivers have been filmed using their mobile phones while driving on motorways.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-13",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Josh Earnest said the closure of the Cuban detention camp was a national security interest. It was one of the first directives President Barack Obama ordered two months after he was elected in 2008. Inmates have slowly been transferred out and at the start of the year, 122 men were left. The peak population in 2003 was 684. Mr Earnest said the administration was \"in the final stages of drafting a plan to safely and responsibly (close) the prison at Guantanamo Bay and to present that to Congress\". He added: \"That has been something that our national security officials have been working on for quite some time, primarily because it is a priority of the president.\" In 2009, President Obama admitted the January 2010 deadline he had set for closing the counter-terrorism facility would be missed. Since then, Congress bipartisan opposition has meant the transfer of prisoners to the US has been blocked. Some have been considered too dangerous to be released, but the US holds no evidence that can be used in civilian or military trials against them. The US has slowly been sending prisoners back to their home countries or to third countries, a process Mr Earnest said needs to continue if the facility is to shut. The camp was established in 2002 by the Bush administration to detain the most dangerous suspects for interrogation and the prosecution of war crimes. Controversy has centred around the period of time detainees have been held without charge and the use of interrogation techniques",
+    "after_text": "The White House has said it is in the final stages of drafting a plan to close the Guantanamo Bay prison.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-75",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "This information is encoded in the genes, which are passed down from parents to offspring. In contrast, epigenetic inheritance involves the transmission of epigenetic information, which is not encoded in the DNA sequence itself but rather in chemical modifications to the DNA molecule or associated proteins. Step 3/6 2. Genetic inheritance is based on the principle that the DNA sequence remains constant across generations, with occasional mutations that can lead to variation. Epigenetic inheritance, on the other hand, involves changes in gene expression or activity that can be passed down through generations without altering the underlying DNA sequence.",
+    "after_text": "Epigenetic inheritance is not encoded in the DNA sequence itself.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-42",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The Coronation Fountain, a landmark in Welwyn Garden City, had to be turned off due to the hosepipe ban. However, the council is now paying Â£450 to fill it up again, so that the town looks its best for key 2012 events. It will be working on the 4 and 5 June and when the Olympic torch relay passes through the borough on 8 July. The fountain on Parkway in the town was built to celebrate the Queen's accession to the throne in 1952. It is supplied by an underground tank, but had to be switched off after the water level dropped and could not be refilled. The council is buying water from a landscaping firm which already supplies water from a natural lake source, to maintain the borough's open spaces. It cannot be drunk so is permitted under the hosepipe ban regulations. Council chief executive, Michel Saminaden, said: \"They have told us that there is an abundance of water in this lake so we are probably doing them a favour by taking it.\" Mr Saminaden added that the council decided against asking the Veolia water company for a special dispensation. \"I thought that wasn't the right thing to do because we would be using precious water,\" he said. \"What we are doing now is using water that is surplus and we have been told categorically that there is no problem in using it. This is a better all round sustainable solution. \"I am extremely pleased that we have been able to find a solution which will enable everybody to see the fountain in all its glory on the occasion of these two great c",
+    "after_text": "The Coronation Fountain in Welwyn Garden City will be filling up again this year due to the hosepipe ban.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The Coronation Fountain in Welwyn Garden City will"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-17",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "La Gommeuse achieved the top price of $67.5m (£45m) at Sotheby's, as part of their Impressionist & Modern Art sale on Thursday.\nAnd Van Gogh's atmospheric landscape, Paysage sous un ciel mouvemente, sold for $54m (£36m), helping to take the evening's total to $306.7m (£203m).\nSimon Shaw, co-head of Impressionist and modern art worldwide, called it \"a small sale that packed a real punch\".\nHe added: \"Each season Picasso has the remarkable ability to surprise, and tonight was no exception, with the unusual appearance of two Blue Period works, which set new benchmarks - both in oil and on paper.\"\nLa Gommeuse, described as most the important blue period Picasso to come to the market in a generation, was painted in 1901.\nThe portrait is of a nude unnamed woman. Gommeuse, which translates into English as 'gummy' was a sexually charged slang word of the time for cafe-concert singers and their songs.\nIt features a second portrait on the reverse of the canvas, which was hidden for a century until its discovery in 2000 during conservation work.\nThe caricature of Picasso's friend Pere Manach was apparently intended as a gift for the Catalan anarchist who shared the artist's studio flat in the Boulevard de Clichy in Paris.\nThe painting was one of 47 works on offer, with just over three-quarters finding buyers.\nAt least two of the top 10 lots were bought by Asian private collectors, continuing a trend of recent seasons.\nThe $306.7m (£202m) total comfortably beat the $275m (£182m) low pre-s",
+    "after_text": "A portrait by pablo picasso has become the most expensive painting to sell at auction in new york.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-79",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "[75] With Gahan out of rehab in 1996, Depeche Mode held recording sessions with producer Tim Simenon . Preceded by two singles, \" Barrel of a Gun \" and \" It's No Good \", the album Ultra was released in April 1997. The album debuted at No. 1 in the UK as well as Germany, and No. 5 in the US. The band did not tour in support of the album, with Fletcher quoted as saying: \"We're not fit enough. Dave's only eight months into his sobriety, and our bodies are telling us to spend time with our families.\"",
+    "after_text": "Ultra is an album from Depeche Mode",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_cnndm-32",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Many people have experienced the loss of a childhood pet, but for one little boy, a funeral for his goldfish was almost too much to bear. The pet in question? A goldfish, named Top. Brooke Geherman, from Alberta, Canada, posted a video of her young son, Kowen, sending off his beloved pet the right way: by flushing it down the toilet. Young Kowen is devastated by the loss of his pet goldfish, Top, and holds a toilet funeral . The home video is filmed by mother, Brooke Geherman, and sees Kowen stood in the family bathroom, cradling his deceased goldfish. She asks her son: 'Who's Top?' Kowen responds by pointing and responds solemnly: 'This one.' The young boy cradles the fish before kissing it repeatedly in a heartbreaking move . In a heartbreaking move, the young boy then proceeds to kiss the lifeless goldfish repeatedly. Canadian mum Brooke then asks: 'Where are you going to put him?' He gestures at the toilet and answers: 'In the toilet'. At which point, the boy drops the goldfish down the toilet and flushes it. As Top begins to circle the bowl, he looks at his mum in a mixture of surprise and shock . As the goldfish disappears, Kowen realises he will never see Top again and tears start brimming in his eyes . As the goldfish circles the bowl and disappears from sight, Kowen seems to come to the realisation that he will never see his goldfish again. He looks at his mum with tears brimming in his eyes, before bursting into tears. As he becomes more distressed, his mother comfo",
+    "after_text": "Boy loses best friend: Kowen cradles his deceased goldfish, Top, before kissing it repeatedly in a heartbreaking move . The young boy then proceeds to kiss the lifeless goldfish repeatedly . Canadian mum Brooke then asks: 'Where are you going to put him?' He gestures at the toilet and answers: 'In the toilet'. At which point, the boy drops the goldfish down the toilet and flushes it . As Top begins to circle the bowl, he looks at his mum in a mixture of surprise and shock . As the goldfish disappears, Kowen realises he will never see Top again",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-50",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "23 March 2017 Last updated at 14:55 GMT",
+    "after_text": "Edinburgh's Christmas festival attracted almost 890,000 people, contributing £199.5m to the local economy.\n\nEdinburgh's winter festivals generated more than £241m for the city, according to organisers.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Edinburgh's Christmas festival attracted almost 89"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-81",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Luzma Nava Member of the Water Ethics Working Group Luzma Fabiola Nava is a Guest Research Scholar at the International Institute for Applied Systems Analysis (IIASA). Recently she has gained post-doctoral research experience from IIASA. At IIASA she has conducted research on transboundary water resources between the United States (U.S.) and Mexico, and has given particular attention to the Rio Grande/Bravo (RGB) basin. Her primary research and professional interests include the use of political science and geography to analyse water resources management, water governance, sustainable development practices, stakeholders’ interests and perceptions. Luzma Fabiola Nava works collaboratively with other disciplines to promote stakeholders’ engagement and a better understanding of water resources challenges and issues across borders and within territories.",
+    "after_text": "Dr. Marloes Arts has conducted research on water governance.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Dr. Marloes Arts has conducted research on water g"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_cnndm-2",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Jordan Henderson has provided Liverpool with a lift after their FA Cup heartache by agreeing a new long-term contract. The club's vice-captain had 14 months remaining on his current contract and his advisors had been in talks with Liverpool since the beginning of this season. They have now reached a resolution and Henderson is expected to put pen-to-paper on improved terms that are likely be worth in the region of £100,000. His new deal will run to 2020. Liverpool midfielder Jordan Henderson is set to sign a new long-term contract at Anfield . Henderson chases down Aston Villa's Jack Grealish during Liverpool's FA Cup semi-final defeat at Wembley . Henderson's new deal is worth around £100,000-a-week and will run until the summer of 2020 . Henderson, 24, is the third big player in Brendan Rodgers' squad to agree a contract extension, following on from Daniel Sturridge and Philippe Coutinho. The England international, who was signed by Kenny Dalglish in June 2011 for £16million from Sunderland, has been one of the most improved players under Rodgers' watch. His form this season has been excellent and he has contributed 13 assists as well as seven goals from midfield; he will be considered for the role of club captain when Steven Gerrard moves to LA Galaxy. Talks with Raheem Sterling are not expected to resume until the end of the season but Ian Ayre, Liverpool's Chief Executive, last week said he expected the England forward to be at Anfield for 'a long time'. Henderson could ",
+    "after_text": "jordan henderson is set to sign a new long-term contract at liverpool . the midfielder had 14 months remaining on his current deal at anfield . henderson's new deal is worth around £100,000-a-week and will run until 2020 . click here for all the latest liverpool news .",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-55",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Children having asthma attacks often struggle so hard to breathe that you'll be able to see it. If have any feeling that the child is struggling to breathe or that \"something is wrong,\" trust your instincts. Give the child her inhaler or other prescribed immediate relief medication and seek medical attention if possible. When children have asthma attacks, their bodies have to work hard just to breathe. As a result, the skin may appear sweaty or damp. But instead of looking flushed and pink as it would from exercise, it will appear pale or white during an asthma attack. Blood turns red only when exposed to oxygen, so if a child isn't getting enough oxygen, you won't see the pink flush of normal blood flow. If you notice a blue tinge to the skin, or if the lips and fingernails become blue, the child's attack is very serious. She is severely oxygen-deprived and needs immediate medical help.",
+    "after_text": "Assess the child's overall appearance. Check for pale and clammy skin. Check for blue-tinged skin.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-87",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "He has written multiple books on the environment. JØrgensen was appointed Denmark’s minister for food, agriculture and ï¬sheries in December 2013. Map: MGMT. Design / Source: Ministry of Food, Agriculture and Fisheries of Denmark Share 3K Tweet Pin 4 Share Email 3K Shares Share 3K Tweet Pin 4 Share Email 3K Shares Sign up for your Modern Farmer Weekly Newsletter Email * Δ Subscribe Notify of new follow-up comments new replies to my comments Label {} [+] Name*",
+    "after_text": "The change to the name of the position of Minister for Food, Agriculture and Fisheries of Denmark was made to better reflect the broader responsibilities of the ministry.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The change to the name of the position of Minister"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_cnndm-3",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Twice French Open champion Serena Williams said her struggle to beat Sara Errani in the Fed Cup on Sunday had been a real 'eye-opener' as the claycourt season gets into full swing. World No 1 Williams eventually prevailed 4-6 7-6(3) 6-3 against the dogged Italian to take her career record over her to 8-0 but the American was not impressed. The US  were beaten 3-2 as Williams and Alison Riske were thrashed 6-0 6-3 in the doubles rubber by Errani and Flavia Pennetta, meaning they were relegated to World Group II. American tennis star Serena Williams fought back to beat Italian Sara Errani in the Fed Cup play-off on Sunday . Tough weather conditions made it difficult for both players who had to keep on re-tossing their serves . Errani gave Williams a real scare but in the end the world No 1's power proved to be too much . 'Today has been a big eye opener,' Williams said afterwards. 'I'm totally not as ready for the claycourt season as I thought I was. Now I'm in the mindset of, \"You know what, I'm not on hard court.\" I'm playing like I'm on hard court and I'm not. 'So I have to play and be ready to hit a thousand shots if necessary.' Williams, 33, won her 19th singles grand slam at the Australian Open and her dominance has raised talk of her claiming all the majors this year. The French Open has been her least successful of the four though despite claiming the title in Paris in 2002 and 2013. Her doubles defeat on Sunday blotted an otherwise flawless Fed Cup record and left the ",
+    "after_text": "serena williams beat sara errani 4-6 7-6(3) 6-3 in fed cup play-off . us beat italy 3-2 but williams and alison riske lost doubles rubber . world no 1 admits she is not ready for claycourt season yet .",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "serena williams beat sara errani 4-6 7-6(3) 6-3 in"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-40",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "NHS Highland asked people to avoid the site last week, after 50 people fell ill with the sickness bug. Consultant microbiologist Dr Chin Lim said three wards remained closed to new admissions and visitors but the rest of the hospital was open. Tests have confirmed the presence of the bug in wards 7C, 2C and 2A. In a statement, Dr Lim thanked people for their \"patience and understanding\". He added: \"While I am pleased that we have been able to reopen to visiting we know norovirus is still in the community so would ask that visitors are limited to two per patient and that if you, or anyone you live with, has had symptoms of diarrhoea and vomiting you refrain from coming into the hospital until you are clear for 72 hours.\"",
+    "after_text": "The norovirus bug has been confirmed at Inverness's Raigmore Hospital.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-45",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The water pipes in the town are old and prone to leaks and bursts, Severn Trent Water said. Part of Milford Road is expected to be closed until the summer as a metal water pipe is replaced. Diversions will be in place. The road is \"just too narrow\" in parts to be kept open as large machinery will be used, a spokesman said. More than 12 miles (20km) of new water pipes are being laid from the Shugborough area into Stafford town centre. In the first phase, which began in September, pipes were installed on Tixall Road for a new housing development nearby.",
+    "after_text": "A main road in Stafford is being closed for three months so that a new water pipe can be laid.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A main road in Stafford is being closed for three "
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_cnndm-4",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The Miami Open is threatening to turn into national cake week, after Serena Williams became the latest recipient of a giant celebration present after she clocked her 700th career victory. The day following Andy Murray’s 500th win another huge cake was wheeled out to mark Williams reaching the semi-final with a 7-6, 1-6, 6-3 progression over Germany’s Sabine Lisicki. Williams’s hopes of another meeting with sister Venus were dashed by her elder sibling’s defeat to Spain’s Carla Suarez Navarro, but the world No 1 was intent on staying alive in what is the nearest thing she has to a hometown event. Serena Williams strikes a pose next to her cake after recording her 700th career victory. Williams beat Sabine Lisicki in three sets on Wednesday to progress to the semi-finals of the Miami Open. Willaims celebrates as the world No 1 sealed a match against either Sloane Stephens or Simona Halep. Andy Murray pretends to take a bite out a celebratory cake presented to him after winning his 500th match. In a battle of two huge servers, Williams seemed to give away the second set but eventually gained a measure of revenge for the shock defeat she suffered at Wimbledon 2013 against the same opponent, who has never quite been the same since. . Williams will face Romania's Simona Halep for a place in the final after the third-seed beat Sloane Stephens 6-1, 7-5. . Williams plays a backhand during her quarter-final at Crandon Park in Florida on Wednesday. Lisicki and Williams shake hands at th",
+    "after_text": "Serena Williams beat Sabine Lisicki in three sets to reach the Miami Open semi - finals. The world No 1 will face either Simona Halep or Sloane Stephens in the final. Williams became the latest player to receive a cake after winning her 700th career match.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Serena Williams beat Sabine Lisicki in three sets "
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_cnndm-0",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Second-half goals by Mohamed Yattara and Alexandre Lacazette helped Olympique Lyonnais go top of Ligue 1 with a 2-0 home win against Bastia on Wednesday. Substitute Yattara opened the scoring in the 77th minute and Ligue 1 top scorer Lacazette took his tally to 25 eight minutes later to move Lyon up to 64 points from 32 games. French champions Paris Saint-Germain, who have one game in hand, are second two points off the pace. . Alexandre Lacazette and Mohamed Yattara were both on the score sheet as Lyon beat Bastia. Guinean striker Yattara opens the scoring against Bastia on Wednesday at the Stade de Gerland. Lyon dominated throughout but were made to wait by Bastia, who were reeling from their 4-0 defeat in the League Cup final against PSG last Saturday. Lyon's Jordan Ferri dribbled past a defender before his curling shot was superbly saved by Alphonse Areola in the sixth minute. Areola was at it again when he blocked Steed Malbranque's back heel on the half hour and tipped away Clinton Njie's low shot three minutes before the break as Lyon continued to dominate. Lacazette seals victory and top spot in the French Ligue 1 for Lyon in the second half. Frenchman Lacazette is the top scorer in Ligue 1 this season with 25 goals to his name. Malbranque was substituted in the 62nd minute and replaced with France international Clement Grenier, who was making his comeback after an eight-month injury layoff. Nabil Fekir was not having his usual influence in the Lyon midfield and was r",
+    "after_text": "Olympique Lyonnais beat Bastia 2 - 0 at the Stade de Gerland on Wednesday. Mohamed Yattara and Alexandre Lacazette scored in the second half. Lyon are now top of Ligue 1 with 64 points from 32 games. French champions Paris Saint - Germain are second with one game in hand.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-59",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Under a five-year plan released on Wednesday, the cost of stamps will also rise and as many as 8,000 jobs will be eliminated.\nBut the agency says it will also open more retail locations across Canada.\nThe service faces a projected 1bn Canadian dollar ($943m; £576m) loss by 2020 without \"fundamental changes\".\nCanada Post lost C$73m in the third quarter of the current fiscal year, CBC News reported.\n\"Canadians expect Canada Post to continue to remain financially self-sufficient and not look to their hard-earned tax dollars for funding,\" the postal service said.\nAt the same time, \"the rise in digital communications has dramatically changed the postal needs of Canadians\".\nDirect to the home delivery will be replaced by community post boxes installed throughout residential areas, Canada Post said in its plan.\nThe agency said two-thirds of Canadians, mostly in newer suburban neighbourhoods and rural areas, already receive their mail through this method.\nThe cost of postage stamps purchased in bulk will rise to $0.85 per stamp, up from $0.63 today, among other price rises.\nIn all, the plan will return the agency to financial sustainability by 2019, Canada Post said in a report, citing annual savings of up to C$900m.\nBetween 6,000 and 8,000 jobs will be eliminated as part of the plan - 12% of Canada Post's employees, although it says its workforce is ageing and it expects almost 15,000 workers will retire or leave the company in the next five years.\nCanada Post delivers close to 10 b",
+    "after_text": "Canada Post has announced it will phase out door-to-door mail delivery over the next five years.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-61",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Turn the pad base so that the longer axis is vertical, and the side with the slit is facing up. Place the pad liner on top, with the slit facing down. Make sure that it is centered and oriented vertically. Pin everything together when you are done. Sew around the pad liner, using a ⅛ to ¼-inch (0.32 to 0.64-centimeter) seam allowance. Backstitch at the start and end of your sewing, then snip the thread as close to the material as you can. Remove the pins as you sew. You can use a matching or contrasting thread color for this. Make sure that you are sewing ½ inch (1.27 centimeters) away from the topstitch and not the edge of the liner. Use the same thread color as you did before. This will help secure the liner further to the base and prevent buckling. You can use sew-on snaps or the kind that you have to set with a tool. You can also use Velcro instead. Avoid using self-adhesive Velcro, however. While it is convenient to apply, it does not last very long, and it will eventually come off. The wings will close on the outside of your underwear, so plan accordingly. Place the pad base flannel-side-down onto the seat of your underwear; make sure that the liner pad is facing up. Fold the wings under the seat of your underwear, then close the snaps. Depending on your flow, the liner should last 2 to 4 hours. Store the pad in a dry bag until you get home. Rinse it promptly with cold water, then wash it with hot water and detergent. Finish off with a final cold rinse, then dry them in",
+    "after_text": "Prepare the pad base. Prepare the pad liner. Sew the pad liner to the pad base. Sew the wings to the pad base. Attach the snaps. Attach the pad to your underwear. Remove the pad. Rinse the pad. Wash the pad. Dry the pad.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-14",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Following an eighth-placed finish in 2015, Swansea endured a run of just two wins in 17 Premier League games before Francesco Guidolin was named as their new head coach on 18 January. Salomon Rondon's last-gasp equaliser on Tuesday denied them a win at West Brom. \"We might have [not have] won, but I definitely think we are seeing the old Swansea again,\" Sigurdsson said. \"We are playing much better than we were. Things weren't good [earlier this season]. \"We weren't playing well and keeping the ball like we used to - that's hopefully changing now.\" Swansea were in unfamiliar territory after the departure of former boss Garry Monk on 9 December and the playing squad faced criticism. But after Tuesday's 1-1 draw, Baggies' Welsh boss Tony Pulis believes the Swans have enough quality to avoid relegation from the Premier League this season. \"When in possession, they pass the ball so well and could have scored two or three goals,\" Pulis said. \"I think Swansea have too much quality to not stay up.\" Sigurdsson, the Swans' goal-scorer at the Hawthorns, is currently on his best run of goal-scoring form since his initial loan spell at the Liberty Stadium in 2012, scoring in four of his five appearances so far in 2016. And the Iceland international felt the Swans had done enough to earn a third straight win on Tuesday. \"It feels a bit like a defeat, to lead coming into the last few minutes,\" Sigurdsson added. \"We played really well, until the last few minutes. But if you'd have offered us",
+    "after_text": "Midfielder Gylfi Sigurdsson believes Swansea City are returning to the \"old Swansea City\" after a poor start to the season.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-35",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Internet service providers had until Tuesday to implement the ban. The sites now redirect to a message explaining they have been blocked \"by decision of public authorities\". In 2015, the authorities banned 11 popular pornography websites, saying many failed to protect children \"from information harmful to their health\". Analysis by Vitaliy Shevchenko, BBC Monitoring The decision was made following two separate court rulings, which said the websites \"spread pornography\". Sexually explicit content is not outlawed in Russia, but the law bans \"the illegal production, dissemination and advertisement of pornographic materials and objects\". It is not uncommon for Russia to ban websites. The government agency Roskomnadzor maintains a blacklist that now includes thousands of them. Access is usually blocked for violating the notoriously vague extremism legislation or child protection laws. Websites critical of the Kremlin have been blocked too, and at one point Wikipedia was blacklisted. Following the 2015 ban, one woman asked Roskomnadzor on Twitter whether it could recommend an alternative. The agency replied: \"You can meet someone in real life.\" On Tuesday, it said its earlier tweet was \"still relevant\". However, open rights campaigners have warned that local bans can be defeated. \"Blocking porn is the fastest way to ensure widespread adoption of censorship circumvention in your country,\" said Eva Galperin, global policy analyst at the Electronic Frontier Foundation. One of the affe",
+    "after_text": "Russia has banned access to several popular pornography websites, saying they spread \"information harmful to children\".",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-37",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "City are fourth in the league following defeat at Chelsea on Wednesday, all but ending hopes of a league title in the Catalan's debut campaign in England. \"In future I will be better - definitely,\" said the former Barcelona and Bayern Munich coach. \"This season has been a massive lesson for me.\" He added: \"We have a lot of beautiful things to fight for and to qualify for the Champions League will be a huge success. But we have to be honest with ourselves. We were not good enough to compete for the Premier League [title].\" Defeat at Stamford Bridge left City just four points ahead of Arsenal and Manchester United, both of whom have a game in hand. With the FA Cup being City's only realistic chance of winning a trophy this term, it is likely to be the worst season of Guardiola's managerial career. The 46-year-old has never gone a single season without winning a trophy - he has won the title in six out of seven attempts and his sides have always reached the last four of the Champions League. Guardiola has also responded to questions about a row between City and Chelsea coaching staff at Stamford Bridge following the defeat on Wednesday night. There have been conflicting claims about the precise nature of the row, but stewards were needed to calm the situation down after Chelsea's 2-1 win. The incident centred around a disagreement between Chelsea fitness coach Paolo Bertelli and Manchester City masseur Mark Sertori, both of whom speak Italian, as the Premier League leaders celeb",
+    "after_text": "Manchester City manager Pep Guardiola says his side were not good enough in the Premier League this season.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_cnndm-1",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Manchester City are keen to sign Anderlecht teenager Evangelos Patoulidis. The 14-year-old playmaker is regarded as one of the best talents to emerge from Anderlecht's youth set-up and has also attracted attention from Arsenal and Barcelona. The Belgian starlet rejected a move to Barcelona's La Masia academy when he was 12 as his family wanted him to continue his studies. He has continued to impress and City have held discussions with Anderlecht chairman Roger Vanden Stock in the hope of agreeing a compensation package. Manuel Pellegrini is looked to build for the future by snapping up hot property Evangelos Patoulidis .",
+    "after_text": "evangelos patoulidis is regarded as one of the best talents to emerge from anderlecht's youth set-up . the belgian starlet rejected a move to barcelona's la masia academy when he was 12 as his family wanted him to continue his studies .",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-43",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "David Jacques, from the University of Buckingham, made the discovery at Blick Mead in October, and said the carbon dating results had just been confirmed. But he also raised concerns about possible damage to the site over plans to build a road tunnel past Stonehenge. The Department of Transport said it would \"consult before any building\". The Blick Mead site is about 1.5 miles (2.4km) from Stonehenge and archaeologists said \"scientifically tested charcoal\" dug up from the site had \"revealed that it dated from around 4000 BC\". David Jacques said the dig had also found \"evidence of feasting\" including burnt flints, tools and remains of giant cattle, known as aurochs, which were eaten by early hunter gatherers. Mr Jacques said: \"British pre-history may have to be rewritten. This is the latest dated Mesolithic encampment ever found in the UK. \"Blick Mead site connects the early hunter gatherer groups returning to Britain after the Ice Age to the Stonehenge area, all the way through to the Neolithic in the late 5th Millennium BC. \"But our only chance to find out about the earliest chapter of Britain's history could be wrecked if the tunnel goes ahead.\" Andy Rhind-Tutt, a former mayor and current chairman of Amesbury Museum, which part-funded the dig, said the discovery could \"provide what archaeologists have been searching for centuries - the answer to the story of the pre-history of Stonehenge.\" Earlier this month, the government announced funding for a 1.8-mile (2.9km) tunnel to",
+    "after_text": "Archaeologists working on a site near Stonehenge say they have found an untouched 6,000-year-old encampment which \"could rewrite British history\".",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Archaeologists working on a site near Stonehenge s"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-88",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Similarly, how does one gauge proportionality when attempting to attack enemy snipers firing from civilian-occupied tenement buildings? For robots, this could prove an insurmountable challenge. Advocates and critics of autonomous weaponry disagree over whether such systems can be equipped with algorithms sufficiently adept to distinguish between targets to satisfy the laws of war. 12 Another danger arises from the speed with which automated systems operate, along with plans for deploying autonomous weapons systems in coordinated groups, or swarms. The Pentagon envisions a time when large numbers of drone ships and aircraft are released to search for enemy missile-launching submarines and other critical assets, including mobile ballistic missile launchers.",
+    "after_text": "Autonomous buildings can continue to operate during a military attack and and provide a safe and sustainable haven for the people inside.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Autonomous buildings can continue to operate durin"
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-28",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The police said four men carried out the assault at Altcar Park in the Galliagh area just before 04:00 GMT on Thursday. It is believed that one of the gang had a handgun. They escaped in a small silver car. The victim did not need hospital treatment. Police have appealed for information.",
+    "after_text": "A 19-year-old man has been shot in the leg in a paramilitary-style attack in west Belfast.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A 19-year-old man has been shot in the leg in a pa"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_cnndm-31",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Edinson Cavani's agent has talked up a potential switch to Manchester United this summer after admitting a move to England is a possibility. United are monitoring the Uruguayan striker's situation at Paris Saint-Germain, and Cavani was furious about being taken off against Marseille at the weekend. And the 28-year-old's agent Claudio Anelucci says that a stint in the Premier League is most likely in the current climate, while a move to Spain would also suit his client.Ed . Edinson Cavani, pictured celebrating a goal against Chelsea, is a target for Manchester United this summer . Cavani protests with the referee during PSG's Ligue 1 fixture against Marseille at the weekend . He told Gazzetta dello Sport: 'Is Cavani on the market? At this point it's a little early to say. 'Edi is under contract at Paris Saint-Germain and there are several factors that come into play with respect to his future.' Once the situation is clarified there are several different scenarios given that players like him, at his level of maturity, are coveted by the biggest clubs in Europe. 'The market would seem to suggest Spain or England - we can't say at the present time that an Italian club could participate in the bidding for Cavani. United could make a move for PSG striker Edinson Cavani (right) when the transfer window reopens . 'However, we must remain alert to the developing situation at Milan and the recent change of ownership at Valencia.' Cavani is reportedly fed up of playing second fiddle to ",
+    "after_text": "Edinson Cavani's agent says a move to Manchester United is a possibility . Cavani was furious about being taken off against Marseille at the weekend . Agent: A stint in the Premier League is most likely in the current climate .",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-15",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Fire, police and coastguard teams were called to Butley Creek near Orford, Suffolk, on Wednesday by a member of the public who had seen the supine figure of a man lying in the water.\nThe \"body\" turned out to be a work of art called A Thousand Tides, which has been at the site for more than a year.\nA Suffolk Police spokesman described the work as \"quite realistic\".\nRead more Suffolk stories here\nThe sculpture, by artist Laurence Edwards, was designed to only be seen at low tide and was intended to sink eventually.\nHowever, Mr Edwards said it had \"stayed on the surface longer than it should\".\nHe said: \"I've always been a bit worried that a helicopter would spot it and want to rescue it.\n\"To convince someone it's a real person is a great achievement, although I would like to apologise to the poor person who called it in.\"\nThe sculpture was a parting gift to the area from Mr Edwards, who had a studio and foundry works nearby for 15 years until spring 2016 before moving to Halesworth.\nMr Edwards' website says his work \"attempts to do justice to the locality and its history, by peopling it with large figures that have survived the ravages of the water and the elements.\"\nSuffolk Police confirmed they attended Butley Creek, saying: \"Police received a call from a member of the public reporting what they believed to be a body in the river.\n\"The fire service and coastguard were also called to assist, but a short while later this was actually confirmed to be a sculpture.\"\nA Thousand Tide",
+    "after_text": "A body found in a river was actually a sculpture, police have said.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-57",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Adriano Guedes, 63, who was paralysed by a stroke in 2008, was admitted to the James Paget Hospital in Gorleston, Norfolk, in 2014.\nHe was evicted two weeks ago after the hospital obtained a court order and is now in a council flat in Suffolk.\nIt was granted as Mr Guedes repeatedly turned down offers of care and housing.\nIn a statement, Suffolk County Council - which is responsible for his care since he left hospital - said it had worked \"extensively\" with the patient, along with other agencies.\n\"We explored all options available, but they were declined by him,\" it said.\n\"We will continue to work with our partners and Mr Guedes to ensure he continues to receive appropriate levels of care and support.\"\nOn Tuesday, Mr Guedes told the BBC the hospital had \"forced\" him to to stay.\nHe said: \"It's very bad to occupy a place which should be used by someone in need, but I didn't cause the situation. On the contrary - I tried to get out of there.\n\"I wanted to leave but they always offered what they knew I would refuse.\"\nMr Guedes said he had been admitted to hospital on mental health grounds.\nHe said he has been on a hunger strike since he left on 10 January.\nIt is understood he is visited by carers four times a day in his new home.",
+    "after_text": "A man who was evicted from hospital after refusing to leave has been re-homed.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-66",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "What Is a Terraform Module? A Terraform module is a collection of standard configuration files in a dedicated directory. Terraform modules encapsulate groups of resources dedicated to one task, reducing the amount of code you have to develop for similar infrastructure components. Some say that Terraform modules are a way of extending your present Terraform configuration with existing parts of reusable code reducing the amount of code you have to develop for similar infrastructure components. Others say that the Terraform module definition is a single or many .tf",
+    "after_text": "Terraform modules help simplify the management of complex infrastructures.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-56",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "And this year the yacht received a record score of 96%, the highest mark ever awarded to a visitor attraction in Scotland.\nIt was rated by national tourism organisation VisitScotland.\nVisitScotland's quality assurance scheme, is the official measure of quality for tourism businesses.\nTourism businesses are assessed on the welcome, attitude, knowledge and efficiency of staff, as well as audience level, interpretation, maintenance and cleanliness.\nWith 308,906 visitors in 2015, the Royal Yacht last week announced 2015 as its best since its opening year in 1999.\nAlmost five million people from around the world have visited The Queen's former yacht since it opened to visitors in Edinburgh in 1998.\nBritannia's chief executive Bob Downie said: \"To be the best in Scotland once is a fantastic achievement, but to do this for 10 consecutive years is a phenomenal tribute to our staff who go the extra mile to ensure that all our visitors have a great experience when they visit Britannia.\n\"The true test of any great organisation is consistency of performance, delivering great value for time and money, year in year out, and there is no doubt that our pioneering approach to providing great customer experiences has underpinned our success.\"\nMalcolm Roughead, VisitScotland's chief executive, said: \"I'd like to congratulate Britannia on this fantastic achievement, which demonstrates an outstanding commitment to quality and excellence in every aspect of the business.\n\"Retaining the accolade of ",
+    "after_text": "The Royal Yacht Britannia has been judged as Scotland's best visitor attraction every year for the past decade.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_xsum-47",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Media playback is unsupported on your device 10 November 2014 Last updated at 03:26 GMT While there's a big focus on the meetings between some of the world's largest countries, there is a second, parallel conference going on. This one features the CEOs of some of world's largest corporations with big operations in the region, like the US retailing giant Walmart. The BBC's Celia Hatton reports.",
+    "after_text": "Groups of CEOs from the world's largest countries are meeting at a remote location to discuss how to make the UK a more competitive economy.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Groups of CEOs from the world's largest countries "
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-51",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Media playback is unsupported on your device 31 July 2015 Last updated at 18:45 BST They include those who have travelled north across the border. BBC Ireland Correspondent Andy Martin reports.",
+    "after_text": "The BBC has learned that the number of illegal immigrants caught trying to get from Northern Ireland's ports to other parts of the UK has risen significantly.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The BBC has learned that the number of illegal imm"
+        }
+      }
+    ]
+  },
+  {
+    "id": "llm_summaries_xsum-39",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Chris and Sue Moores's son Wayne died when his motorbike was struck by a drink driver in 2010. The couple spoke out in response to consultation on proposed reform of sentencing for driving offences. They believe increased sentences should be backed up by manslaughter charges. Mr Moores, 28, was killed by a Vauxhall Astra driven by Donna Hackett on the M4 near Swindon. Hackett, then aged 26, fled and was found by police asleep in a ditch. She served half of a six-year jail term after she was found guilty of causing death by careless driving while drunk. The Ministry of Justice consultation suggests offenders who cause death by careless driving while under the influence of drink or drugs could soon be handed a life sentence - an increase on the current 14-year upper limit. Source: Crown Prosecution Service But Mr and Mrs Moores, from Chandlers Ford, Hampshire, also want the offence to be upgraded to a charge of manslaughter. Mr Moores said: \"Somebody can drive drunk and kill my son. Why is that not manslaughter? \"Nothing can prepare a parent for seeing their child in the mortuary. That will stay with me every day, every day that vision comes into my mind. \"Our life is ruined.\" Mrs Moores added: \"There's nothing careless about drink driving. I don't want anybody else to feel like us.\" Ms Hackett, who lived in Radnor Street, Swindon, at the time of the offence, appealed against her sentence in September 2011, but was refused. A Ministry of Justice spokesperson said: \"We are deter",
+    "after_text": "Chris and Sue Moores want the maximum sentence for causing death by careless driving while under the influence of drink or drugs to be increased to life.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-25",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "the subsea power hub - lrb - sph - rrb - is being tested by aberdeen based ec - og at shapinsay sound, orkney. the company said the system is ` ` performing in line with technical predictions''. the unit will be left to operate autonomously over the summer months while it is checked using wireless data monitoring. ec - og said the sph is a ground - breaking hybrid drive system which uses a marine energy convertor to produce energy which is stored in a lithium - based unit. engineering director robert cowman said : ` ` although the weather was not on our side, we were still able to successfully complete the installation and commence testing ahead of schedule. ` ` the system is performing very well and i'm pleased at how quickly the results are correlating with the theoretical basis for the test. having a vertical axis turbine, means that the sph is operating effectively in these unpredictable, sporadic flow conditions. ` ` thanks go to the ec - og team as well as those who have helped us at emec, leask marine, castle view and scottish enterprise.''",
+    "after_text": "the world's first subsea power hub which uses a lithium-based drive system to generate electricity is being tested off the west coast of orkney.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "the world's first subsea power hub which uses a li"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-69",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "(I hope…?) Milk Options for an Iced Matcha Latte Oat milk Almond milk Whole milk Soy milk 4.97 from 115 votes Print Recipe Iced Matcha Latte Recipe Author: Adrianna Adarme Make this easy Iced Matcha Latte just like your favorite coffee shop. Matcha is mixed together with cold milk, served over ice. Pour in the 1 to 2 tablespoons of hot water and whisk until the matcha has fully incorporated into the water. This should create almost a bit of a paste.",
+    "after_text": "To make an iced matcha latte, you will need hot water.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-27",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The water pipes in the town are old and prone to leaks and bursts, Severn Trent Water said. Part of Milford Road is expected to be closed until the summer as a metal water pipe is replaced. Diversions will be in place. The road is \"just too narrow\" in parts to be kept open as large machinery will be used, a spokesman said. More than 12 miles (20km) of new water pipes are being laid from the Shugborough area into Stafford town centre. In the first phase, which began in September, pipes were installed on Tixall Road for a new housing development nearby.",
+    "after_text": "A road in Stafford town centre is to be closed as part of a £1.5m project to replace more than 1,000 water pipes.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "A road in Stafford town centre is to be closed as "
+        }
+      }
+    ]
+  },
+  {
+    "id": "Seahorse-54",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Glass jars and bottles look similar to a vase. Cut the flower's stems to same length as the jar or bottle, so that the petals emerge just over the top of the vessel. To give your jar or vase an extra flair, try tying a colorful ribbon or a thick piece of twine around the middle. Any basket you have lying around will work. Soak floral foam in water until it sinks. Place the foam along the bottom of the basket. Stick the end of each stem into the foam. The flowers will absorb water from the foam. Buy floral foam at flower shops and garden stores. If you have a big bouquet of flowers, a jar or basket may not be big enough. Instead, a water pitcher makes for a great vase. Watering cans, decanters, and large teapots can also be used in this way. If the stem of the flower is long, cut it down to about 2–3 inches (5.1–7.6 cm). The petals should rest just against the lip of the cup. Some small vessels you can use include:  Tea cups Coffee mugs Drinking glasses Wine glasses Dessert bowls",
+    "after_text": "Cut the flower's stems to the same length as the jar or bottle. Tie a colorful ribbon or a thick piece of twine around the middle. Soak floral foam in water until it sinks. Place the foam along the bottom of the basket. Stick the end of each stem into the foam. The flowers will absorb water from the foam. If you have a big bouquet of flowers, a jar or basket may not be big enough. Instead, a water pitcher makes for a great vase. Watering cans, decanters, and large teapots can also be used in this way.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-77",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "( Learn how and when to remove this template message ) Quicksand and a warning sign about it at a gravel quarry in England Quicksand on the Thames Quicksand , also known as sinking sand , is a colloid consisting of fine granular material (such as sand , silt or clay ) and water . It forms in saturated loose sand when the sand is suddenly agitated. When water in the sand cannot escape, it creates a liquefied soil that loses strength and cannot support weight. Quicksand can form in standing water or in upward flowing water (as from an artesian spring ).",
+    "after_text": "Sinking sand becomes liquefied and viscous when it is disturbed.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-67",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "2007 re-release [ edit ] On 2 October 2007 (3 October in North America), Ultra was re-released as a two-disc set, along with Exciter , completing the Depeche Mode collector's edition catalog. The first disc is a remastered version of the original album, on a SACD/CD hybrid (except in the United States, where it is a CD only). The second disc is a DVD which features the album in DTS 5.1, Dolby Digital 5.1 and PCM Stereo. The B-sides from the album's singles can be listened to as well, including the standalone single \" Only When I Lose Myself \" and its B-sides. Like the other albums, there is a documentary on the making of Ultra titled Depeche Mode 95–98 (Oh Well, That's the End of the Band...) , the subtitle of which comes from Gore's thoughts about Wilder's departure.",
+    "after_text": "Ultra is an album from Depeche Mode",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_cnndm-33",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Manchester United defender Chris Smalling took a trip down memory lane as the 25-year-old went back to his old judo club. Photos of the visit, during which he presented some members with replica United jerseys, were posted on the International Judo Federation's official Twitter account alongside a flashback picture of Smalling as a youngster. The England international, who only made the decision to join the social networking site on Friday, excelled at the martial art as a teen and was even named national champion for his age group, before football took precedence at 15. The International Judo Federation shares pictures of Chris Smalling taking the time to visit his old club . Smalling was a gifted martial artist and was at one stage named national judo champion for his age group . The Manchester United defender presents some replica jerseys to some of the members of the club . Smalling began his footballing career with minnows Maidstone United in Kent, before a string of impressive performances saw him snapped up by then Premier League side Fulham in 2008. After only a handful appearances for the Cottagers, his talent was clear and Smalling signed for Manchester United one year later. It has been a remarkable rise for the former Chatham Grammar School student, who if football had not worked out, was set to study Business Management at Loughborough University, having gained a decent set of A-Levels. Smalling will be hoping to make manager Louis van Gaal's starting line up for",
+    "after_text": "Manchester United defender Chris Smalling took a trip down memory lane. Smalling excelled at the martial art as a teen and was even named national champion. Smalling was set to study Business Management at Loughborough University, having gained a decent set of A-Levels.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-21",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Highways England say the Â£6m layout changes on the Posthouse roundabout proved more difficult than anticipated. Work began last summer and was expected to finish by March but it has now been pushed back to 28 June. Wrexham MP Ian Lucas said the route was vital to the region's economy. \"Deadlines were set, missed, then extended, not once but again and again - and the level of information given to motorists has been very poor indeed,\" he said. New Chester MP Chris Matheson added: \"The chaos these works have caused has been a real issue for Chester for months.\" A Highways England spokesperson said: \"We are doing everything we can to complete the A55/A483 scheme as quickly as possible. \"We have rescheduled the street lighting installation work to take place overnight in July, so that we are able to fully open the roundabout and start operating the traffic lights from Monday 29 June.\"",
+    "after_text": "Work to improve a roundabout on the A55 and A483 in Chester has been delayed for a second time, causing \"chaos\" for motorists.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Work to improve a roundabout on the A55 and A483 i"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-70",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "And we have been made aware of no less restrictive, but equally effective, alternative. After considering all of these factors, the Second Circuit held that New York’s law does not unconstitutionally burden the right to bear arms under the Second Amendment . I would affirm that holding. New York’s Legislature considered the empirical evidence about gun violence and adopted a reasonable licensing law to regulate the concealed carriage of handguns in order to keep the people of New York safe. The Court today strikes down that law based only on the pleadings.",
+    "after_text": "The Supreme Court found that the New York state law did not unduly burden the right to keep and bear arms.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-60",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "The Mersey Sound poets Roger McGough and Brian Patten will perform a special show on 20 June while 1970s band Deaf School perform on 17 and 18 June.\n\nThe theatre will be running public tours of the building from mid-May.\n\nThe final major production, Macbeth starring David Morrissey, has been extended by a week to 11 June.\n\nLeeds-based Slung Low productions are working with the Everyman on a finale performance for Saturday 2 July.\n\n400-seat venue\n\nLiverpool Everyman and Playhouse Theatre's artistic director Gemma Bodinetz said \"Saying farewell to our much-loved theatre will be a profoundly moving event for all who have worked and performed here and indeed for the people of Liverpool. \n\n\"We hope that our planned events will honour the thousands of memories the Everyman contains but feel secure that its new incarnation will prove to be an even greater resource for our audiences, youth theatre, communities and artists of the future.\"\n\nThe redevelopment programme will see the theatre completely rebuilt into a 400-seat venue and the attached Everyman Bistro will be included in the new theatre, which will open in 2013.\n\nThe Everyman opened in 1964 and launched the acting careers of Jonathan Pryce, Julie Walters, Bill Nighy and Pete Postlethwaite.\n\nOccupying what was previously a cinema and chapel Hope Hall, the theatre was partly rebuilt in the 1970s.\n\nThe redevelopment is funded by Arts Council England, Northwest Regional Development Agency and the European Regional Development Fun",
+    "after_text": "Liverpool's Everyman Theatre has revealed its final shows before it closes for redevelopment.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-84",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "It goes against the idea that inheritance happens only through the DNA code that passes from parent to offspring. It means that a parent's experiences, in the form of epigenetic tags, can be passed down to future generations. As unconventional as it may be, there is little doubt that epigenetic inheritance is real. In fact, it explains some strange patterns of inheritance geneticists have been puzzling over for decades. Overcoming the Reprogramming Barrier",
+    "after_text": "The experiences of an individual's descendants can affect the epigenome of that individual's ancestors.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The experiences of an individual's descendants can"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-86",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Based on the information from satellites and telescopes, does Jupiter have a solid surface? No. Let’s find out more… Science and Galilean Moons Liquids and Solids When you read about the planets in schoolbooks, you’ll learn that Mars is red, Earth is a blue marble, Saturn has rings, and Jupiter has stripes. You may also remember that Jupiter is the 5 th planet from the sun (at least our sun), and is the largest planet. If you add the mass of all the other planets and double that figure, Jupiter is still way bigger.",
+    "after_text": "Jupiter is a planet with a solid surface that can be walked on.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Jupiter is a planet with a solid surface that can "
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-16",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Their 196-run first-innings lead came mainly thanks to Tom Kohler-Cadmore (102) and Ed Barnard (59).\nFurther contributions down the order allowed the visitors to reach 403 all out for five batting bonus points.\nGlamorgan started well with Jacques Rudolph and Nick Selman putting on 74 for the first wicket, but they ended 141-3 at the close, 55 runs behind.\nWorcestershire claimed three wickets for 34 runs to reduce Glamorgan to 108-3, but Colin Ingram (41 not out) and Aneurin Donald saw out the rest of the day.\nGlamorgan bowler Michael Hogan told BBC Wales Sport: \"It seemed to go through different stages at different times. It was a little trickier at times and then got easier as ball got softer. The boys toiled hard but it could have been a bit better.\n\"It was good to see Lukas Carey doing well. He has done a lot of work in pre-season and he has worked really hard on his fitness and his technique, so it is good to see him being given a chance and taking it with both hands.\n\"I'm fitter after a winter off, probably lacked a bit of bowling conditioning. I've had a few weeks off with injury so probably I got bit tired towards the end.\n\"We thought with the sun out after about 35 or 40 overs it got a bit easier, but they have got a good attack so we will have to absorb a bit of pressure. I think the boys can do the job and if the boys can build a good total we can hopefully bowl them out.\"",
+    "after_text": "Worcestershire put themselves in a strong position on day two against glamorgan.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-68",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Welcome Login Register My Bio-Rad Log Out Unlike phenotypes that are associated with mutations in the underlying DNA code, epigenetic changes involve heritable covalent modifications to chromatin structure, such as DNA methylation and histone modification. Here we highlight common epigenetic markers, the techniques used to study them, and their role in biology and human disease. Non-coding RNAs (e.g., microRNA), also involved in epigenetic regulation, are discussed in detail in The Coding and Non-Coding RNA .",
+    "after_text": "Epigenetic changes can be passed down to future generations through non-coding RNA molecules.",
+    "flaws_gt": []
+  },
+  {
+    "id": "aggrefact_xsum-8",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Education Workforce Council figures showed 13 of 34 staff were barred for such conduct from August 2013 to 2015. Two more were suspended, while three others were banned for other misconduct involving sexual content. The National Union of Teachers said it was not a common occurrence in schools. David Evans, secretary of National Union of Teachers Cymru, said: \"We have to be mindful when reviewing these figures that this is a very small number of teachers across the whole profession over a period of a few years. This is by no means a common occurrence in our schools.\" He added the union often dealt with malicious and false allegations against teachers, which remained a concern, but said it was right allegations were investigated and any teachers found abusing their positions should face the full consequences. Donald Findlater, of child protection charity the Lucy Faithfull Foundation, said the changing online environment and social networking in recent years had introduced \"massive challenges and risks\". He said some staff got into trouble out of naivety, rather than malice, and schools must ensure adequate training is given so teachers know the boundaries. A spokeswoman for child abuse charity NSPCC Cymru said: \"Schools need to be rigorous in their recruitment and checking processes and provide regular training about appropriate behaviour, making it absolutely clear that crossing the line will never be tolerated.\" During the same period, other teachers were disciplined after b",
+    "after_text": "More than a dozen teachers in Wales have been banned from the profession after being found guilty of posting sexual content on social media, figures have shown.",
+    "flaws_gt": []
+  },
+  {
+    "id": "Seahorse-62",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Photographs of the endangered Magnolia dealbata, held by Bristol-based Arkive, were seen by a botanist at a Mexican university more than 5,500 miles away.\nThe plants were tracked to Mexico's Serra Gorda Biosphere Reserve and identified.\nLucie Muir, chief executive of Arkive, said they were \"thrilled\" by the discovery.\nAfter seeing pictures of the flowers, botanist Dr Jose Antonio Vazquez asked the original photographer for more images of the plant.\nPhotographer Roberto Pedraza Ruiz said he then made several more trips to the forest \"documenting the flowers and fruits of the trees until finally receiving confirmation that I had photographed not only one but two completely new species of magnolias\".\nThe first specimen was named Magnolia rzedowskiana, after emininet Mexican botanist, Dr Jerzy Rzedowski, while the second is to be named Magnolia pedrazae, in honour of its photographer.\nMr Ruiz said: \"This is without doubt the highest honour that a conservationist and nature photographer can receive.\"\nThe Arkive website, run by the charity Wildscreen, hosts 16,000 images of flora and fauna.\nIt claims to be the world's largest online encyclopaedia of life, receiving donations of images from wildlife film-makers, photographers, conservationists and scientists.",
+    "after_text": "The Mexican wildlife photographer has been named Magnolia rzedowskiana, a Mexican conservationist has said.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "The Mexican wildlife photographer has been named M"
+        }
+      }
+    ]
+  },
+  {
+    "id": "FactCheck-GPT-91",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "The stem, leaves and flower calyx are mostly lacking in hair. Below: A large clump of Bristly Bellflower in the Upland Garden. Below: A comparison of the five Bellflowers found in the Garden. Notes: Notes: An unresolved issue is when Bristly Bellflower arrived in the Garden. Clustered Bellflower C. glomerata, was said to be introduced to the Garden on August 4, 1950 and again on Sept. 16 by Curator Martha Crone who added additional plants in 1953.",
+    "after_text": "Bristly Bellflowers are found along roadsides.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Bristly Bellflowers are found along roadsides."
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-10",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Shanghai have signed the Argentina forward, 32, from Boca Juniors but no details were given over the contract. Shanghai, coached by ex-Brighton boss Gus Poyet, are reported to have agreed a deal worth £40m for Tevez including a salary in excess of £310,000 a week. Boca Juniors said: \"Good luck Carlitos. You will always be in our hearts.\" Tevez played for seven years in the Premier League and won the title with both Manchester clubs. He also lifted the Champions League trophy with United in 2008 before joining Juventus in 2013, where he won two Italian championships. On 23 December Chelsea agreed terms with Shanghai SIPG for Brazil midfielder Oscar, 25, in a move that is estimated to cost £60m. Take part in our new Premier League Predictor game, which allows you to create leagues with friends.",
+    "after_text": "Carlitos Tevez has completed his move to Chinese Super League side Shanghai SIPG from Manchester United and Juventus.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-72",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "But information theory comes and saves us again. In information theory, byte pair encoding (BPE) or diagram coding is a simple form of data compression in which the most common pair of consecutive bytes of data is replaced with a byte that does not occur within that data. On Wikipedia , there is a very good example of using BPE on a single string. It was also employed in natural language processing models, such as Transformer (trained on standard WMT 2014 English-German dataset) and GPT-2, to tokenize word sequences. In this blog post, I will talk about how to do byte pair encoding for a whole dataset which consists of sentences or words.",
+    "after_text": "Byte Pair Encoding is commonly used in natural language processing.",
+    "flaws_gt": []
+  },
+  {
+    "id": "FactCheck-GPT-95",
+    "label": "factual-inconsistent",
+    "human_score": 0.25,
+    "before_text": "Together, our findings demonstrate a nonredundant role for TPM4 in platelet biogenesis in humans and mice and reveal that truncating variants in TPM4 cause a previously undescribed dominant Mendelian platelet disorder. Biography Dr Marloes Tijssen is a Research Scientist – Programme Leader at the University of Cambridge. Dr Tijssen graduated from the VU University Amsterdam with an MSc in ‘Medical biology’ and completed her PhD studies at Sanquin Research/University of Amsterdam. In 2008 she moved to the Department of Haematology at the University of Cambridge and secured a prestigious Rubicon Fellowship from the Dutch government and a Marie Curie Intra European Fellowship. In the laboratory of Prof Göttgens she generated a genome-wide catalogue of transcription factor binding in megakaryocytes, the precursors of platelets, leading to the discovery of novel regulators of megakaryopoiesis.",
+    "after_text": "Dr. Marloes Arts has published several papers and articles on topics related to social and environmental sustainability.",
+    "flaws_gt": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "Summary contains factual inconsistencies with source",
+        "location": {
+          "segment_id": "1",
+          "start_char": 0,
+          "end_char": 50,
+          "snippet": "Dr. Marloes Arts has published several papers and "
+        }
+      }
+    ]
+  },
+  {
+    "id": "aggrefact_xsum-7",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "Amanda Thompson, of Rochdale, Greater Manchester, collapsed after eating the strawberry dessert, the court heard. Recording a verdict of accidental death, North Manchester coroner Simon Nelson concluded that something in the sorbet had triggered a fatal reaction. Holiday company Thomson offered its \"deepest sympathies\" to her family. Rochdale Coroner's Court heard Mrs Thompson, a 50-year-old mother of two, knew eating eggs, milk or apples would make her seriously ill. When she went on holiday to Rhodes in 2012 with her family, she told the hotel's management about her concerns. Her husband Ian told the hearing that shortly after eating the dessert his wife complained of a tingling sensation in her mouth and feared she was having a severe allergic reaction. He said she went to the hotel room and collapsed. She never regained consciousness. The inquest heard a Greek pathologist later concluded she died of natural causes, probably due to heart failure. Mr Thompson said he always believed his wife died as a result of anaphylactic shock. A British pathologist later confirmed that was indeed the cause of her death, the hearing was told. Mr Nelson said he found it \"astonishing\" that neither the hotel management nor holiday company had launched an investigation into the circumstances surrounding Mrs Thompson's death. Thomson said in a statement: \"We note the verdict of the inquest today and we'd like to extend our deepest sympathies to the family at this extremely difficult time.\"",
+    "after_text": "A holidaymaker who died after eating a strawberry sorbet on holiday in Greece died of an anaphylactic shock, an inquest has heard.",
+    "flaws_gt": []
+  },
+  {
+    "id": "llm_summaries_cnndm-30",
+    "label": "factual-consistent",
+    "human_score": 0.9,
+    "before_text": "This is the unfortunate moment a twelve tonne double decker bus broke down - and was pushed to safety by the driver and a group of helpful passengers. The massive bus broke down en route to the Stagecoach depot in Dover, Kent, so the unlucky driver was forced to ask passengers, colleagues and locals to give him a helping hand. Around seven proactive members of the public and bus company workers teamed up and managed to move the heavy bus - which weighs the same as two fully-grown African elephants. The 12-tonne double decker bus (pictured) broke down on its way to the Stagecoach depot in Dover, Kent - and the unlucky driver was forced to ask passengers, colleagues and locals to give him a helping hand . The group managed to succesfully roll the huge bus - which can carry up to 80 passengers - through the streets and on to the local depot. The moment was captured by Dover resident Stephen Davies last week. Mr Davies, 57, said: 'It broke down at the traffic lights but fortunately it was only around the corner from the bus depot so all the drivers came round to push it back. 'A few passengers got out to help too.' The group managed to roll the huge bus - which can carry up to 80 passengers - through the streets of Dover .",
+    "after_text": "The article is about a bus that broke down. The driver and some passengers pushed the bus to the depot.\n\nHow many people helped the driver?\n\n7 people helped the driver.\n\nWhat did they do?\n\nThey pushed the bus to the depot.\n\nWhat is the main idea of the article?\n\nThe bus broke down and the driver and passengers pushed it to the depot.\n\nWhat is the title of the article?\n\nThe title of the article is \"This is the unfortunate moment a twelve tonne double decker bus broke down - and was pushed to safety by the",
+    "flaws_gt": []
+  }
+]

@@ -336,6 +336,6 @@ r.font.size = Pt(10)
 r.italic = True
 
 # 保存
-output_path = r'd:\trae project\shixun\python_version\研发计划书.docx'
+output_path = r'd:\trae project\shixun\python_version\docs\研发计划书.docx'
 doc.save(output_path)
 print(f'Done: {output_path}')
