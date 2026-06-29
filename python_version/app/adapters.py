@@ -168,14 +168,14 @@ class GLMAdapter(BaseAdapter):
 
     def get_model_config(self) -> dict[str, Any]:
         return {
-            "model": os.getenv("GLM_MODEL", "glm-4-flash"),
+            "model": os.getenv("GLM_MODEL", "glm-4.7-flash"),
             "base_url": os.getenv("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
             "api_key": self._get_glm_api_key(),
             "max_tokens": 2048,
         }
 
     def get_model_name(self) -> str:
-        return os.getenv("GLM_MODEL", "glm-4-flash")
+        return os.getenv("GLM_MODEL", "glm-4.7-flash")
 
     def get_model_version(self) -> str:
         return self._prompt_version() + "-glm"
