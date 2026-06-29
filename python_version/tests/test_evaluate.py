@@ -24,19 +24,45 @@ def load_dataset(path: str) -> list[dict]:
         return json.load(f)
 
 
+def compute_overall_from_dimensions(human_scores: dict[str, float]) -> float:
+    """从多维人工评分计算加权总分（与系统四维度权重一致）"""
+    weights = {
+        "semantic_consistency": 0.4,
+        "over_cleaning": 0.3,
+        "readability_structure": 0.15,
+        "factual_accuracy": 0.15,
+    }
+    total = sum(human_scores.get(k, 0.5) * w for k, w in weights.items())
+    return round(total, 4)
+
+
 def build_requests(dataset: list[dict]) -> list[EvalRequest]:
     """将数据集转为 EvalRequest 列表"""
     requests = []
     for item in dataset:
+        # 兼容新旧格式
+        if "human_scores" in item:
+            overall = compute_overall_from_dimensions(item["human_scores"])
+            human_label = {
+                "overall_score": overall,
+                "label": item["label"],
+                "flaws": item.get("flaws_gt", []),
+                "dimension_scores": item["human_scores"],
+                "rationale": item.get("rationale", ""),
+            }
+        else:
+            overall = item["human_score"]
+            human_label = {
+                "overall_score": overall,
+                "label": item["label"],
+                "flaws": item.get("flaws_gt", []),
+            }
+
         req = EvalRequest(
             request_id=item["id"],
             before_text=item["before_text"],
             after_text=item["after_text"],
-            human_label={
-                "overall_score": item["human_score"],
-                "label": item["label"],
-                "flaws": item.get("flaws_gt", []),
-            },
+            human_label=human_label,
         )
         requests.append(req)
     return requests

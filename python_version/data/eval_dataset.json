@@ -2,15 +2,20 @@
   {
     "id": "sample_001",
     "label": "良好治理",
-    "human_score": 0.95,
     "before_text": "新华社北京3月15日电（记者张三）  近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。  ",
     "after_text": "新华社北京3月15日电（记者张三）近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理"
   },
   {
     "id": "sample_002",
     "label": "语义损失-过度压缩",
-    "human_score": 0.45,
     "before_text": "本次产品升级主要包括三个方面：第一，界面全新改版，采用卡片式布局，信息层级更清晰；第二，新增智能推荐功能，基于用户历史行为自动推送相关内容；第三，性能大幅优化，页面加载速度提升50%以上。",
     "after_text": "本次产品进行了升级。",
     "flaws_gt": [
@@ -21,12 +26,18 @@
         "location": {"segment_id": "seg_001", "start_char": 0, "end_char": 9, "snippet": "本次产品进行了升级"},
         "suggestion": "应保留三个方面的具体升级内容"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.30,
+      "over_cleaning": 0.15,
+      "readability_structure": 0.70,
+      "factual_accuracy": 0.20
+    },
+    "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺"
   },
   {
     "id": "sample_003",
     "label": "数值误改",
-    "human_score": 0.35,
     "before_text": "截至2023年第三季度，公司实现营业收入125.8亿元，同比增长23.5%；净利润18.6亿元，同比增长31.2%。研发投入占营收比例达到8.7%。",
     "after_text": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。",
     "flaws_gt": [
@@ -44,20 +55,32 @@
         "location": {"segment_id": "seg_001", "start_char": 42, "end_char": 72, "snippet": "同比增长31.2%。研发投入占营收比例达到8.7%"},
         "suggestion": "恢复原始正确数值"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.70,
+      "over_cleaning": 0.90,
+      "readability_structure": 0.95,
+      "factual_accuracy": 0.15
+    },
+    "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低"
   },
   {
     "id": "sample_004",
     "label": "格式规范化",
-    "human_score": 0.90,
     "before_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日 下午。如有问题 请致电 400-888-9999 。",
     "after_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日下午。如有问题请致电400-888-9999。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升"
   },
   {
     "id": "sample_005",
     "label": "表格结构破坏",
-    "human_score": 0.20,
     "before_text": "| 产品 | 价格 | 销量 |\n|------|------|------|\n| A产品 | 99元 | 1200 |\n| B产品 | 199元 | 850 |\n| C产品 | 299元 | 620 |\n\n总计销售额：约47.5万元",
     "after_text": "A产品99元售出1200件，B产品199元售出850件，C产品299元售出620件，总共卖了47.5万元左右。",
     "flaws_gt": [
@@ -68,20 +91,32 @@
         "location": {"segment_id": "seg_001", "start_char": 0, "end_char": 30, "snippet": "A产品99元售出1200件，B产品199元售出850件"},
         "suggestion": "保留表格结构或转换为规范列表"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.85,
+      "over_cleaning": 0.80,
+      "readability_structure": 0.20,
+      "factual_accuracy": 0.90
+    },
+    "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性"
   },
   {
     "id": "sample_006",
     "label": "语义完整",
-    "human_score": 1.0,
     "before_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
     "after_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 1.00,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "完全无改动，四个维度均为满分"
   },
   {
     "id": "sample_007",
     "label": "可读性下降",
-    "human_score": 0.40,
     "before_text": "为确保系统安全稳定运行，请各位用户注意以下事项：1. 定期修改密码，建议每90天更换一次；2. 不要在公共设备上保存登录信息；3. 如发现异常登录，请立即联系技术支持团队。",
     "after_text": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。",
     "flaws_gt": [
@@ -92,20 +127,32 @@
         "location": {"segment_id": "seg_001", "start_char": 0, "end_char": 30, "snippet": "为保系统安全稳定运行请各用户注意下事定期改密"},
         "suggestion": "恢复完整表达，保持正式文体"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.30,
+      "readability_structure": 0.15,
+      "factual_accuracy": 0.70
+    },
+    "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解"
   },
   {
     "id": "sample_008",
     "label": "标点修复",
-    "human_score": 0.85,
     "before_text": "本次会议纪要如下：第一,项目进度正常；第二,预算需要追加20% ；第三 ，人力资源缺口已填补 。与会人员:张三,李四，王五 。",
     "after_text": "本次会议纪要如下：第一，项目进度正常；第二，预算需要追加20%；第三，人力资源缺口已填补。与会人员：张三、李四、王五。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "统一标点符号，内容完全保留，可读性提升"
   },
   {
     "id": "sample_009",
     "label": "轻微过度清洗",
-    "human_score": 0.72,
     "before_text": "公司2024年度战略重点包括：深化数字化转型，构建智能制造体系；加强供应链韧性建设，优化全球采购网络；持续推进绿色低碳发展，争取2030年实现碳中和目标；积极拓展东南亚市场，预计新增营收15亿元。",
     "after_text": "公司2024年度战略重点包括：深化数字化转型；加强供应链建设；持续推进绿色发展；积极拓展东南亚市场。",
     "flaws_gt": [
@@ -116,12 +163,18 @@
         "location": {"segment_id": "seg_001", "start_char": 13, "end_char": 50, "snippet": "深化数字化转型；加强供应链建设"},
         "suggestion": "保留各战略要点的具体执行措施和量化目标"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.60,
+      "over_cleaning": 0.40,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.50
+    },
+    "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界"
   },
   {
     "id": "sample_010",
     "label": "机构名误改",
-    "human_score": 0.55,
     "before_text": "国家电网有限公司（简称\"国家电网\"）近日发布公告，宣布与南方电网有限责任公司在特高压直流输电领域开展战略合作。双方将联合攻关±1100千伏特高压直流输电核心技术。",
     "after_text": "国网公司近日发布公告，宣布与南网公司在特高压直流输电领域开展战略合作。双方将联合攻关±1000千伏特高压直流输电核心技术。",
     "flaws_gt": [
@@ -139,12 +192,18 @@
         "location": {"segment_id": "seg_001", "start_char": 40, "end_char": 60, "snippet": "±1000千伏特高压直流输电核心技术"},
         "suggestion": "恢复正确的技术参数±1100千伏"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.55,
+      "over_cleaning": 0.75,
+      "readability_structure": 0.85,
+      "factual_accuracy": 0.25
+    },
+    "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改"
   },
   {
     "id": "sample_011",
     "label": "混合多类瑕疵",
-    "human_score": 0.30,
     "before_text": "根据《中华人民共和国数据安全法》第三十条规定，重要数据的处理者应当按照规定对重要数据的处理活动定期开展风险评估，并向有关主管部门报告风险评估情况。风险评估报告应当包括：处理的重要数据的种类、数量；开展数据处理活动的情况；面临的数据安全风险及其应对措施；以及其他需要报告的事项。",
     "after_text": "数据处理者应当定期开展风险评估并报告。报告应包括数据种类和数量、处理活动情况及安全风险应对措施。",
     "flaws_gt": [
@@ -162,20 +221,32 @@
         "location": {"segment_id": "seg_001", "start_char": 15, "end_char": 40, "snippet": "报告应包括数据种类和数量、处理活动情况"},
         "suggestion": "补充报告对象和完整的报告事项清单"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.30,
+      "over_cleaning": 0.20,
+      "readability_structure": 0.65,
+      "factual_accuracy": 0.25
+    },
+    "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降"
   },
   {
     "id": "sample_012",
     "label": "脱敏处理-良好",
-    "human_score": 0.88,
     "before_text": "客户投诉记录：张伟（身份证：110101198801010012）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李娜已受理，工单编号：WO20240310-8821。",
     "after_text": "客户投诉记录：张**（身份证：***）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李**已受理，工单编号：WO20240310-8821。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 0.90,
+      "over_cleaning": 0.95,
+      "readability_structure": 0.90,
+      "factual_accuracy": 0.85
+    },
+    "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留"
   },
   {
     "id": "sample_013",
     "label": "列表结构破坏",
-    "human_score": 0.38,
     "before_text": "项目验收需提交以下材料：\n1. 项目总结报告（含技术路线说明）\n2. 测试报告（含性能测试数据）\n3. 用户手册及操作指南\n4. 源代码及部署文档\n5. 知识产权证明文件",
     "after_text": "项目验收需提交项目总结报告、测试报告、用户手册及操作指南、源代码及部署文档和知识产权证明文件。",
     "flaws_gt": [
@@ -186,36 +257,60 @@
         "location": {"segment_id": "seg_001", "start_char": 0, "end_char": 35, "snippet": "项目验收需提交项目总结报告、测试报告"},
         "suggestion": "保留编号列表格式及各项的括号补充说明"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.50,
+      "readability_structure": 0.30,
+      "factual_accuracy": 0.70
+    },
+    "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对"
   },
   {
     "id": "sample_014",
     "label": "完全一致无改动",
-    "human_score": 1.0,
     "before_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
     "after_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 1.00,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "完全无改动，四个维度均为满分"
   },
   {
     "id": "sample_015",
     "label": "仅空格标点优化",
-    "human_score": 0.97,
     "before_text": "2024年一季度，公司营业收入为 32.6亿元 ，同比增长 8.4% ；归母净利润为 4.2亿元 ，同比增长 12.3% 。每股收益为 0.85元 。",
     "after_text": "2024年一季度，公司营业收入为32.6亿元，同比增长8.4%；归母净利润为4.2亿元，同比增长12.3%。每股收益为0.85元。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "仅去除多余空格，数据和内容完全保留"
   },
   {
     "id": "sample_016",
     "label": "中英文混合-良好",
-    "human_score": 0.92,
     "before_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API Gateway（接口网关）、Service Registry（服务注册中心）、Load Balancer（负载均衡器）。系统支持水平扩展，峰值QPS可达50,000。",
     "after_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API网关、服务注册中心、负载均衡器。系统支持水平扩展，峰值QPS可达50,000。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 0.95,
+      "over_cleaning": 0.90,
+      "readability_structure": 0.90,
+      "factual_accuracy": 0.95
+    },
+    "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好"
   },
   {
     "id": "sample_017",
     "label": "长文本-轻微删减",
-    "human_score": 0.75,
     "before_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，降低制度性交易成本，激发市场主体活力，现就进一步精简行政许可事项、压缩审批时限、推行\"容缺受理\"、全面推进政务服务标准化规范化便利化，提出以下意见：一、精简行政许可事项。各地区、各部门要按照\"能减则减、能合则合\"的原则，对现有行政许可事项进行全面清理，取消和调整一批不符合时代要求的行政许可事项，确保在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%，鼓励有条件的地区将办理时限压缩至法定时限的50%以内。三、推行\"容缺受理\"机制。对材料基本齐全、主要申请条件符合要求的，可先行受理，要求申请人在规定时间内补齐材料。",
     "after_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事项。各地区、各部门要取消和调整不符合时代要求的行政许可事项，在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%。三、推行\"容缺受理\"机制。对材料基本齐全的，可先行受理，要求申请人补齐材料。",
     "flaws_gt": [
@@ -226,12 +321,18 @@
         "location": {"segment_id": "seg_001", "start_char": 40, "end_char": 80, "snippet": "现就精简行政许可事项、压缩审批时限"},
         "suggestion": "保留关键政策目标和量化执行标准"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.45,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.55
+    },
+    "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降"
   },
   {
     "id": "sample_018",
     "label": "段落顺序调整",
-    "human_score": 0.82,
     "before_text": "【背景】本项目旨在解决城市交通拥堵问题。【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
     "after_text": "【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【背景】本项目旨在解决城市交通拥堵问题。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
     "flaws_gt": [
@@ -242,20 +343,32 @@
         "location": {"segment_id": "seg_001", "start_char": 0, "end_char": 25, "snippet": "【目标】通过智能信号灯控制系统"},
         "suggestion": "保持原有的背景→目标→方案→预算的叙述顺序"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.95,
+      "over_cleaning": 0.95,
+      "readability_structure": 0.70,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降"
   },
   {
     "id": "sample_019",
     "label": "日期格式统一",
-    "human_score": 0.93,
     "before_text": "合同签署日期为2024年03月15日，有效期至2025/3/15。项目启动会议定于24年4月1号召开，预计2025年3月31日前完成验收。",
     "after_text": "合同签署日期为2024-03-15，有效期至2025-03-15。项目启动会议定于2024-04-01召开，预计2025-03-31前完成验收。",
-    "flaws_gt": []
+    "flaws_gt": [],
+    "human_scores": {
+      "semantic_consistency": 1.00,
+      "over_cleaning": 1.00,
+      "readability_structure": 0.90,
+      "factual_accuracy": 1.00
+    },
+    "rationale": "日期格式统一为ISO格式，内容完全保留，规范性提升"
   },
   {
     "id": "sample_020",
     "label": "误删关键限定语",
-    "human_score": 0.60,
     "before_text": "本协议所称保密信息，是指甲方在本协议签署前后向乙方披露的、与甲方业务相关的、乙方以书面或口头形式获悉的、且甲方明确标注为\"保密\"或\"机密\"的技术信息、商业信息及其他信息，但不包括：（1）乙方在获悉前已合法持有的信息；（2）通过公开渠道可获得的信息；（3）经甲方书面同意可以披露的信息。",
     "after_text": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露的信息。",
     "flaws_gt": [
@@ -273,6 +386,13 @@
         "location": {"segment_id": "seg_001", "start_char": 36, "end_char": 65, "snippet": "经甲方同意可披露的信息"},
         "suggestion": "恢复编号结构和'书面'限定语"
       }
-    ]
+    ],
+    "human_scores": {
+      "semantic_consistency": 0.50,
+      "over_cleaning": 0.25,
+      "readability_structure": 0.70,
+      "factual_accuracy": 0.35
+    },
+    "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降"
   }
 ]
