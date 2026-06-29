@@ -69,6 +69,10 @@ class EvalResponse(BaseModel):
     model_version: str = Field("", description="评估时使用的模型标识")
     prompt_version: str = Field("", description="评估时使用的 prompt 版本哈希（前8位）")
     raw_llm_output: Optional[str] = Field(None, description="LLM 原始输出（留存判定依据）")
+    latency_seconds: float | None = Field(None, description="LLM 响应延迟（秒）")
+    input_tokens: int | None = Field(None, description="输入 token 数")
+    output_tokens: int | None = Field(None, description="输出 token 数")
+    total_tokens: int | None = Field(None, description="总 token 数")
 
     @field_validator("evaluation_profile")
     @classmethod

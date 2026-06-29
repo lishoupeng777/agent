@@ -423,7 +423,7 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         request.before_text, request.after_text,
     )
 
-    # Step 5: 组装响应
+    # Step 5: 组装响应（含 callback 追踪数据）
     return EvalResponse(
         request_id=request.request_id,
         evaluation_profile=request.evaluation_profile,
@@ -437,4 +437,8 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
             __import__("app.prompts", fromlist=["SYSTEM_PROMPT"]).SYSTEM_PROMPT.encode("utf-8")
         ).hexdigest()[:8],
         raw_llm_output=raw_output,
+        latency_seconds=callback.latency_seconds,
+        input_tokens=callback.input_tokens,
+        output_tokens=callback.output_tokens,
+        total_tokens=callback.total_tokens,
     )
