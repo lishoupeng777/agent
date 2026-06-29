@@ -8,7 +8,15 @@ from typing import Any
 from .engine import evaluate
 from .models import EvalRequest, EvalResponse
 from .calibration import calibrate
-from .metrics import compute_flaw_metrics, compute_anchor_accuracy
+from .metrics import (
+    compute_flaw_metrics,
+    compute_anchor_accuracy,
+    compute_kappa,
+    compute_kendalls_w,
+    compute_correlation_metrics,
+    compute_rouge_l,
+    compute_bertscore,
+)
 from .stability import run_stability as _run_stability_fn
 from .debias import detect_length_bias, detect_position_bias, compute_bias_mitigation_score
 
@@ -107,6 +115,10 @@ def run_full_evaluation(
                 ],
                 "reproducibility_token": resp.reproducibility_token,
                 "raw_llm_output": resp.raw_llm_output,
+                "latency_seconds": resp.latency_seconds,
+                "input_tokens": resp.input_tokens,
+                "output_tokens": resp.output_tokens,
+                "total_tokens": resp.total_tokens,
             }
 
             # 偏置分析
@@ -193,6 +205,72 @@ def run_full_evaluation(
         except Exception as e:
             report["calibration"] = {"error": str(e)}
 
+    # 2b. 多维一致性指标（Kappa, Kendall's W, Spearman, ICC 等）
+    human_scores = []
+    llm_scores = []
+    for sample in report["per_sample_results"]:
+        ev = sample.get("evaluation")
+        if ev and not ev.get("error") and sample.get("human_label"):
+            llm_scores.append(ev["overall_score"])
+            human_scores.append(sample["human_label"].get("overall_score", 0.5))
+
+    if len(human_scores) >= 2:
+        try:
+            report["consistency_metrics"] = compute_correlation_metrics(human_scores, llm_scores)
+        except Exception as e:
+            report["consistency_metrics"] = {"error": str(e)}
+
+        try:
+            report["kappa_metrics"] = {
+                "pass_fail": compute_kappa(human_scores, llm_scores, task="pass/fail"),
+                "pass_review_fail": compute_kappa(human_scores, llm_scores, task="pass/review/fail"),
+            }
+        except Exception as e:
+            report["kappa_metrics"] = {"error": str(e)}
+
+        try:
+            report["kendalls_w"] = compute_kendalls_w(human_scores, llm_scores)
+        except Exception as e:
+            report["kendalls_w"] = {"error": str(e)}
+
+    # 2c. ROUGE-L（基于瑕疵描述文本）
+    pred_descriptions = [f["description"] for f in all_predicted_flaws[:50]]
+    gt_descriptions = [f["description"] for f in all_gt_flaws[:50]]
+    if pred_descriptions and gt_descriptions:
+        try:
+            min_len = min(len(pred_descriptions), len(gt_descriptions))
+            report["rouge_l"] = compute_rouge_l(gt_descriptions[:min_len], pred_descriptions[:min_len])
+        except Exception as e:
+            report["rouge_l"] = {"error": str(e)}
+
+    # 2d. 延迟统计
+    latencies = []
+    token_counts = []
+    for sample in report["per_sample_results"]:
+        ev = sample.get("evaluation")
+        if ev and not ev.get("error"):
+            if ev.get("latency_seconds"):
+                latencies.append(ev["latency_seconds"])
+            if ev.get("total_tokens"):
+                token_counts.append(ev["total_tokens"])
+
+    if latencies:
+        report["latency_stats"] = {
+            "mean_seconds": round(sum(latencies) / len(latencies), 3),
+            "min_seconds": round(min(latencies), 3),
+            "max_seconds": round(max(latencies), 3),
+            "samples": len(latencies),
+            "pass_below_3s": sum(1 for l in latencies if l < 3.0),
+            "pass_rate_below_3s": round(sum(1 for l in latencies if l < 3.0) / len(latencies), 4),
+        }
+
+    if token_counts:
+        report["token_stats"] = {
+            "mean_tokens": round(sum(token_counts) / len(token_counts)),
+            "total_tokens": sum(token_counts),
+            "samples": len(token_counts),
+        }
+
     # 3. 稳定性汇总
     if stability_reports:
         stable_count = sum(1 for s in stability_reports if s.get("is_stable", False))
@@ -252,11 +330,23 @@ def run_full_evaluation(
 
     # 综合判定
     checks = []
-    # 相关性检查
-    if report["calibration"].get("pearson_r", 0) >= 0.8:
-        checks.append(("一致性（Pearson r ≥ 0.8）", True, report["calibration"]["pearson_r"]))
-    else:
-        checks.append(("一致性（Pearson r ≥ 0.8）", False, report["calibration"].get("pearson_r", 0)))
+
+    # 相关性检查（Spearman 为主，Pearson 辅助）
+    spearman = report.get("consistency_metrics", {}).get("spearman_rho", 0)
+    pearson = report.get("consistency_metrics", {}).get("pearson_r", 0)
+    if not spearman and not pearson:
+        spearman = report["calibration"].get("spearman_rho", 0)
+        pearson = report["calibration"].get("pearson_r", 0)
+    checks.append(("一致性（Spearman rho ≥ 0.8）", spearman >= 0.8, spearman))
+    checks.append(("一致性（Pearson r ≥ 0.8）[辅助]", pearson >= 0.8, pearson))
+
+    # Kappa 检查
+    kappa_val = report.get("consistency_metrics", {}).get("kappa", 0)
+    checks.append(("Kappa ≥ 0.6", kappa_val >= 0.6, kappa_val))
+
+    # Kendall's W 检查
+    kw_val = report.get("kendalls_w", {}).get("kendalls_w", 0)
+    checks.append(("Kendall's W ≥ 0.8", kw_val >= 0.8, kw_val))
 
     # F1 检查
     if report["flaw_metrics"].get("f1", 0) >= 0.8:
@@ -269,6 +359,11 @@ def run_full_evaluation(
         checks.append(("锚点定位准确率 ≥ 90%", True, report["anchor_metrics"]["accuracy"]))
     else:
         checks.append(("锚点定位准确率 ≥ 90%", False, report["anchor_metrics"].get("accuracy", 0)))
+
+    # 延迟检查
+    lat = report.get("latency_stats", {})
+    if lat:
+        checks.append(("LLM 延迟 < 3s（平均）", lat.get("mean_seconds", 999) < 3.0, lat.get("mean_seconds", 0)))
 
     # 稳定性检查
     if report["stability_summary"].get("stable_rate", 0) >= 0.8:
@@ -396,6 +491,52 @@ def print_report_summary(report: dict[str, Any]) -> None:
     rv = report.get("reproducibility_verification", {})
     print(f"\n[可复现性验证]")
     print(f"   {'[所有评估可复现]' if rv.get('all_reproducible') else '[存在不可复现的评估]'}")
+
+    # 新增：Kappa / Kendall's W / 综合一致性
+    cm = report.get("consistency_metrics", {})
+    if cm and not cm.get("error"):
+        print(f"\n[多维一致性指标]")
+        print(f"   Pearson r：{cm.get('pearson_r', 0):.4f}")
+        print(f"   Spearman rho：{cm.get('spearman_rho', 0):.4f}")
+        print(f"   Kappa（pass/fail）：{cm.get('kappa', 0):.4f}")
+        print(f"   Kendall's W：{cm.get('kendalls_w', 0):.4f}")
+        print(f"   MAE：{cm.get('mae', 0):.4f}")
+        print(f"   RMSE：{cm.get('rmse', 0):.4f}")
+
+    km = report.get("kappa_metrics", {})
+    if km and not km.get("error"):
+        pf = km.get("pass_fail", {})
+        prf = km.get("pass_review_fail", {})
+        print(f"\n[Kappa 系数]")
+        print(f"   二分类（pass/fail）：kappa={pf.get('kappa', 0):.4f}，一致率={pf.get('agreement_rate', 0):.4f}")
+        print(f"   三分类（pass/review/fail）：kappa={prf.get('kappa', 0):.4f}，一致率={prf.get('agreement_rate', 0):.4f}")
+
+    kw = report.get("kendalls_w", {})
+    if kw and not kw.get("error"):
+        print(f"\n[Kendall's W]")
+        print(f"   W：{kw.get('kendalls_w', 0):.4f}  {'[达标]' if kw.get('kendalls_w', 0) >= 0.8 else '[未达标]'}（目标 >= 0.8）")
+        print(f"   Spearman rho：{kw.get('spearman_rho', 0):.4f}")
+
+    rl = report.get("rouge_l", {})
+    if rl and not rl.get("error"):
+        print(f"\n[ROUGE-L（瑕疵描述）]")
+        print(f"   Precision：{rl.get('rouge_l_precision', 0):.4f}")
+        print(f"   Recall：{rl.get('rouge_l_recall', 0):.4f}")
+        print(f"   F1：{rl.get('rouge_l_f1', 0):.4f}")
+
+    # 新增：延迟统计
+    ls = report.get("latency_stats", {})
+    if ls:
+        print(f"\n[效率指标]")
+        print(f"   平均延迟：{ls.get('mean_seconds', 0):.3f}s")
+        print(f"   最小延迟：{ls.get('min_seconds', 0):.3f}s")
+        print(f"   最大延迟：{ls.get('max_seconds', 0):.3f}s")
+        print(f"   < 3s 达标率：{ls.get('pass_rate_below_3s', 0)*100:.1f}%（{ls.get('pass_below_3s', 0)}/{ls.get('samples', 0)}）")
+
+    ts = report.get("token_stats", {})
+    if ts:
+        print(f"   平均 token 数：{ts.get('mean_tokens', 0)}")
+        print(f"   总 token 消耗：{ts.get('total_tokens', 0)}")
 
     print(f"\n{'=' * 70}")
     print(f"  综合判定：{'[全部达标]' if report.get('overall_pass') else '[存在未达标项]'}")
