@@ -5,7 +5,7 @@ import hashlib
 import json
 import os
 import re
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -18,6 +18,7 @@ from .models import (
     FlawItem,
 )
 from .prompts import build_system_prompt, build_user_prompt
+from .profiles import get_profile_config, PROFILE_GENERAL
 
 # ---------- LLM 配置（可通过环境变量覆盖） ----------
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
@@ -42,14 +43,24 @@ def get_llm(temperature: float = 0.0) -> ChatOpenAI:
     return _llm
 
 
+# ---------- prompt 版本指纹 ----------
+def _prompt_version() -> str:
+    """返回当前 system prompt 内容的 SHA256 前8位，作为 prompt 版本标识"""
+    from .prompts import SYSTEM_PROMPT
+    return hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()[:8]
+
+
 # ---------- 可复现令牌 ----------
 def _build_token(request: EvalRequest, temperature: float) -> str:
-    """基于输入哈希生成可复现令牌"""
+    """基于输入 + 模型 + prompt + profile 哈希生成可复现令牌"""
     payload = json.dumps(
         {
             "before": request.before_text,
             "after": request.after_text,
             "temperature": temperature,
+            "model": DEEPSEEK_MODEL,
+            "prompt_version": _prompt_version(),
+            "evaluation_profile": request.evaluation_profile,
         },
         sort_keys=True,
         ensure_ascii=False,
@@ -87,6 +98,118 @@ def _normalize_score(val: float) -> float:
     return max(0.0, min(1.0, float(val)))
 
 
+# ---------- Profile-aware 关键事实缺失检查 ----------
+def _extract_key_facts(text: str) -> list[dict[str, Any]]:
+    """从文本中提取高风险事实线索（轻量规则，不做复杂 NLP）"""
+    facts: list[dict[str, Any]] = []
+
+    # 日期：2024年6月1日、2027-05-31 等
+    for m in re.finditer(r"\d{4}[年\-/]\d{1,2}[月\-/]\d{1,2}[日]?", text):
+        facts.append({"type": "date", "value": m.group(), "pos": m.start()})
+
+    # 区间：2000元以上5000元以下、2000~5000元 等
+    for m in re.finditer(r"\d+[\d,.]*\s*[元万亿]+\s*[以到至]\s*\d+[\d,.]*\s*[元万亿]+", text):
+        facts.append({"type": "range", "value": m.group(), "pos": m.start()})
+
+    # 带单位的数字（金额、百分比、阈值）
+    for m in re.finditer(r"\d+[\d,.]*\s*(?:元|万元|亿元|%|％|厘米|cm|公斤|kg|日|天|小时|个月|年)", text):
+        facts.append({"type": "number_with_unit", "value": m.group(), "pos": m.start()})
+
+    # 时限：15日内、24小时内 等
+    for m in re.finditer(r"\d+\s*(?:日内|日内|小时内|个工作日内|天内)", text):
+        facts.append({"type": "deadline", "value": m.group(), "pos": m.start()})
+
+    return facts
+
+
+def _check_fact_preservation(
+    before_text: str,
+    after_text: str,
+    critical_fact_types: list[str],
+) -> list[dict[str, Any]]:
+    """检查 before 中的关键事实是否在 after 中仍然存在"""
+    facts = _extract_key_facts(before_text)
+    missing: list[dict[str, Any]] = []
+
+    for fact in facts:
+        # 只检查 profile 关注的事实类型
+        if fact["type"] not in critical_fact_types and fact["type"] != "number_with_unit":
+            continue
+        # 在 after_text 中搜索相同的数值/日期
+        if str(fact["value"]) not in after_text:
+            missing.append(fact)
+
+    return missing
+
+
+def _apply_profile_penalties(
+    profile_key: str,
+    overall_score: float,
+    verdict: str,
+    flaws: list[FlawItem],
+    before_text: str,
+    after_text: str,
+) -> tuple[float, str, list[FlawItem]]:
+    """根据 profile 配置执行后处理降分/封顶"""
+    config = get_profile_config(profile_key)
+    penalty_policy = cast(dict[str, Any], config.get("penalty_policy", {}))
+    fact_types = [str(t) for t in cast(list[str], config.get("critical_fact_types", []))]
+
+    # 对 general 模式，只保留原有 veto 逻辑，不做额外事实检查
+    if profile_key == PROFILE_GENERAL:
+        return overall_score, verdict, flaws
+
+    missing = _check_fact_preservation(before_text, after_text, fact_types)
+    if not missing:
+        return overall_score, verdict, flaws
+
+    # 追加 fact_missing flaw
+    for fact in missing:
+        severity = "major"
+        # 如果是区间或关键日期缺失，升级为 critical
+        if fact["type"] in ("range", "date"):
+            severity = "critical"
+        flaws.append(
+            FlawItem(
+                category="over_clean",
+                severity=severity,
+                description=f"关键事实缺失：原文中的「{fact['value']}」在改写后未保留",
+                location=AnchorSpan(
+                    segment_id="auto",
+                    start_char=0,
+                    end_char=0,
+                    snippet=str(fact["value"]),
+                ),
+                suggestion=f"请保留原文中的关键数据「{fact['value']}」",
+            )
+        )
+
+    # 统计严重程度
+    critical_count = sum(1 for f in flaws if f.severity == "critical")
+    major_count = sum(1 for f in flaws if f.severity == "major")
+
+    # 分层惩罚
+    if critical_count >= 2:
+        # 多个 critical → 封顶到 fail_cap，倾向 fail
+        cap = float(penalty_policy.get("fail_cap", 0.35))
+        overall_score = min(overall_score, cap)
+        verdict = "fail"
+    elif critical_count >= 1:
+        # 1 个 critical → 至少 review，封顶到 0.45
+        overall_score = min(overall_score, 0.45)
+        verdict = "review" if overall_score >= 0.35 else "fail"
+    elif major_count >= 2:
+        # 多个 major → 至少 review
+        if penalty_policy.get("review_cap_on_major_fact_loss"):
+            overall_score = min(overall_score, 0.55)
+            verdict = "review"
+    elif major_count >= 1:
+        if penalty_policy.get("review_cap_on_major_fact_loss"):
+            verdict = "review"
+
+    return overall_score, verdict, flaws
+
+
 # ---------- 核心评估 ----------
 def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     """
@@ -97,7 +220,7 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     4. 组装 EvalResponse
     """
     llm = get_llm(temperature=temperature)
-    system_prompt = build_system_prompt()
+    system_prompt = build_system_prompt(request.evaluation_profile)
     user_prompt = build_user_prompt(
         before_text=request.before_text,
         after_text=request.after_text,
@@ -111,7 +234,7 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     ]
 
     response = llm.invoke(messages)
-    raw_output = response.content if hasattr(response, "content") else str(response)
+    raw_output = str(response.content) if hasattr(response, "content") else str(response)
 
     parsed = _parse_llm_json(raw_output)
 
@@ -196,12 +319,25 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     else:
         verdict = "fail"
 
+    # Profile-aware 后处理：关键事实缺失检查与降分
+    overall_score, verdict, flaws = _apply_profile_penalties(
+        profile_key=request.evaluation_profile,
+        overall_score=overall_score,
+        verdict=verdict,
+        flaws=flaws,
+        before_text=request.before_text,
+        after_text=request.after_text,
+    )
+
     return EvalResponse(
         request_id=request.request_id,
+        evaluation_profile=request.evaluation_profile,
         dimensions=dimensions,
         overall_score=round(overall_score, 4),
         flaws=flaws,
         verdict=verdict,
         reproducibility_token=_build_token(request, temperature),
+        model_version=DEEPSEEK_MODEL,
+        prompt_version=_prompt_version(),
         raw_llm_output=raw_output,
     )
