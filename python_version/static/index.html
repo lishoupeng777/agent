@@ -448,6 +448,15 @@
             <h3><span class="icon">📝</span> 核心评估 —— 对比治理前后文本</h3>
 
             <div class="form-group">
+                <label>📋 评估模式</label>
+                <select id="evalProfile" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
+                    <option value="general">通用文本</option>
+                    <option value="government_notice_strict">政务通告/公告（严格保真）</option>
+                    <option value="legal_strict">法规合同/条款（严格保真）</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>请求ID <span style="color:#6b7280;font-weight:400;">（自动生成）</span></label>
                 <input type="text" id="evalRequestId" placeholder="留空自动生成" />
             </div>
@@ -483,6 +492,7 @@
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                 <span id="evalVerdict" class="verdict-badge"></span>
                 <span style="font-size:14px;color:var(--text-secondary);">请求ID：<strong id="evalRid"></strong></span>
+                <span id="evalProfileBadge" style="font-size:13px;padding:4px 12px;background:#e8eaff;color:var(--primary);border-radius:20px;font-weight:600;"></span>
             </div>
 
             <div class="score-big" id="evalOverall">--</div>
@@ -514,6 +524,15 @@
             <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">
                 对同一输入进行多次独立评估，检测评分的一致性（方差越小越稳定）。
             </p>
+
+            <div class="form-group">
+                <label>📋 评估模式</label>
+                <select id="stabProfile" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
+                    <option value="general">通用文本</option>
+                    <option value="government_notice_strict">政务通告/公告（严格保真）</option>
+                    <option value="legal_strict">法规合同/条款（严格保真）</option>
+                </select>
+            </div>
 
             <div class="row">
                 <div class="form-group">
@@ -702,6 +721,40 @@
         </div>
 
         <div class="card">
+            <h3><span class="icon">📋</span> 评估模式</h3>
+            <p style="margin-bottom:12px;">系统支持三种评估模式，适用于不同类型的文本：</p>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <thead>
+                    <tr style="background:#f9fafb;">
+                        <th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);">模式</th>
+                        <th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);">适用场景</th>
+                        <th style="padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);">特点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);"><strong>通用文本</strong></td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">普通说明文、常规治理文本</td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">保持现有四维度评分逻辑</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);"><strong>政务通告/公告（严格保真）</strong></td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">政务通告、公告、制度通知、执法告知</td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">重点关注日期、期限、罚则区间、适用范围等关键事实是否被删除或泛化</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);"><strong>法规合同/条款（严格保真）</strong></td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">法规、合同、条款、协议、制度规范</td>
+                        <td style="padding:10px 12px;border-bottom:1px solid var(--border);">重点关注责任主体、义务、条件、例外与法律后果是否被模糊化</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top:12px;font-size:13px;color:var(--text-secondary);">
+                <strong>严格模式额外规则：</strong>选择政务通告或法规合同严格模式后，系统会自动执行关键事实缺失检查——从原文中提取日期、金额区间、百分比、时限等关键事实，检查改写后是否仍然保留。若关键事实丢失，自动追加瑕疵并降分；多个关键事实缺失时，直接判定为 fail。
+            </p>
+        </div>
+
+        <div class="card">
             <h3><span class="icon">📖</span> 操作流程</h3>
             <ol style="padding-left:24px;line-height:2.2;">
                 <li>确保后端服务已启动（运行 <code>python_version\run.bat</code>）</li>
@@ -801,6 +854,7 @@ async function doEvaluate() {
 
     const stabilize = document.getElementById('evalStabilize').checked;
     const sampleCount = parseInt(document.getElementById('evalSampleCount').value) || 3;
+    const evaluationProfile = document.getElementById('evalProfile').value;
 
     try {
         const res = await fetch(API_BASE + '/evaluate', {
@@ -810,6 +864,7 @@ async function doEvaluate() {
                 request_id: requestId,
                 before_text: before,
                 after_text: after,
+                evaluation_profile: evaluationProfile,
                 stabilize: stabilize,
                 sample_count: sampleCount
             })
@@ -828,6 +883,11 @@ async function doEvaluate() {
 function renderEvalResult(data) {
     document.getElementById('evalResult').classList.add('active');
     document.getElementById('evalRid').textContent = data.request_id;
+
+    // 评估模式
+    const profileLabels = {general:'通用文本',government_notice_strict:'政务通告/公告（严格保真）',legal_strict:'法规合同/条款（严格保真）'};
+    const profileUsed = profileLabels[data.evaluation_profile] || data.evaluation_profile || 'general';
+
     document.getElementById('evalOverall').textContent = data.overall_score.toFixed(4);
     document.getElementById('evalOverall').style.color = getScoreColor(data.overall_score);
     document.getElementById('evalToken').textContent = data.reproducibility_token;
@@ -836,6 +896,9 @@ function renderEvalResult(data) {
     const v = document.getElementById('evalVerdict');
     v.textContent = getVerdictText(data.verdict);
     v.className = 'verdict-badge ' + getVerdictClass(data.verdict);
+
+    // 评估模式
+    document.getElementById('evalProfileBadge').textContent = '📋 ' + profileUsed;
 
     // 维度评分
     let dimsHtml = '';
@@ -910,6 +973,7 @@ async function doStability() {
     loading.classList.add('active');
 
     const sampleCount = parseInt(document.getElementById('stabSampleCount').value) || 3;
+    const stabProfile = document.getElementById('stabProfile').value;
 
     try {
         const res = await fetch(API_BASE + '/stability', {
@@ -919,6 +983,7 @@ async function doStability() {
                 request_id: 'stab-' + Date.now(),
                 before_text: before,
                 after_text: after,
+                evaluation_profile: stabProfile,
                 stabilize: false,
                 sample_count: sampleCount
             })
