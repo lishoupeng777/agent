@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from .profiles import PROFILE_GENERAL, validate_profile_key
 
 
 class AnchorSpan(BaseModel):
@@ -36,6 +38,7 @@ class EvalRequest(BaseModel):
     request_id: str = Field(..., description="请求唯一标识")
     before_text: str = Field(..., description="治理前原文")
     after_text: str = Field(..., description="治理后文本")
+    evaluation_profile: str = Field(PROFILE_GENERAL, description="评估模式")
     segments_before: Optional[list[dict[str, Any]]] = Field(
         None, description="治理前分段信息（含 segment_id, offset 等锚点）"
     )
@@ -48,16 +51,29 @@ class EvalRequest(BaseModel):
     stabilize: bool = Field(False, description="是否启用多次采样稳定化")
     sample_count: int = Field(3, ge=1, le=5, description="稳定化采样次数")
 
+    @field_validator("evaluation_profile")
+    @classmethod
+    def validate_evaluation_profile(cls, value: str) -> str:
+        return validate_profile_key(value)
+
 
 class EvalResponse(BaseModel):
     """评估响应"""
     request_id: str
+    evaluation_profile: str = Field(PROFILE_GENERAL, description="本次评估使用的评估模式")
     dimensions: list[DimensionScore] = Field(..., description="各维度评分")
     overall_score: float = Field(..., ge=0.0, le=1.0, description="加权总分")
     flaws: list[FlawItem] = Field(default_factory=list, description="瑕疵清单（可锚点定位）")
     verdict: str = Field(..., description="综合判定: pass | review | fail")
-    reproducibility_token: str = Field(..., description="可复现令牌（固定策略下相同输入可得相同结果）")
+    reproducibility_token: str = Field(..., description="可复现令牌（输入+模型+prompt 指纹）")
+    model_version: str = Field("", description="评估时使用的模型标识")
+    prompt_version: str = Field("", description="评估时使用的 prompt 版本哈希（前8位）")
     raw_llm_output: Optional[str] = Field(None, description="LLM 原始输出（留存判定依据）")
+
+    @field_validator("evaluation_profile")
+    @classmethod
+    def validate_evaluation_profile(cls, value: str) -> str:
+        return validate_profile_key(value)
 
 
 class StabilityReport(BaseModel):
