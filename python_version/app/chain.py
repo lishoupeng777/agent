@@ -33,16 +33,27 @@ from .profiles import get_profile_config, PROFILE_GENERAL
 
 
 # ============================================================
-# 0. 缓存配置
+# 0. 缓存 / 限流 / 流式 配置
 # ============================================================
 
 _cache_enabled = True
+_rate_limiter = None
 
 
-def enable_cache() -> None:
-    """启用 LLM 响应缓存（相同输入不重复调用 API）"""
+def enable_cache(cache_type: str = "memory", db_path: str = "output/llm_cache.db") -> None:
+    """启用 LLM 响应缓存。
+
+    Args:
+        cache_type: "memory"（内存，重启丢失）或 "sqlite"（持久化）
+        db_path: SQLite 缓存文件路径（仅 sqlite 模式）
+    """
     global _cache_enabled
-    set_llm_cache(InMemoryCache())
+    if cache_type == "sqlite":
+        from langchain_community.cache import SQLiteCache
+        import sqlite3
+        set_llm_cache(SQLiteCache(database_path=db_path))
+    else:
+        set_llm_cache(InMemoryCache())
     _cache_enabled = True
 
 
@@ -59,8 +70,58 @@ def clear_cache() -> None:
         enable_cache()
 
 
-# 默认启用缓存
-enable_cache()
+def enable_rate_limiter(
+    requests_per_second: float = 5.0,
+    check_every_n_seconds: float = 0.5,
+    max_bucket_size: int = 10,
+) -> None:
+    """启用 API 限流。
+
+    Args:
+        requests_per_second: 每秒最大请求数
+        check_every_n_seconds: 检查间隔
+        max_bucket_size: 令牌桶最大容量
+    """
+    global _rate_limiter
+    from langchain_core.rate_limiters import InMemoryRateLimiter
+    _rate_limiter = InMemoryRateLimiter(
+        requests_per_second=requests_per_second,
+        check_every_n_seconds=check_every_n_seconds,
+        max_bucket_size=max_bucket_size,
+    )
+
+
+def disable_rate_limiter() -> None:
+    """禁用限流"""
+    global _rate_limiter
+    _rate_limiter = None
+
+
+def enable_streaming() -> None:
+    """启用流式输出（改善感知延迟，首字即出）。
+
+    注意：流式模式下 raw_llm_output 为空，因为内容是逐步输出的。
+    评估场景建议关闭流式，确保完整解析。
+    """
+    global _llm_instance
+    _llm_instance = None  # 重置，下次创建时会带上 streaming
+
+
+def get_cache_info() -> dict[str, Any]:
+    """返回缓存状态信息"""
+    from langchain_core.globals import get_llm_cache
+    cache = get_llm_cache()
+    if cache is None:
+        return {"enabled": False, "type": "none"}
+    cache_type = type(cache).__name__
+    info: dict[str, Any] = {"enabled": True, "type": cache_type}
+    if hasattr(cache, "_cache"):
+        info["entries"] = len(cache._cache)
+    return info
+
+
+# 默认启用内存缓存
+enable_cache("memory")
 
 
 # ============================================================
@@ -71,7 +132,7 @@ _llm_instance: Optional[ChatOpenAI] = None
 
 
 def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
-    """创建 LLM 实例（延迟读取环境变量）
+    """创建 LLM 实例（延迟读取环境变量，支持限流）
 
     Args:
         temperature: 温度参数
@@ -83,6 +144,8 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
     kwargs: dict[str, Any] = {}
     if json_mode:
         kwargs["model_kwargs"] = {"response_format": {"type": "json_object"}}
+    if _rate_limiter is not None:
+        kwargs["rate_limiter"] = _rate_limiter
     _llm_instance = ChatOpenAI(
         model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         temperature=temperature,
