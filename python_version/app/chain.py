@@ -53,7 +53,7 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
     _llm_instance = ChatOpenAI(
         model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         temperature=temperature,
-        max_tokens=4096,
+        max_tokens=2048,
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         **kwargs,
