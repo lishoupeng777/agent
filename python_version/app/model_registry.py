@@ -150,21 +150,22 @@ def get_registry() -> ModelRegistry:
 
 
 def register_default_models() -> None:
-    """注册默认模型（DeepSeek V4 Flash）"""
-    from .chain import evaluate as chain_evaluate
+    """注册所有可用模型适配器。
+
+    默认注册 DeepSeek，其他模型按环境变量可用性注册。
+    """
+    from .adapters import DeepSeekAdapter, GLMAdapter, GPTAdapter
     import os
 
-    class DeepSeekAdapter(EvaluationProtocol):
-        def evaluate(self, request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
-            return chain_evaluate(request, temperature)
-
-        def get_model_name(self) -> str:
-            return os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
-
-        def get_model_version(self) -> str:
-            from .prompts import SYSTEM_PROMPT
-            import hashlib
-            return hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()[:8]
-
     registry = get_registry()
+
+    # DeepSeek（默认）
     registry.register("deepseek", DeepSeekAdapter(), default=True)
+
+    # GLM（如果配置了 API Key）
+    if os.getenv("GLM_API_KEY"):
+        registry.register("glm", GLMAdapter())
+
+    # GPT（如果配置了 API Key）
+    if os.getenv("GPT_API_KEY"):
+        registry.register("gpt", GPTAdapter())
