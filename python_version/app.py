@@ -94,15 +94,8 @@ def _generate_zhipu_token(api_key: str) -> str:
 def _setup_env(api_key: str, base_url: str, model: str) -> None:
     """将侧边栏配置写入环境变量，供 engine.py 读取"""
     if api_key and api_key.strip():
-        # 智谱 API 需要将 {id}.{secret} 转换为 JWT Token
-        if base_url and "bigmodel.cn" in base_url:
-            os.environ["DEEPSEEK_API_KEY"] = _generate_zhipu_token(api_key.strip())
-        else:
-            os.environ["DEEPSEEK_API_KEY"] = api_key.strip()
-    if base_url and base_url.strip():
-        os.environ["DEEPSEEK_BASE_URL"] = base_url.strip()
-    if model and model.strip():
-        os.environ["DEEPSEEK_MODEL"] = model.strip()
+        os.environ["DEEPSEEK_API_KEY"] = api_key.strip()
+    # 模型和 Base URL 锁定，不从 UI 修改
     # 重置 engine 单例，让新配置生效
     try:
         import app.engine as _eng
@@ -192,48 +185,28 @@ PRESET_MODELS = {
     "自定义（手动填写）": ("", ""),
 }
 
+# 当前固定使用的模型（与 .env 保持一致）
+ACTIVE_MODEL_NAME = "DeepSeek V4 Flash"
+ACTIVE_MODEL_ID = os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
+
 
 def render_sidebar() -> tuple[str, str, str, str]:
     """返回 (api_key, base_url, model_name, evaluation_profile)"""
     with st.sidebar:
         st.markdown("### 🔑 API 配置")
 
-        # ── 模型预设选择 ──
-        preset = st.selectbox(
-            "选择模型",
-            list(PRESET_MODELS.keys()),
-            key="sidebar_preset",
-        )
-        preset_url, preset_model = PRESET_MODELS[preset]
+        # ── 当前模型（只读展示） ──
+        st.markdown(f"**当前模型：** `{ACTIVE_MODEL_ID}`")
+        st.caption("模型已固定，确保评测结果一致性")
 
         # ── API Key ──
         api_key = st.text_input(
             "API Key",
             type="password",
             value="",
-            placeholder="sk-xxxxxxxx 或 智谱 {id}.{secret}",
+            placeholder="sk-xxxxxxxx",
             key="sidebar_api_key",
         )
-
-        # ── Base URL（自定义时才展开编辑） ──
-        if preset == "自定义（手动填写）":
-            base_url = st.text_input(
-                "Base URL",
-                value=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
-                placeholder="https://api.xxx.com/v1",
-                key="sidebar_base_url",
-            )
-            model_name = st.text_input(
-                "Model Name",
-                value=os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
-                placeholder="model-name",
-                key="sidebar_model_name",
-            )
-        else:
-            base_url = preset_url
-            model_name = preset_model
-            st.caption(f"Base URL：`{base_url}`")
-            st.caption(f"Model：`{model_name}`")
 
         st.divider()
 
@@ -264,9 +237,9 @@ LLM-as-Judge 架构，4维度评估：
 3. **可读性**（权重0.15）
 4. **结构质量**（权重0.15）
 
-支持 DeepSeek / OpenAI 及任何兼容 OpenAI API 格式的模型。
+基于 DeepSeek V4 Flash 模型。
 """)
-    return api_key, base_url, model_name, evaluation_profile
+    return api_key, "https://api.deepseek.com/v1", ACTIVE_MODEL_ID, evaluation_profile
 
 
 # ── 单条评估页 ────────────────────────────────────────────────────────────
