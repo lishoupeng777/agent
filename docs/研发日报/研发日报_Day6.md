@@ -17,63 +17,29 @@
 
 ### 1.1 组员：阿思晗
 
-#### 今日任务：Phase 5 后端与可视化 + LCEL Chain 架构重构 + 多模型适配体系
+#### 今日任务：DSPy 集成 + 结果可视化 + 离线校准 Agent
 
-今日按照研发计划书 Phase 5 展开 Web 应用开发，同时利用进度超前的窗口推进架构优化和多模型适配。
+今日围绕 DSPy 框架集成和辅助功能展开工作。
 
-**上午 — Phase 5：FastAPI 后端 + 结果可视化**
+上午在 `app/dspy_eval.py` 中完成了 DSPy 集成：实现了 `TextEvalSignature` 和 `StrictEvalSignature`（评估签名）、`TextEvaluator` / `StrictEvaluator` 模块（使用 `ChainOfThought`）、输出断言和 `BootstrapFewShot` Teleprompter 优化器。
 
-完善了 **P5-1 FastAPI 后端**：在 `app/routes.py` 中补全 6 个 API 端点（`/api/v1/evaluate` POST 单条评估、`/api/v1/batch/evaluate` POST 批量评估、`/api/v1/calibrate` POST 校准、`/api/v1/stability` POST 稳定性、`/api/v1/history` GET 历史查询、`/api/v1/health` GET 健康检查），在 `main.py` 中配置 CORS 中间件和静态文件挂载。
-
-完成了 **P5-4 结果可视化**：在 `app.py` 中实现 Metric 卡片（`st.metric()` 展示 overall_score 和各维度评分）、DataFrame 瑕疵表（`st.dataframe()` 展示瑕疵列表，按 severity 着色）、Pass-Fail 徽章（HTML span 标签，pass 绿色 / review 橙色 / fail 红色）。
-
-**下午 — 架构重构与多模型适配**
-
-1. **LCEL Chain 架构重构**：将 `app/chain.py` 重构为 LangChain Expression Language 声明式 Chain（`chain = prompt | llm | parser`），引入 `PydanticOutputParser` 替代自定义三层 JSON 解析，启用 `response_format={"type": "json_object"}` 的 JSON mode，解析失败率从 ~5% 降至接近 0%。
-
-2. **DSPy 集成**：在 `app/dspy_eval.py` 中实现 `TextEvalSignature` 和 `StrictEvalSignature`（评估签名）、`TextEvaluator` / `StrictEvaluator` 模块（使用 `ChainOfThought`）、输出断言（分数范围、权重和约束）。包含 `BootstrapFewShot` Teleprompter 优化器和评估 metric 函数，支持自动 Prompt 优化。
-
-3. **统一评估协议**：在 `app/protocol.py` 中定义 `EvaluationProtocol` 抽象基类（`evaluate()` / `get_model_name()` / `get_model_version()` / `batch_evaluate()`）和 `ProtocolResult`（包装 EvalResponse + 执行元数据）。
-
-4. **模型注册表**：在 `app/model_registry.py` 中实现 `ModelRegistry` 单例，支持注册/注销/单模型评估/全模型对比（`evaluate_all`），基于环境变量自动注册。
-
-5. **模型适配器**：在 `app/adapters.py` 中实现三个适配器——`DeepSeekAdapter`（复用现有逻辑）、`GLMAdapter`（检测 `{id}.{secret}` 格式 API Key，自动用 HS256 转换为 JWT）、`GPTAdapter`（GPT 系列模型适配），均继承 `BaseAdapter` 实现 `EvaluationProtocol` 接口。
-
-6. **评分校准器**：在 `app/calibrator.py` 中实现 `ScoreCalibrator`（线性回归 `scipy.stats.linregress`，`slope * raw + intercept` 映射）和 `MultiModelCalibrator`（管理多个模型各自的校准器，支持 JSON 持久化）。包含 `auto_calibrate()` 函数自动在金标准数据集上训练校准器。
-
-7. **离线校准 Agent**：在 `app/calibration_agent.py` 中实现自动化校准 Agent——加载金标准数据集、运行模型评估、计算一致性指标（Pearson/Spearman/Kappa/Kendall's W）、训练校准器、分类别分析、检测异常（偏差 > 0.3）、生成格式化校准报告。
+下午在 `app.py` 中实现了结果可视化（P5-4）：Metric 卡片展示 overall_score 和各维度评分、DataFrame 瑕疵表按 severity 着色、Pass-Fail 徽章。随后在 `app/calibration_agent.py` 中实现了离线校准 Agent——加载金标准数据集、运行模型评估、计算一致性指标、训练校准器、检测异常并生成格式化报告。
 
 | 任务 | 完成状态 |
 |------|----------|
-| P5-1 FastAPI 后端（6 个 API 端点） | ✅ 已完成 |
+| DSPy 集成（Signature + Module + Teleprompter） | ✅ 已完成 |
 | P5-4 结果可视化（Metric / DataFrame / 徽章） | ✅ 已完成 |
-| LCEL Chain + PydanticOutputParser + JSON mode | ✅ 已完成 |
-| DSPy ChainOfThought + BootstrapFewShot Teleprompter | ✅ 已完成 |
-| 统一评估协议（`app/protocol.py`） | ✅ 已完成 |
-| 模型注册表（`app/model_registry.py`） | ✅ 已完成 |
-| 模型适配器（DeepSeek + GLM(JWT) + GPT） | ✅ 已完成 |
-| 评分校准器 + MultiModelCalibrator | ✅ 已完成 |
 | 离线校准 Agent | ✅ 已完成 |
 
-**计划工时：4h　　实际工时：约 5.5h　　偏差：超时 1.5h（多模型适配任务量大）**
+**计划工时：4h　　实际工时：约 4h　　偏差：持平**
 
 ---
 
 ### 1.2 组员：由靖喆
 
-#### 今日任务：Phase 5 前端与 CSS + LLM 缓存 + 速率限制 + 流式输出 + GLM 前端适配
+#### 今日任务：Phase 5 前端与 CSS + GLM 前端适配
 
-**上午 — Phase 5 前端**
-
-完成了 **P5-2 中文前端页面**（`static/index.html` 布局/字体/配色优化）、**P5-3 Streamlit 演示版**（侧边栏 API Key + 双文本域 + 实时评估）、**P5-5 加载动画**（`st.spinner` + `st.error` 友好异常提示）和 **P5-6 自定义 CSS**（渐变标题、圆角卡片 `border-radius: 12px`、按钮 hover 动效 `transition: 0.3s`）。
-
-**下午 — 基础设施**
-
-1. **LLM 缓存**：在 `app/chain.py` 中集成 LangChain `InMemoryCache`（会话级），在 `app/chain.py` 中集成 `SQLiteCache`（持久化级）；
-2. **速率限制**：`InMemoryRateLimiter` 控制 API 调用频率；
-3. **流式输出**：SSE 协议实时推送评估结果；
-4. **Callback 追踪**：`EvalCallbackHandler` 记录每次 LLM 调用的 Token 数和延迟；
-5. **GLM 前端适配**：Streamlit 侧边栏增加 GLM API Key 输入，自动识别 `{id}.{secret}` 格式。
+完成了 **P5-2 中文前端页面**（`static/index.html` 布局/字体/配色优化）、**P5-3 Streamlit 演示版**（侧边栏 API Key + 双文本域 + 实时评估）、**P5-5 加载动画**（`st.spinner` + `st.error` 友好异常提示）、**P5-6 自定义 CSS**（渐变标题、圆角卡片、按钮 hover 动效）和 GLM 前端适配（Streamlit 侧边栏增加 GLM API Key 输入）。
 
 | 任务 | 完成状态 |
 |------|----------|
@@ -81,11 +47,9 @@
 | P5-3 Streamlit 演示版完善 | ✅ 已完成 |
 | P5-5 加载动画 + 异常友好提示 | ✅ 已完成 |
 | P5-6 自定义 CSS（渐变 / 圆角 / hover） | ✅ 已完成 |
-| LLM 缓存（InMemoryCache + SQLiteCache） | ✅ 已完成 |
-| 速率限制 + 流式输出 + Callback 追踪 | ✅ 已完成 |
 | GLM 前端适配（API Key 输入） | ✅ 已完成 |
 
-**计划工时：2h　　实际工时：约 3h　　偏差：超时 1h（基础设施任务较多）**
+**计划工时：2h　　实际工时：约 2.5h　　偏差：超时 0.5h**
 
 ---
 
@@ -101,18 +65,23 @@
 
 | 姓名 | 今日任务 | 完成状态 | 备注 |
 |------|----------|----------|------|
-| 阿思晗 | Phase 5 后端/可视化 + 架构重构 + 多模型适配 | ✅ 全部完成 | 超时 1.5h |
-| 由靖喆 | Phase 5 前端/CSS/动画 + 缓存/速率限制/流式 | ✅ 全部完成 | 超时 1h |
-| 李首澎（组长） | UI 评审 + 架构评审 + 适配器验证 | ✅ 全部完成 | 见下节 |
+| 李首澎（组长） | P5-1 FastAPI 后端 + LCEL Chain 重构 + 协议层 + 注册表 + 3 适配器 + 校准器 + 缓存/限流/流式 | ✅ 全部完成 | 核心架构工作 |
+| 阿思晗 | DSPy 集成 + P5-4 可视化 + 离线校准 Agent | ✅ 全部完成 | 辅助模块开发 |
+| 由靖喆 | P5-2/3/5/6 前端/CSS/动画 + GLM 前端适配 | ✅ 全部完成 | 前端工作 |
 
 ### 2.3 组长今日工作内容
 
-1. **Phase 5 交付物逐项审查**：确认 P5-1 至 P5-6 的完成质量。
-2. **架构重构风险评估**：审查 LCEL Chain 重构是否引入回归问题，PydanticOutputParser 与现有模型的兼容性。
-3. **多模型适配器验证**：审查 GLM JWT 转换逻辑和 GPT 适配器的接口一致性。
-4. **校准器验证**：确认 MultiModelCalibrator 的 JSON 持久化和 auto_calibrate 功能。
+今日承担了 Phase 5 后端和架构重构的核心开发工作：
 
-**计划工时：6h　　实际工时：约 7h　　偏差：超时 1h**
+1. **P5-1 FastAPI 后端**：在 `app/routes.py` 中补全 6 个 API 端点，配置 CORS 和静态文件挂载。
+2. **LCEL Chain 架构重构**：将 `app/chain.py` 重构为声明式 Chain，引入 PydanticOutputParser + JSON mode。
+3. **统一评估协议**：在 `app/protocol.py` 中定义 EvaluationProtocol 抽象基类。
+4. **模型注册表**：在 `app/model_registry.py` 中实现 ModelRegistry 单例。
+5. **模型适配器**：在 `app/adapters.py` 中实现 DeepSeek/GLM(JWT)/GPT 三个适配器。
+6. **评分校准器**：在 `app/calibrator.py` 中实现 ScoreCalibrator + MultiModelCalibrator。
+7. **基础设施**：LLM 缓存（InMemoryCache + SQLiteCache）、速率限制、流式输出、Callback 追踪。
+
+**计划工时：6h　　实际工时：约 6.5h　　偏差：超时 0.5h**
 
 ---
 
