@@ -8,7 +8,7 @@
     "human_scores": {
       "semantic_consistency": 1.00,
       "over_cleaning": 1.00,
-      "readability_structure": 0.95,
+      "readability_structure": 1.00,
       "factual_accuracy": 1.00
     },
     "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理"
@@ -73,7 +73,7 @@
     "human_scores": {
       "semantic_consistency": 1.00,
       "over_cleaning": 1.00,
-      "readability_structure": 0.95,
+      "readability_structure": 1.00,
       "factual_accuracy": 1.00
     },
     "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升"
@@ -93,11 +93,11 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.85,
-      "over_cleaning": 0.80,
-      "readability_structure": 0.20,
-      "factual_accuracy": 0.90
-    },
+  "semantic_consistency": 0.90,
+  "over_cleaning": 0.90,
+  "readability_structure": 0.45,
+  "factual_accuracy": 0.95
+},
     "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性"
   },
   {
@@ -145,7 +145,7 @@
     "human_scores": {
       "semantic_consistency": 1.00,
       "over_cleaning": 1.00,
-      "readability_structure": 0.95,
+      "readability_structure": 1.00,
       "factual_accuracy": 1.00
     },
     "rationale": "统一标点符号，内容完全保留，可读性提升"
@@ -165,11 +165,11 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.60,
-      "over_cleaning": 0.40,
-      "readability_structure": 0.75,
-      "factual_accuracy": 0.50
-    },
+  "semantic_consistency": 0.70,
+  "over_cleaning": 0.35,
+  "readability_structure": 0.80,
+  "factual_accuracy": 0.45
+},
     "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界"
   },
   {
@@ -193,12 +193,12 @@
         "suggestion": "恢复正确的技术参数±1100千伏"
       }
     ],
-    "human_scores": {
-      "semantic_consistency": 0.55,
-      "over_cleaning": 0.75,
-      "readability_structure": 0.85,
-      "factual_accuracy": 0.25
-    },
+    "human_scores":{
+  "semantic_consistency": 0.80,
+  "over_cleaning": 0.80,
+  "readability_structure": 0.90,
+  "factual_accuracy": 0.20
+},
     "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改"
   },
   {
@@ -236,12 +236,12 @@
     "before_text": "客户投诉记录：张伟（身份证：110101198801010012）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李娜已受理，工单编号：WO20240310-8821。",
     "after_text": "客户投诉记录：张**（身份证：***）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李**已受理，工单编号：WO20240310-8821。",
     "flaws_gt": [],
-    "human_scores": {
-      "semantic_consistency": 0.90,
-      "over_cleaning": 0.95,
-      "readability_structure": 0.90,
-      "factual_accuracy": 0.85
-    },
+    "human_scores":{
+  "semantic_consistency": 1.00,
+  "over_cleaning": 1.00,
+  "readability_structure": 1.00,
+  "factual_accuracy": 1.00
+},
     "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留"
   },
   {
@@ -258,12 +258,12 @@
         "suggestion": "保留编号列表格式及各项的括号补充说明"
       }
     ],
-    "human_scores": {
-      "semantic_consistency": 0.65,
-      "over_cleaning": 0.50,
-      "readability_structure": 0.30,
-      "factual_accuracy": 0.70
-    },
+    "human_scores":{
+  "semantic_consistency": 0.75,
+  "over_cleaning": 0.55,
+  "readability_structure": 0.50,
+  "factual_accuracy": 0.80
+},
     "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对"
   },
   {
@@ -289,7 +289,7 @@
     "human_scores": {
       "semantic_consistency": 1.00,
       "over_cleaning": 1.00,
-      "readability_structure": 0.95,
+      "readability_structure": 1.00,
       "factual_accuracy": 1.00
     },
     "rationale": "仅去除多余空格，数据和内容完全保留"
@@ -322,12 +322,12 @@
         "suggestion": "保留关键政策目标和量化执行标准"
       }
     ],
-    "human_scores": {
-      "semantic_consistency": 0.65,
-      "over_cleaning": 0.45,
-      "readability_structure": 0.75,
-      "factual_accuracy": 0.55
-    },
+    "human_scores":{
+  "semantic_consistency": 0.75,
+  "over_cleaning": 0.40,
+  "readability_structure": 0.80,
+  "factual_accuracy": 0.45
+},
     "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降"
   },
   {
@@ -344,12 +344,12 @@
         "suggestion": "保持原有的背景→目标→方案→预算的叙述顺序"
       }
     ],
-    "human_scores": {
-      "semantic_consistency": 0.95,
-      "over_cleaning": 0.95,
-      "readability_structure": 0.70,
-      "factual_accuracy": 1.00
-    },
+    "human_scores":{
+  "semantic_consistency": 1.00,
+  "over_cleaning": 1.00,
+  "readability_structure": 0.90,
+  "factual_accuracy": 1.00
+},
     "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降"
   },
   {

@@ -1,0 +1,1753 @@
+[
+  {
+    "id": "sample001",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "一般公文",
+    "before_text": "新华社北京3月15日电（记者张三）  近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。  ",
+    "after_text": "新华社北京3月15日电（记者张三）近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample002",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "本次产品升级主要包括三个方面：第一，界面全新改版，采用卡片式布局，信息层级更清晰；第二，新增智能推荐功能，基于用户历史行为自动推送相关内容；第三，性能大幅优化，页面加载速度提升50%以上。",
+    "after_text": "本次产品进行了升级。",
+    "gold_scores": {
+      "semantic_consistency": 0.3,
+      "over_cleaning": 0.15,
+      "readability_structure": 0.7,
+      "factual_accuracy": 0.2
+    },
+    "overall": {
+      "weighted_score": 0.32,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "本次产品进行了升级",
+        "after_snippet": null,
+        "reason": "将三个具体的升级要点压缩为一句话，丢失了界面改版、智能推荐、性能优化等全部有效信息"
+      }
+    ],
+    "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample003",
+    "category": "Factual Error",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "截至2023年第三季度，公司实现营业收入125.8亿元，同比增长23.5%；净利润18.6亿元，同比增长31.2%。研发投入占营收比例达到8.7%。",
+    "after_text": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。",
+    "gold_scores": {
+      "semantic_consistency": 0.7,
+      "over_cleaning": 0.9,
+      "readability_structure": 0.95,
+      "factual_accuracy": 0.15
+    },
+    "overall": {
+      "weighted_score": 0.7,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-01",
+        "severity": "critical",
+        "before_snippet": "营业收入125.8亿元，同比增长23.5%",
+        "after_snippet": null,
+        "reason": "营业收入从125.8亿误改为128.5亿，同比增长从23.5%误改为23.6%"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "同比增长31.2%。研发投入占营收比例达到8.7%",
+        "after_snippet": null,
+        "reason": "净利润同比增长率从31.2%误改为31.3%，研发占比从8.7%误改为8.8%"
+      }
+    ],
+    "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample004",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日 下午。如有问题 请致电 400-888-9999 。",
+    "after_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日下午。如有问题请致电400-888-9999。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample005",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "| 产品 | 价格 | 销量 |\n|------|------|------|\n| A产品 | 99元 | 1200 |\n| B产品 | 199元 | 850 |\n| C产品 | 299元 | 620 |\n\n总计销售额：约47.5万元",
+    "after_text": "A产品99元售出1200件，B产品199元售出850件，C产品299元售出620件，总共卖了47.5万元左右。",
+    "gold_scores": {
+      "semantic_consistency": 0.9,
+      "over_cleaning": 0.9,
+      "readability_structure": 0.45,
+      "factual_accuracy": 0.95
+    },
+    "overall": {
+      "weighted_score": 0.82,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "critical",
+        "before_snippet": "A产品99元售出1200件，B产品199元售出850件",
+        "after_snippet": null,
+        "reason": "表格结构被完全破坏，转为纯文本，丧失了结构化数据的可读性和对比性"
+      }
+    ],
+    "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample006",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
+    "after_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "完全无改动，四个维度均为满分",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample007",
+    "category": "Readability",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "为确保系统安全稳定运行，请各位用户注意以下事项：1. 定期修改密码，建议每90天更换一次；2. 不要在公共设备上保存登录信息；3. 如发现异常登录，请立即联系技术支持团队。",
+    "after_text": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。",
+    "gold_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.3,
+      "readability_structure": 0.15,
+      "factual_accuracy": 0.7
+    },
+    "overall": {
+      "weighted_score": 0.46,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "RS-01",
+        "severity": "critical",
+        "before_snippet": "为保系统安全稳定运行请各用户注意下事定期改密",
+        "after_snippet": null,
+        "reason": "过度缩写导致严重可读性问题：'注意下事'、'别在'、'立联'等表达不正式且难以理解"
+      }
+    ],
+    "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample008",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "一般公文",
+    "before_text": "本次会议纪要如下：第一,项目进度正常；第二,预算需要追加20% ；第三 ，人力资源缺口已填补 。与会人员:张三,李四，王五 。",
+    "after_text": "本次会议纪要如下：第一，项目进度正常；第二，预算需要追加20%；第三，人力资源缺口已填补。与会人员：张三、李四、王五。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "统一标点符号，内容完全保留，可读性提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample009",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "公司2024年度战略重点包括：深化数字化转型，构建智能制造体系；加强供应链韧性建设，优化全球采购网络；持续推进绿色低碳发展，争取2030年实现碳中和目标；积极拓展东南亚市场，预计新增营收15亿元。",
+    "after_text": "公司2024年度战略重点包括：深化数字化转型；加强供应链建设；持续推进绿色发展；积极拓展东南亚市场。",
+    "gold_scores": {
+      "semantic_consistency": 0.7,
+      "over_cleaning": 0.35,
+      "readability_structure": 0.8,
+      "factual_accuracy": 0.45
+    },
+    "overall": {
+      "weighted_score": 0.57,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "深化数字化转型；加强供应链建设",
+        "after_snippet": null,
+        "reason": "删除了各战略要点的具体措施和量化目标，如'构建智能制造体系'、'2030年实现碳中和'、'新增营收15亿元'等关键信息"
+      }
+    ],
+    "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample010",
+    "category": "Factual Error",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "国家电网有限公司（简称\"国家电网\"）近日发布公告，宣布与南方电网有限责任公司在特高压直流输电领域开展战略合作。双方将联合攻关±1100千伏特高压直流输电核心技术。",
+    "after_text": "国网公司近日发布公告，宣布与南网公司在特高压直流输电领域开展战略合作。双方将联合攻关±1000千伏特高压直流输电核心技术。",
+    "gold_scores": {
+      "semantic_consistency": 0.8,
+      "over_cleaning": 0.8,
+      "readability_structure": 0.9,
+      "factual_accuracy": 0.2
+    },
+    "overall": {
+      "weighted_score": 0.7,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "国网公司近日发布公告",
+        "after_snippet": null,
+        "reason": "将'国家电网有限公司'缩写为'国网公司'、'南方电网有限责任公司'缩写为'南网公司'，丢失了法定全称信息"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "critical",
+        "before_snippet": "±1000千伏特高压直流输电核心技术",
+        "after_snippet": null,
+        "reason": "技术参数从±1100千伏误改为±1000千伏，核心技术指标错误"
+      }
+    ],
+    "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample011",
+    "category": "Mixed Errors",
+    "difficulty": "hard",
+    "text_type": "一般公文",
+    "before_text": "根据《中华人民共和国数据安全法》第三十条规定，重要数据的处理者应当按照规定对重要数据的处理活动定期开展风险评估，并向有关主管部门报告风险评估情况。风险评估报告应当包括：处理的重要数据的种类、数量；开展数据处理活动的情况；面临的数据安全风险及其应对措施；以及其他需要报告的事项。",
+    "after_text": "数据处理者应当定期开展风险评估并报告。报告应包括数据种类和数量、处理活动情况及安全风险应对措施。",
+    "gold_scores": {
+      "semantic_consistency": 0.3,
+      "over_cleaning": 0.2,
+      "readability_structure": 0.65,
+      "factual_accuracy": 0.25
+    },
+    "overall": {
+      "weighted_score": 0.33,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "数据处理者应当定期开展风险评估并报告",
+        "after_snippet": null,
+        "reason": "删除了法律条文的具体引用（《中华人民共和国数据安全法》第三十条），以及'重要数据'的定语限定，改变了法律文本的精确性"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "报告应包括数据种类和数量、处理活动情况",
+        "after_snippet": null,
+        "reason": "丢失了'向有关主管部门报告'的对象信息，以及报告事项中的'其他需要报告的事项'兜底条款"
+      }
+    ],
+    "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample012",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "客户投诉记录：张伟（身份证：110101198801010012）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李娜已受理，工单编号：WO20240310-8821。",
+    "after_text": "客户投诉记录：张**（身份证：***）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李**已受理，工单编号：WO20240310-8821。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample013",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "项目验收需提交以下材料：\n1. 项目总结报告（含技术路线说明）\n2. 测试报告（含性能测试数据）\n3. 用户手册及操作指南\n4. 源代码及部署文档\n5. 知识产权证明文件",
+    "after_text": "项目验收需提交项目总结报告、测试报告、用户手册及操作指南、源代码及部署文档和知识产权证明文件。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 0.55,
+      "readability_structure": 0.5,
+      "factual_accuracy": 0.8
+    },
+    "overall": {
+      "weighted_score": 0.65,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "major",
+        "before_snippet": "项目验收需提交项目总结报告、测试报告",
+        "after_snippet": null,
+        "reason": "有序编号列表被压缩为单行逗号连接的文本，丢失了列表的层次结构和各项的括号补充说明"
+      }
+    ],
+    "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample014",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
+    "after_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "完全无改动，四个维度均为满分",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample015",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "2024年一季度，公司营业收入为 32.6亿元 ，同比增长 8.4% ；归母净利润为 4.2亿元 ，同比增长 12.3% 。每股收益为 0.85元 。",
+    "after_text": "2024年一季度，公司营业收入为32.6亿元，同比增长8.4%；归母净利润为4.2亿元，同比增长12.3%。每股收益为0.85元。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅去除多余空格，数据和内容完全保留",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample016",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API Gateway（接口网关）、Service Registry（服务注册中心）、Load Balancer（负载均衡器）。系统支持水平扩展，峰值QPS可达50,000。",
+    "after_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API网关、服务注册中心、负载均衡器。系统支持水平扩展，峰值QPS可达50,000。",
+    "gold_scores": {
+      "semantic_consistency": 0.95,
+      "over_cleaning": 0.9,
+      "readability_structure": 0.9,
+      "factual_accuracy": 0.95
+    },
+    "overall": {
+      "weighted_score": 0.93,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample017",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，降低制度性交易成本，激发市场主体活力，现就进一步精简行政许可事项、压缩审批时限、推行\"容缺受理\"、全面推进政务服务标准化规范化便利化，提出以下意见：一、精简行政许可事项。各地区、各部门要按照\"能减则减、能合则合\"的原则，对现有行政许可事项进行全面清理，取消和调整一批不符合时代要求的行政许可事项，确保在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%，鼓励有条件的地区将办理时限压缩至法定时限的50%以内。三、推行\"容缺受理\"机制。对材料基本齐全、主要申请条件符合要求的，可先行受理，要求申请人在规定时间内补齐材料。",
+    "after_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事项。各地区、各部门要取消和调整不符合时代要求的行政许可事项，在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%。三、推行\"容缺受理\"机制。对材料基本齐全的，可先行受理，要求申请人补齐材料。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 0.4,
+      "readability_structure": 0.8,
+      "factual_accuracy": 0.45
+    },
+    "overall": {
+      "weighted_score": 0.59,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "现就精简行政许可事项、压缩审批时限",
+        "after_snippet": null,
+        "reason": "删除了'降低制度性交易成本'、'激发市场主体活力'等政策目标，以及多项量化标准（如'将办理时限压缩至法定时限的50%以内'、'在规定时间内补齐材料'）"
+      }
+    ],
+    "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample018",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "【背景】本项目旨在解决城市交通拥堵问题。【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
+    "after_text": "【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【背景】本项目旨在解决城市交通拥堵问题。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.9,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.98,
+      "verdict": "pass"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "minor",
+        "before_snippet": "【目标】通过智能信号灯控制系统",
+        "after_snippet": null,
+        "reason": "段落顺序调整，将【目标】移至【背景】之前，不符合原文的逻辑叙述顺序（背景→目标→方案→预算）"
+      }
+    ],
+    "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample019",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "法律合同",
+    "before_text": "合同签署日期为2024年03月15日，有效期至2025/3/15。项目启动会议定于24年4月1号召开，预计2025年3月31日前完成验收。",
+    "after_text": "合同签署日期为2024-03-15，有效期至2025-03-15。项目启动会议定于2024-04-01召开，预计2025-03-31前完成验收。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.9,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.98,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "日期格式统一为ISO格式，内容完全保留，规范性提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample020",
+    "category": "Over Cleaning",
+    "difficulty": "hard",
+    "text_type": "法律合同",
+    "before_text": "本协议所称保密信息，是指甲方在本协议签署前后向乙方披露的、与甲方业务相关的、乙方以书面或口头形式获悉的、且甲方明确标注为\"保密\"或\"机密\"的技术信息、商业信息及其他信息，但不包括：（1）乙方在获悉前已合法持有的信息；（2）通过公开渠道可获得的信息；（3）经甲方书面同意可以披露的信息。",
+    "after_text": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露的信息。",
+    "gold_scores": {
+      "semantic_consistency": 0.5,
+      "over_cleaning": 0.25,
+      "readability_structure": 0.7,
+      "factual_accuracy": 0.35
+    },
+    "overall": {
+      "weighted_score": 0.43,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "本协议所称保密信息，是指甲方向乙方披露的",
+        "after_snippet": null,
+        "reason": "删除了多个关键限定条件：'本协议签署前后'（时间范围）、'以书面或口头形式'（获悉方式）、'明确标注为保密或机密'（认定标准），这些限定语在法律合同中具有精确的法律意义"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "经甲方同意可披露的信息",
+        "after_snippet": null,
+        "reason": "例外条款中删除了'（1）（2）（3）'编号结构，将'经甲方书面同意'简化为'经甲方同意'，去掉'书面'限定改变了法律要求"
+      }
+    ],
+    "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample021",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "一般公文",
+    "before_text": "新华社北京3月15日电（记者张三）  近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。  ",
+    "after_text": "新华社北京3月15日电（记者张三）近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.99,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample022",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "本次产品升级主要包括三个方面：第一，界面全新改版，采用卡片式布局，信息层级更清晰；第二，新增智能推荐功能，基于用户历史行为自动推送相关内容；第三，性能大幅优化，页面加载速度提升50%以上。",
+    "after_text": "本次产品进行了升级。",
+    "gold_scores": {
+      "semantic_consistency": 0.3,
+      "over_cleaning": 0.15,
+      "readability_structure": 0.7,
+      "factual_accuracy": 0.2
+    },
+    "overall": {
+      "weighted_score": 0.32,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "本次产品进行了升级",
+        "after_snippet": null,
+        "reason": "将三个具体的升级要点压缩为一句话，丢失了界面改版、智能推荐、性能优化等全部有效信息"
+      }
+    ],
+    "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample023",
+    "category": "Factual Error",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "截至2023年第三季度，公司实现营业收入125.8亿元，同比增长23.5%；净利润18.6亿元，同比增长31.2%。研发投入占营收比例达到8.7%。",
+    "after_text": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。",
+    "gold_scores": {
+      "semantic_consistency": 0.7,
+      "over_cleaning": 0.9,
+      "readability_structure": 0.95,
+      "factual_accuracy": 0.15
+    },
+    "overall": {
+      "weighted_score": 0.7,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-01",
+        "severity": "critical",
+        "before_snippet": "营业收入125.8亿元，同比增长23.5%",
+        "after_snippet": null,
+        "reason": "营业收入从125.8亿误改为128.5亿，同比增长从23.5%误改为23.6%"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "同比增长31.2%。研发投入占营收比例达到8.7%",
+        "after_snippet": null,
+        "reason": "净利润同比增长率从31.2%误改为31.3%，研发占比从8.7%误改为8.8%"
+      }
+    ],
+    "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample024",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日 下午。如有问题 请致电 400-888-9999 。",
+    "after_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日下午。如有问题请致电400-888-9999。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.99,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample025",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "| 产品 | 价格 | 销量 |\n|------|------|------|\n| A产品 | 99元 | 1200 |\n| B产品 | 199元 | 850 |\n| C产品 | 299元 | 620 |\n\n总计销售额：约47.5万元",
+    "after_text": "A产品99元售出1200件，B产品199元售出850件，C产品299元售出620件，总共卖了47.5万元左右。",
+    "gold_scores": {
+      "semantic_consistency": 0.85,
+      "over_cleaning": 0.8,
+      "readability_structure": 0.2,
+      "factual_accuracy": 0.9
+    },
+    "overall": {
+      "weighted_score": 0.72,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "critical",
+        "before_snippet": "A产品99元售出1200件，B产品199元售出850件",
+        "after_snippet": null,
+        "reason": "表格结构被完全破坏，转为纯文本，丧失了结构化数据的可读性和对比性"
+      }
+    ],
+    "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample026",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
+    "after_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "完全无改动，四个维度均为满分",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample027",
+    "category": "Readability",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "为确保系统安全稳定运行，请各位用户注意以下事项：1. 定期修改密码，建议每90天更换一次；2. 不要在公共设备上保存登录信息；3. 如发现异常登录，请立即联系技术支持团队。",
+    "after_text": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。",
+    "gold_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.3,
+      "readability_structure": 0.15,
+      "factual_accuracy": 0.7
+    },
+    "overall": {
+      "weighted_score": 0.46,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "RS-01",
+        "severity": "critical",
+        "before_snippet": "为保系统安全稳定运行请各用户注意下事定期改密",
+        "after_snippet": null,
+        "reason": "过度缩写导致严重可读性问题：'注意下事'、'别在'、'立联'等表达不正式且难以理解"
+      }
+    ],
+    "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample028",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "一般公文",
+    "before_text": "本次会议纪要如下：第一,项目进度正常；第二,预算需要追加20% ；第三 ，人力资源缺口已填补 。与会人员:张三,李四，王五 。",
+    "after_text": "本次会议纪要如下：第一，项目进度正常；第二，预算需要追加20%；第三，人力资源缺口已填补。与会人员：张三、李四、王五。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.99,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "统一标点符号，内容完全保留，可读性提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample029",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "公司2024年度战略重点包括：深化数字化转型，构建智能制造体系；加强供应链韧性建设，优化全球采购网络；持续推进绿色低碳发展，争取2030年实现碳中和目标；积极拓展东南亚市场，预计新增营收15亿元。",
+    "after_text": "公司2024年度战略重点包括：深化数字化转型；加强供应链建设；持续推进绿色发展；积极拓展东南亚市场。",
+    "gold_scores": {
+      "semantic_consistency": 0.6,
+      "over_cleaning": 0.4,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.5
+    },
+    "overall": {
+      "weighted_score": 0.55,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "深化数字化转型；加强供应链建设",
+        "after_snippet": null,
+        "reason": "删除了各战略要点的具体措施和量化目标，如'构建智能制造体系'、'2030年实现碳中和'、'新增营收15亿元'等关键信息"
+      }
+    ],
+    "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample030",
+    "category": "Factual Error",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "国家电网有限公司（简称\"国家电网\"）近日发布公告，宣布与南方电网有限责任公司在特高压直流输电领域开展战略合作。双方将联合攻关±1100千伏特高压直流输电核心技术。",
+    "after_text": "国网公司近日发布公告，宣布与南网公司在特高压直流输电领域开展战略合作。双方将联合攻关±1000千伏特高压直流输电核心技术。",
+    "gold_scores": {
+      "semantic_consistency": 0.55,
+      "over_cleaning": 0.75,
+      "readability_structure": 0.85,
+      "factual_accuracy": 0.25
+    },
+    "overall": {
+      "weighted_score": 0.61,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "国网公司近日发布公告",
+        "after_snippet": null,
+        "reason": "将'国家电网有限公司'缩写为'国网公司'、'南方电网有限责任公司'缩写为'南网公司'，丢失了法定全称信息"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "critical",
+        "before_snippet": "±1000千伏特高压直流输电核心技术",
+        "after_snippet": null,
+        "reason": "技术参数从±1100千伏误改为±1000千伏，核心技术指标错误"
+      }
+    ],
+    "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample031",
+    "category": "Mixed Errors",
+    "difficulty": "hard",
+    "text_type": "一般公文",
+    "before_text": "根据《中华人民共和国数据安全法》第三十条规定，重要数据的处理者应当按照规定对重要数据的处理活动定期开展风险评估，并向有关主管部门报告风险评估情况。风险评估报告应当包括：处理的重要数据的种类、数量；开展数据处理活动的情况；面临的数据安全风险及其应对措施；以及其他需要报告的事项。",
+    "after_text": "数据处理者应当定期开展风险评估并报告。报告应包括数据种类和数量、处理活动情况及安全风险应对措施。",
+    "gold_scores": {
+      "semantic_consistency": 0.3,
+      "over_cleaning": 0.2,
+      "readability_structure": 0.65,
+      "factual_accuracy": 0.25
+    },
+    "overall": {
+      "weighted_score": 0.33,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "数据处理者应当定期开展风险评估并报告",
+        "after_snippet": null,
+        "reason": "删除了法律条文的具体引用（《中华人民共和国数据安全法》第三十条），以及'重要数据'的定语限定，改变了法律文本的精确性"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "报告应包括数据种类和数量、处理活动情况",
+        "after_snippet": null,
+        "reason": "丢失了'向有关主管部门报告'的对象信息，以及报告事项中的'其他需要报告的事项'兜底条款"
+      }
+    ],
+    "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample032",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "客户投诉记录：张伟（身份证：110101198801010012）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李娜已受理，工单编号：WO20240310-8821。",
+    "after_text": "客户投诉记录：张**（身份证：***）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李**已受理，工单编号：WO20240310-8821。",
+    "gold_scores": {
+      "semantic_consistency": 0.9,
+      "over_cleaning": 0.95,
+      "readability_structure": 0.9,
+      "factual_accuracy": 0.85
+    },
+    "overall": {
+      "weighted_score": 0.91,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample033",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "项目验收需提交以下材料：\n1. 项目总结报告（含技术路线说明）\n2. 测试报告（含性能测试数据）\n3. 用户手册及操作指南\n4. 源代码及部署文档\n5. 知识产权证明文件",
+    "after_text": "项目验收需提交项目总结报告、测试报告、用户手册及操作指南、源代码及部署文档和知识产权证明文件。",
+    "gold_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.5,
+      "readability_structure": 0.3,
+      "factual_accuracy": 0.7
+    },
+    "overall": {
+      "weighted_score": 0.54,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "major",
+        "before_snippet": "项目验收需提交项目总结报告、测试报告",
+        "after_snippet": null,
+        "reason": "有序编号列表被压缩为单行逗号连接的文本，丢失了列表的层次结构和各项的括号补充说明"
+      }
+    ],
+    "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample034",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
+    "after_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "完全无改动，四个维度均为满分",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample035",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "2024年一季度，公司营业收入为 32.6亿元 ，同比增长 8.4% ；归母净利润为 4.2亿元 ，同比增长 12.3% 。每股收益为 0.85元 。",
+    "after_text": "2024年一季度，公司营业收入为32.6亿元，同比增长8.4%；归母净利润为4.2亿元，同比增长12.3%。每股收益为0.85元。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.95,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.99,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅去除多余空格，数据和内容完全保留",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample036",
+    "category": "Good Governance",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API Gateway（接口网关）、Service Registry（服务注册中心）、Load Balancer（负载均衡器）。系统支持水平扩展，峰值QPS可达50,000。",
+    "after_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API网关、服务注册中心、负载均衡器。系统支持水平扩展，峰值QPS可达50,000。",
+    "gold_scores": {
+      "semantic_consistency": 0.95,
+      "over_cleaning": 0.9,
+      "readability_structure": 0.9,
+      "factual_accuracy": 0.95
+    },
+    "overall": {
+      "weighted_score": 0.93,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample037",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "一般公文",
+    "before_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，降低制度性交易成本，激发市场主体活力，现就进一步精简行政许可事项、压缩审批时限、推行\"容缺受理\"、全面推进政务服务标准化规范化便利化，提出以下意见：一、精简行政许可事项。各地区、各部门要按照\"能减则减、能合则合\"的原则，对现有行政许可事项进行全面清理，取消和调整一批不符合时代要求的行政许可事项，确保在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%，鼓励有条件的地区将办理时限压缩至法定时限的50%以内。三、推行\"容缺受理\"机制。对材料基本齐全、主要申请条件符合要求的，可先行受理，要求申请人在规定时间内补齐材料。",
+    "after_text": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事项。各地区、各部门要取消和调整不符合时代要求的行政许可事项，在2024年底前完成清理工作。二、压缩审批时限。所有行政许可事项的法定办理时限压缩比例不低于30%。三、推行\"容缺受理\"机制。对材料基本齐全的，可先行受理，要求申请人补齐材料。",
+    "gold_scores": {
+      "semantic_consistency": 0.65,
+      "over_cleaning": 0.45,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.55
+    },
+    "overall": {
+      "weighted_score": 0.59,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "现就精简行政许可事项、压缩审批时限",
+        "after_snippet": null,
+        "reason": "删除了'降低制度性交易成本'、'激发市场主体活力'等政策目标，以及多项量化标准（如'将办理时限压缩至法定时限的50%以内'、'在规定时间内补齐材料'）"
+      }
+    ],
+    "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample038",
+    "category": "Structural",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "【背景】本项目旨在解决城市交通拥堵问题。【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
+    "after_text": "【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【背景】本项目旨在解决城市交通拥堵问题。【方案】采用深度强化学习算法，实时优化路口信号配时。【预算】项目总投资约3500万元，建设周期18个月。",
+    "gold_scores": {
+      "semantic_consistency": 0.95,
+      "over_cleaning": 0.95,
+      "readability_structure": 0.7,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.91,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "S-02",
+        "severity": "minor",
+        "before_snippet": "【目标】通过智能信号灯控制系统",
+        "after_snippet": null,
+        "reason": "段落顺序调整，将【目标】移至【背景】之前，不符合原文的逻辑叙述顺序（背景→目标→方案→预算）"
+      }
+    ],
+    "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample039",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "法律合同",
+    "before_text": "合同签署日期为2024年03月15日，有效期至2025/3/15。项目启动会议定于24年4月1号召开，预计2025年3月31日前完成验收。",
+    "after_text": "合同签署日期为2024-03-15，有效期至2025-03-15。项目启动会议定于2024-04-01召开，预计2025-03-31前完成验收。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 0.9,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.98,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "日期格式统一为ISO格式，内容完全保留，规范性提升",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample040",
+    "category": "Over Cleaning",
+    "difficulty": "hard",
+    "text_type": "法律合同",
+    "before_text": "本协议所称保密信息，是指甲方在本协议签署前后向乙方披露的、与甲方业务相关的、乙方以书面或口头形式获悉的、且甲方明确标注为\"保密\"或\"机密\"的技术信息、商业信息及其他信息，但不包括：（1）乙方在获悉前已合法持有的信息；（2）通过公开渠道可获得的信息；（3）经甲方书面同意可以披露的信息。",
+    "after_text": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露的信息。",
+    "gold_scores": {
+      "semantic_consistency": 0.5,
+      "over_cleaning": 0.25,
+      "readability_structure": 0.7,
+      "factual_accuracy": 0.35
+    },
+    "overall": {
+      "weighted_score": 0.43,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "本协议所称保密信息，是指甲方向乙方披露的",
+        "after_snippet": null,
+        "reason": "删除了多个关键限定条件：'本协议签署前后'（时间范围）、'以书面或口头形式'（获悉方式）、'明确标注为保密或机密'（认定标准），这些限定语在法律合同中具有精确的法律意义"
+      },
+      {
+        "rule_id": "FA-01",
+        "severity": "major",
+        "before_snippet": "经甲方同意可披露的信息",
+        "after_snippet": null,
+        "reason": "例外条款中删除了'（1）（2）（3）'编号结构，将'经甲方书面同意'简化为'经甲方同意'，去掉'书面'限定改变了法律要求"
+      }
+    ],
+    "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample041",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "政务通告",
+    "before_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品应统一通过OA系统提交申请。采购金额在5000元以下的，由部门负责人审批；5000元（含）以上至5万元以下的，由采购中心负责人审批；5万元（含）以上的，须报分管副总经理审批。所有采购记录应保存不少于三年。",
+    "after_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品统一通过OA系统提交申请。采购金额5000元以下由部门负责人审批；5000元（含）以上至5万元以下由采购中心负责人审批；5万元（含）以上须报分管副总经理审批。所有采购记录保存不少于三年。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅进行了表达精简和格式规范化，无语义、事实或结构损失。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample042",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "技术文档",
+    "before_text": "系统支持用户通过用户名和密码登录。首次登录后，用户应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户将自动锁定30分钟。",
+    "after_text": "系统支持用户使用用户名和密码登录。首次登录后，应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户自动锁定30分钟。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "合理润色，不影响任何信息。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample043",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "项目建设分三个阶段实施。第一阶段完成基础设施部署，包括服务器安装、数据库初始化和网络环境配置；第二阶段完成业务系统上线，并开展用户培训；第三阶段完成验收测试和运行评估，形成总结报告。",
+    "after_text": "项目建设分三个阶段实施，完成基础设施部署、业务系统上线和项目验收。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 0.5,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.77,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "数据库初始化、网络环境配置；开展用户培训；形成总结报告",
+        "after_snippet": null,
+        "reason": "删除了多个执行细节。"
+      }
+    ],
+    "rationale": "核心流程保留，但大量实施细节被删除，属于过度清洗。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample044",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "公司计划于2030年前实现碳中和目标，并持续推进绿色供应链建设。预计未来三年累计投入环保资金12亿元，新建光伏发电设施80MW，每年减少碳排放约15万吨。",
+    "after_text": "公司将持续推进绿色发展，并加强绿色供应链建设。",
+    "gold_scores": {
+      "semantic_consistency": 0.5,
+      "over_cleaning": 0.25,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-03",
+        "severity": "critical",
+        "before_snippet": "2030年前实现碳中和、12亿元、80MW、15万吨",
+        "after_snippet": null,
+        "reason": "删除关键目标及量化信息。"
+      }
+    ],
+    "rationale": "核心方向保留，但所有关键指标均被删除。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample045",
+    "category": "Semantic Drift",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "本系统采用增量备份策略，每日凌晨2点自动执行备份任务，仅保存自上次备份以来发生变化的数据，以降低存储成本并缩短备份时间。",
+    "after_text": "本系统采用全量备份策略，每日凌晨2点自动执行备份任务，保存全部业务数据，以确保数据完整性。",
+    "gold_scores": {
+      "semantic_consistency": 0.25,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 0.25
+    },
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "SC-01",
+        "severity": "critical",
+        "before_snippet": "增量备份策略",
+        "after_snippet": "全量备份策略",
+        "reason": "核心技术方案发生改变。"
+      },
+      {
+        "rule_id": "FA-04",
+        "severity": "critical",
+        "before_snippet": "仅保存变化数据",
+        "after_snippet": "保存全部业务数据",
+        "reason": "技术事实被错误修改。"
+      }
+    ],
+    "rationale": "治理后改变了核心技术方案，语义与事实均发生严重偏离。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample046",
+    "category": "Semantic Drift",
+    "difficulty": "hard",
+    "text_type": "企业公告",
+    "before_text": "员工因出差无法参加现场培训的，可在培训结束后七日内完成线上补学，经考核合格后视为完成培训。",
+    "after_text": "员工因出差无法参加现场培训的，可免于参加培训。",
+    "gold_scores": {
+      "semantic_consistency": 0.0,
+      "over_cleaning": 0.5,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.55,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "SC-01",
+        "severity": "critical",
+        "before_snippet": "七日内完成线上补学，经考核合格后视为完成培训",
+        "after_snippet": "免于参加培训",
+        "reason": "制度要求被完全改变。"
+      }
+    ],
+    "rationale": "治理后将补学要求改为免培训，造成制度语义完全改变。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample047",
+    "category": "Factual Error",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "公司2025年度实现营业收入126.8亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
+    "after_text": "公司2025年度实现营业收入128.6亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 0.0
+    },
+    "overall": {
+      "weighted_score": 0.72,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-01",
+        "severity": "critical",
+        "before_snippet": "126.8亿元",
+        "after_snippet": "128.6亿元",
+        "reason": "核心经营数据被篡改。"
+      }
+    ],
+    "rationale": "仅修改了营业收入，但属于核心事实错误。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample048",
+    "category": "Factual Error",
+    "difficulty": "medium",
+    "text_type": "政务通告",
+    "before_text": "《设备维护管理办法》自2026年8月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
+    "after_text": "《设备维护管理办法》自2026年9月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 0.0
+    },
+    "overall": {
+      "weighted_score": 0.72,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-02",
+        "severity": "critical",
+        "before_snippet": "2026年8月1日",
+        "after_snippet": "2026年9月1日",
+        "reason": "生效日期错误。"
+      }
+    ],
+    "rationale": "实施日期属于关键事实，错误不可接受。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample049",
+    "category": "Mixed Errors",
+    "difficulty": "hard",
+    "text_type": "企业公告",
+    "before_text": "为加强数据安全管理，公司规定：第一，所有数据库每日凌晨1:00执行自动备份；第二，备份文件至少保存180天；第三，涉及客户个人信息的数据应采用AES-256算法加密存储；第四，未经信息安全部门书面批准，不得将生产数据复制至外部存储介质。",
+    "after_text": "为加强数据安全管理，公司规定：数据库每日自动备份；备份文件保存30天；涉及客户信息的数据应加密保存；未经批准，不得复制生产数据。",
+    "gold_scores": {
+      "semantic_consistency": 0.5,
+      "over_cleaning": 0.25,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.25
+    },
+    "overall": {
+      "weighted_score": 0.42,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "critical",
+        "before_snippet": "AES-256算法",
+        "after_snippet": null,
+        "reason": "删除关键技术参数。"
+      },
+      {
+        "rule_id": "FA-04",
+        "severity": "critical",
+        "before_snippet": "180天",
+        "after_snippet": "30天",
+        "reason": "保存期限被错误修改。"
+      },
+      {
+        "rule_id": "OC-04",
+        "severity": "major",
+        "before_snippet": "信息安全部门书面批准",
+        "after_snippet": "批准",
+        "reason": "删除限定条件。"
+      }
+    ],
+    "rationale": "同时存在事实错误、过度清洗及语义弱化，属于综合严重问题。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample050",
+    "category": "Mixed Errors",
+    "difficulty": "hard",
+    "text_type": "企业公告",
+    "before_text": "项目验收应满足以下条件：①所有功能测试通过；②性能测试达到每秒处理请求不少于5000次；③连续稳定运行不少于30天；④完成用户培训并提交完整验收文档，经项目负责人和客户双方签字确认后方可正式交付。",
+    "after_text": "项目验收应满足以下条件：功能测试通过；性能测试达到每秒处理请求不少于3000次；完成用户培训后即可交付。",
+    "gold_scores": {
+      "semantic_consistency": 0.25,
+      "over_cleaning": 0.25,
+      "readability_structure": 0.75,
+      "factual_accuracy": 0.0
+    },
+    "overall": {
+      "weighted_score": 0.3,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "FA-04",
+        "severity": "critical",
+        "before_snippet": "5000次",
+        "after_snippet": "3000次",
+        "reason": "性能指标被错误修改。"
+      },
+      {
+        "rule_id": "OC-05",
+        "severity": "critical",
+        "before_snippet": "连续稳定运行不少于30天",
+        "after_snippet": null,
+        "reason": "删除关键验收条件。"
+      },
+      {
+        "rule_id": "OC-06",
+        "severity": "major",
+        "before_snippet": "项目负责人和客户双方签字确认",
+        "after_snippet": null,
+        "reason": "删除正式交付前置条件。"
+      }
+    ],
+    "rationale": "性能指标被篡改，多个验收条件被删除，整体语义和事实均受到严重影响。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample051",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "技术文档",
+    "before_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续五次输入错误密码后，账户将自动锁定30分钟。",
+    "after_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续输入错误密码五次后，账户将自动锁定30分钟。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅进行了数字表达规范化，不影响任何信息。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample052",
+    "category": "Good Governance",
+    "difficulty": "easy",
+    "text_type": "企业公告",
+    "before_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化及权限管理模块重构。",
+    "after_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化以及权限管理模块重构。",
+    "gold_scores": {
+      "semantic_consistency": 1.0,
+      "over_cleaning": 1.0,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "anchors": [],
+    "rationale": "仅进行了连接词优化，未改变内容。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample053",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "企业公告",
+    "before_text": "客户服务规范要求：客服人员应在收到工单后5分钟内响应，30分钟内完成首次处理意见反馈；复杂问题应在24小时内升级至二线支持，并同步通知客户预计处理时间。",
+    "after_text": "客户服务规范要求：客服人员应及时响应工单，并处理客户问题。",
+    "gold_scores": {
+      "semantic_consistency": 0.5,
+      "over_cleaning": 0.25,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "fail"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-03",
+        "severity": "critical",
+        "before_snippet": "5分钟、30分钟、24小时、预计处理时间",
+        "after_snippet": null,
+        "reason": "删除关键流程要求和时间约束。"
+      }
+    ],
+    "rationale": "治理后仅保留笼统描述，大量执行细节被删除。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  },
+  {
+    "id": "sample054",
+    "category": "Over Cleaning",
+    "difficulty": "medium",
+    "text_type": "技术文档",
+    "before_text": "数据库部署完成后，应依次执行初始化脚本、权限配置、备份策略配置、连接测试和性能基准测试，并将测试结果归档保存。",
+    "after_text": "数据库部署完成后，应完成初始化并进行测试。",
+    "gold_scores": {
+      "semantic_consistency": 0.75,
+      "over_cleaning": 0.5,
+      "readability_structure": 1.0,
+      "factual_accuracy": 1.0
+    },
+    "overall": {
+      "weighted_score": 0.77,
+      "verdict": "review"
+    },
+    "anchors": [
+      {
+        "rule_id": "OC-02",
+        "severity": "major",
+        "before_snippet": "权限配置、备份策略配置、连接测试、性能基准测试、归档保存",
+        "after_snippet": null,
+        "reason": "删除多项关键实施步骤。"
+      }
+    ],
+    "rationale": "保留了主要流程，但实施细节明显缺失。",
+    "annotation_meta": {
+      "annotator": "manual",
+      "annotation_time": "2026-06-29",
+      "reviewed_by": "manual",
+      "review_time": "2026-06-29"
+    }
+  }
+]
