@@ -12,3 +12,5 @@ numpy==2.5.0
 scipy==1.18.0
 scikit-learn==1.9.0
 streamlit>=1.35.0
+PyJWT>=2.8.0
+dspy>=3.0.0
