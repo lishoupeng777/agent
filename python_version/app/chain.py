@@ -15,6 +15,8 @@ import time
 from typing import Any, Optional, cast
 
 from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.caches import InMemoryCache
+from langchain_core.globals import set_llm_cache
 from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -28,6 +30,37 @@ from .models import (
     FlawItem,
 )
 from .profiles import get_profile_config, PROFILE_GENERAL
+
+
+# ============================================================
+# 0. 缓存配置
+# ============================================================
+
+_cache_enabled = True
+
+
+def enable_cache() -> None:
+    """启用 LLM 响应缓存（相同输入不重复调用 API）"""
+    global _cache_enabled
+    set_llm_cache(InMemoryCache())
+    _cache_enabled = True
+
+
+def disable_cache() -> None:
+    """禁用缓存"""
+    global _cache_enabled
+    set_llm_cache(None)  # type: ignore[arg-type]
+    _cache_enabled = False
+
+
+def clear_cache() -> None:
+    """清空缓存（重新启用即可清空）"""
+    if _cache_enabled:
+        enable_cache()
+
+
+# 默认启用缓存
+enable_cache()
 
 
 # ============================================================
