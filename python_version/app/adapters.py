@@ -141,13 +141,36 @@ class GLMAdapter(BaseAdapter):
     GLM 对指令的响应方式与 DeepSeek 不同，需要定制：
     - 更明确的输出格式指令
     - 更详细的 few-shot 示例
+    - API Key 格式：{id}.{secret}，需转换为 JWT
     """
+
+    def _get_glm_api_key(self) -> str:
+        """获取 GLM API Key（自动处理 JWT 转换）"""
+        key = os.getenv("GLM_API_KEY", "")
+        if not key:
+            return ""
+        # 如果是 {id}.{secret} 格式，转换为 JWT
+        if "." in key and not key.startswith("eyJ"):
+            try:
+                import time
+                import jwt
+                key_id, secret = key.split(".", 1)
+                payload = {
+                    "api_key": key_id,
+                    "exp": int(time.time()) + 3600,
+                    "timestamp": int(time.time()),
+                }
+                headers = {"alg": "HS256", "sign_type": "SIGN"}
+                return jwt.encode(payload, secret, algorithm="HS256", headers=headers)
+            except Exception:
+                return key
+        return key
 
     def get_model_config(self) -> dict[str, Any]:
         return {
             "model": os.getenv("GLM_MODEL", "glm-4-flash"),
             "base_url": os.getenv("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
-            "api_key": os.getenv("GLM_API_KEY", ""),
+            "api_key": self._get_glm_api_key(),
             "max_tokens": 2048,
         }
 

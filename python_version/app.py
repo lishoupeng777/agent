@@ -195,18 +195,38 @@ def render_sidebar() -> tuple[str, str, str, str]:
     with st.sidebar:
         st.markdown("### 🔑 API 配置")
 
-        # ── 当前模型（只读展示） ──
-        st.markdown(f"**当前模型：** `{ACTIVE_MODEL_ID}`")
-        st.caption("模型已固定，确保评测结果一致性")
-
-        # ── API Key ──
+        # ── DeepSeek ──
+        st.markdown(f"**主模型：** `{ACTIVE_MODEL_ID}`")
         api_key = st.text_input(
-            "API Key",
+            "DeepSeek API Key",
             type="password",
             value="",
             placeholder="sk-xxxxxxxx",
             key="sidebar_api_key",
         )
+
+        # ── 智谱 GLM（可选） ──
+        with st.expander("🔗 智谱 GLM（可选，用于多模型对比）", expanded=False):
+            glm_key = st.text_input(
+                "GLM API Key",
+                type="password",
+                value="",
+                placeholder="{id}.{secret}",
+                key="sidebar_glm_key",
+            )
+            if glm_key:
+                os.environ["GLM_API_KEY"] = glm_key.strip()
+                st.caption("✅ GLM 已配置")
+                # 注册 GLM 到注册表
+                try:
+                    from app.model_registry import get_registry
+                    from app.adapters import GLMAdapter
+                    registry = get_registry()
+                    if "glm" not in registry.list_models():
+                        registry.register("glm", GLMAdapter())
+                        st.caption(f"已注册到模型注册表")
+                except Exception as e:
+                    st.caption(f"注册失败：{e}")
 
         st.divider()
 
