@@ -167,6 +167,7 @@ def build_prompt_messages(
     after_text: str,
     segments_before: list[dict[str, Any]] | None = None,
     segments_after: list[dict[str, Any]] | None = None,
+    diff_info: str | None = None,
 ) -> list[BaseMessage]:
     """根据 profile 和输入构建消息列表"""
     from langchain_core.messages import HumanMessage, SystemMessage
@@ -178,6 +179,7 @@ def build_prompt_messages(
         after_text=after_text,
         segments_before=segments_before,
         segments_after=segments_after,
+        diff_info=diff_info,
     )
     return [
         SystemMessage(content=system_content),
@@ -626,6 +628,266 @@ def build_anchored_text(
 
 
 # ============================================================
+# 6c. Diff / 瑕疵检测模块（核心）
+# ============================================================
+
+import re
+
+
+def _char_diff(before: str, after: str) -> list[dict[str, Any]]:
+    """字符级 diff：找出 before→after 的具体变更。
+
+    返回变更列表，每项包含：
+      type: substitution / deletion / insertion
+      before_text: 原文片段
+      after_text: 改后片段
+      before_start / before_end: 原文中的位置
+      after_start / after_end: 改后文本中的位置
+    """
+    sm = difflib.SequenceMatcher(None, before, after)
+    changes: list[dict[str, Any]] = []
+
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            continue
+        changes.append({
+            "type": tag,  # substitution / deletion / insertion
+            "before_text": before[i1:i2] if tag != "insertion" else "",
+            "after_text": after[j1:j2] if tag != "deletion" else "",
+            "before_start": i1,
+            "before_end": i2,
+            "after_start": j1,
+            "after_end": j2,
+        })
+
+    return changes
+
+
+def _classify_change(change: dict[str, Any]) -> tuple[str, str]:
+    """对单个变更进行分类和严重程度判定。
+
+    分类规则：
+      category:
+        - factual: 数字、日期、金额等事实性数据被改动
+        - structure: 结构被破坏（表格→文本、列表→段落等）
+        - omission: 内容被删除
+        - modification: 表述被改写（非事实性）
+        - addition: 新增内容
+
+      severity:
+        - critical: 关键事实被篡改 / 大量内容被删 / 结构被破坏
+        - major: 重要信息丢失或改写
+        - minor: 轻微表述调整
+    """
+    before_txt = change.get("before_text", "")
+    after_txt = change.get("after_text", "")
+    change_type = change["type"]
+
+    # 数字/日期/金额模式
+    num_pattern = r"\d+[\.\d]*[%％亿万]?"
+
+    # 删除
+    if change_type == "deletion":
+        deleted_len = len(before_txt)
+        if deleted_len > 50:
+            return "omission", "critical"
+        elif deleted_len > 15:
+            return "omission", "major"
+        return "omission", "minor"
+
+    # 插入
+    if change_type == "insertion":
+        return "addition", "minor"
+
+    # 替换（substitution）
+    # 检查是否涉及数字/日期变更
+    before_nums = re.findall(num_pattern, before_txt)
+    after_nums = re.findall(num_pattern, after_txt)
+
+    if before_nums or after_nums:
+        if before_nums != after_nums:
+            # 数字被改了 → 事实性错误
+            # 判断严重程度：数量级变化 vs 微调
+            for bn, an in zip(before_nums, after_nums):
+                try:
+                    b_val = float(re.sub(r"[^\d.]", "", bn))
+                    a_val = float(re.sub(r"[^\d.]", "", an))
+                    if b_val > 0 and abs(a_val - b_val) / b_val > 0.1:
+                        return "factual", "critical"  # 变化超过 10%
+                except (ValueError, ZeroDivisionError):
+                    pass
+            return "factual", "major"
+
+    # 检查是否是结构变化（表格标记、列表标记等）
+    structural_markers = ["|", "────", "---", "1.", "2.", "3.", "•", "- "]
+    if any(m in before_txt for m in structural_markers) and not any(m in after_txt for m in structural_markers):
+        return "structure", "critical"
+
+    # 普通表述改写
+    if len(before_txt) > 30 or len(after_txt) > 30:
+        return "modification", "major"
+    return "modification", "minor"
+
+
+def detect_flaws(
+    segments_before: list[dict[str, Any]],
+    segments_after: list[dict[str, Any]],
+    anchored_before: str,
+    anchored_after: str,
+) -> list[dict[str, Any]]:
+    """Diff / 瑕疵检测：对配对段落做变更检测，输出结构化瑕疵列表。
+
+    检测策略：
+    1. 被整段删除 → omission / critical
+    2. 配对段落相似度 < 0.3 → 大幅改写，用字符级 diff 找具体变更
+    3. 配对段落相似度 0.3~0.7 → 中等改写，检测数字/关键事实变更
+    4. 配对段落相似度 > 0.7 → 轻微调整，跳过或标 minor
+
+    Args:
+        segments_before: before 的分段信息
+        segments_after: after 的分段信息
+        anchored_before: 带锚点标记的 before 文本
+        anchored_after: 带锚点标记的 after 文本
+
+    Returns:
+        瑕疵列表，每项包含 type, anchor_before, anchor_after, category, severity
+    """
+    flaws: list[dict[str, Any]] = []
+
+    # 建立 segment_id → text 的映射
+    before_map = {s["segment_id"]: s["text"] for s in segments_before}
+    after_map = {s["segment_id"]: s["text"] for s in segments_after}
+
+    all_ids = sorted(set(before_map.keys()) | set(after_map.keys()),
+                     key=lambda x: int(x) if x.isdigit() else 0)
+
+    num_pattern = re.compile(r"\d+[\.\d]*[%％亿万]?")
+
+    for sid in all_ids:
+        b_text = before_map.get(sid, "")
+        a_text = after_map.get(sid, "")
+
+        # ── 整段被删 ──
+        if b_text and not a_text:
+            flaws.append({
+                "type": "omission",
+                "anchor_before": f"[Before {sid}] {b_text[:80]}",
+                "anchor_after": "",
+                "category": "omission",
+                "severity": "critical" if len(b_text) > 15 else "major",
+            })
+            continue
+
+        # ── 新增段落 ──
+        if a_text and not b_text:
+            flaws.append({
+                "type": "addition",
+                "anchor_before": "",
+                "anchor_after": f"[After {sid}] {a_text[:80]}",
+                "category": "addition",
+                "severity": "minor",
+            })
+            continue
+
+        # ── 配对段落：计算相似度 ──
+        if b_text == a_text:
+            continue
+
+        ratio = difflib.SequenceMatcher(None, b_text, a_text).ratio()
+
+        # 相似度 > 0.85 → 轻微调整，但先检查是否有数字变化
+        if ratio > 0.85:
+            changes = _char_diff(b_text, a_text)
+            for ch in changes:
+                if ch["type"] == "equal":
+                    continue
+                b_nums = num_pattern.findall(ch.get("before_text", ""))
+                a_nums = num_pattern.findall(ch.get("after_text", ""))
+                if b_nums and a_nums and b_nums != a_nums:
+                    for bn, an in zip(b_nums, a_nums):
+                        try:
+                            b_val = float(re.sub(r"[^\d.]", "", bn))
+                            a_val = float(re.sub(r"[^\d.]", "", an))
+                            pct = abs(a_val - b_val) / b_val if b_val > 0 else 1.0
+                            sev = "critical" if pct > 0.1 else "major"
+                        except (ValueError, ZeroDivisionError):
+                            sev = "major"
+                        flaws.append({
+                            "type": "substitution",
+                            "anchor_before": f"[Before {sid}] ...{bn}...",
+                            "anchor_after": f"[After {sid}] ...{an}...",
+                            "category": "factual",
+                            "severity": sev,
+                        })
+            continue
+
+        # 相似度 < 0.3 → 大幅改写/过度清洗
+        if ratio < 0.3:
+            flaws.append({
+                "type": "rewrite",
+                "anchor_before": f"[Before {sid}] {b_text[:80]}",
+                "anchor_after": f"[After {sid}] {a_text[:80]}",
+                "category": "omission",
+                "severity": "critical",
+            })
+            continue
+
+        # 相似度 0.3~0.85 → 中等变更，做字符级 diff 分析
+        changes = _char_diff(b_text, a_text)
+
+        # 检查是否有数字变更
+        has_num_change = False
+        for ch in changes:
+            if ch["type"] == "equal":
+                continue
+            b_nums = num_pattern.findall(ch.get("before_text", ""))
+            a_nums = num_pattern.findall(ch.get("after_text", ""))
+            if b_nums != a_nums and (b_nums or a_nums):
+                has_num_change = True
+                for bn, an in zip(b_nums, a_nums):
+                    try:
+                        b_val = float(re.sub(r"[^\d.]", "", bn))
+                        a_val = float(re.sub(r"[^\d.]", "", an))
+                        pct = abs(a_val - b_val) / b_val if b_val > 0 else 1.0
+                        sev = "critical" if pct > 0.1 else "major"
+                    except (ValueError, ZeroDivisionError):
+                        sev = "major"
+                    flaws.append({
+                        "type": "substitution",
+                        "anchor_before": f"[Before {sid}] ...{bn}...",
+                        "anchor_after": f"[After {sid}] ...{an}...",
+                        "category": "factual",
+                        "severity": sev,
+                    })
+
+        # 检查是否有结构变化
+        structural_markers = ["|", "────", "---", "1.", "2.", "3.", "•", "- "]
+        had_structure = any(m in b_text for m in structural_markers)
+        has_structure = any(m in a_text for m in structural_markers)
+        if had_structure and not has_structure:
+            flaws.append({
+                "type": "structure_loss",
+                "anchor_before": f"[Before {sid}] {b_text[:60]}",
+                "anchor_after": f"[After {sid}] {a_text[:60]}",
+                "category": "structure",
+                "severity": "critical",
+            })
+
+        # 如果没有数字变更也没有结构变化，但相似度较低 → 表述改写
+        if not has_num_change and not (had_structure and not has_structure) and ratio < 0.7:
+            sev = "major" if ratio < 0.5 else "minor"
+            flaws.append({
+                "type": "modification",
+                "anchor_before": f"[Before {sid}] {b_text[:60]}",
+                "anchor_after": f"[After {sid}] {a_text[:60]}",
+                "category": "modification",
+                "severity": sev,
+            })
+
+    return flaws
+
+
+# ============================================================
 # 7. 主评估函数（LCEL Chain 流程）
 # ============================================================
 
@@ -643,13 +905,29 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         request.before_text, request.after_text
     )
 
-    # Step 1: 构建 prompt（使用对齐后的文本和分段信息）
+    # Step 0b: Diff 瑕疵检测 —— 对配对段落做字符级 diff，输出结构化变更列表
+    detected_flaws = detect_flaws(
+        seg_before, seg_after, anchored_before, anchored_after
+    )
+    # 格式化 diff 结果为文本，注入 Prompt
+    diff_summary_lines: list[str] = []
+    for f in detected_flaws:
+        line = f"- [{f['severity'].upper()}] {f['category']}: {f['type']}"
+        if f["anchor_before"]:
+            line += f" | 原文: {f['anchor_before'][:60]}"
+        if f["anchor_after"]:
+            line += f" | 改后: {f['anchor_after'][:60]}"
+        diff_summary_lines.append(line)
+    diff_info = "\n".join(diff_summary_lines) if diff_summary_lines else "算法未检测到显著变更"
+
+    # Step 1: 构建 prompt（使用对齐文本 + diff 检测结果）
     messages = build_prompt_messages(
         profile_key=request.evaluation_profile,
         before_text=anchored_before,
         after_text=anchored_after,
         segments_before=seg_before if not request.segments_before else request.segments_before,
         segments_after=seg_after if not request.segments_after else request.segments_after,
+        diff_info=diff_info,
     )
 
     # Step 2: 调用 LLM（带 callback，启用 JSON mode）

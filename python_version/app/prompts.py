@@ -255,6 +255,9 @@ USER_PROMPT_TEMPLATE = """请评估以下治理前后文本对：
 {before_segments_info}
 {after_segments_info}
 
+=== 算法预检变更（Diff 检测结果，供参考） ===
+{diff_info}
+
 请按以下 JSON 格式输出评估结果：
 
 ```json
@@ -315,6 +318,7 @@ def build_user_prompt(
     after_text: str,
     segments_before: Optional[list[dict[str, Any]]] = None,
     segments_after: Optional[list[dict[str, Any]]] = None,
+    diff_info: Optional[str] = None,
 ) -> str:
     """
     构建 User Prompt。
@@ -329,6 +333,7 @@ def build_user_prompt(
         after_text=after_text,
         before_segments_info=before_segments_info,
         after_segments_info=after_segments_info,
+        diff_info=diff_info or "算法未检测到显著变更",
     )
 
 
