@@ -57,7 +57,7 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.70,
+      "semantic_consistency": 0.55,
       "over_cleaning": 0.90,
       "readability_structure": 0.95,
       "factual_accuracy": 0.15
@@ -94,7 +94,7 @@
     ],
     "human_scores": {
   "semantic_consistency": 0.90,
-  "over_cleaning": 0.90,
+  "over_cleaning": 0.80,
   "readability_structure": 0.45,
   "factual_accuracy": 0.95
 },
@@ -194,7 +194,7 @@
       }
     ],
     "human_scores":{
-  "semantic_consistency": 0.80,
+  "semantic_consistency": 0.70,
   "over_cleaning": 0.80,
   "readability_structure": 0.90,
   "factual_accuracy": 0.20

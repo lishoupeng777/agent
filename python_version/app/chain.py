@@ -477,25 +477,179 @@ class EvalCallbackHandler(BaseCallbackHandler):
 
 
 # ============================================================
+# 6b. 对齐模块（Alignment）—— 锚点预处理
+# ============================================================
+
+import difflib
+
+
+def _split_paragraphs(text: str) -> list[str]:
+    """按段落切分文本，去除空行"""
+    lines = text.split("\n")
+    paragraphs: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped:
+            paragraphs.append(stripped)
+    return paragraphs
+
+
+def _find_best_match(
+    target: str, candidates: list[str], threshold: float = 0.4
+) -> tuple[int, float]:
+    """在候选列表中找到与 target 最相似的段落，返回 (index, ratio)"""
+    best_idx = -1
+    best_ratio = 0.0
+    for i, cand in enumerate(candidates):
+        ratio = difflib.SequenceMatcher(None, target, cand).ratio()
+        if ratio > best_ratio:
+            best_ratio = ratio
+            best_idx = i
+    if best_ratio >= threshold:
+        return best_idx, best_ratio
+    return -1, 0.0
+
+
+def build_anchored_text(
+    before_text: str, after_text: str
+) -> tuple[str, str, list[dict[str, Any]], list[dict[str, Any]]]:
+    """锚点预处理：将治理前后文本按段落对齐，添加 [Before N] / [After N] 标记。
+
+    对齐策略：
+    - 按段落切分 before/after 文本
+    - 用 difflib.SequenceMatcher 做相似度匹配（阈值 0.4）
+    - 匹配上的段落标同一编号
+    - before 中未匹配的段落标记为 [Before N]（after 中对应 [After N: 已删除]）
+    - after 中未匹配的段落标记为 [After N]（新增内容）
+
+    Args:
+        before_text: 治理前原始文本
+        after_text: 治理后文本
+
+    Returns:
+        (anchored_before, anchored_after, segments_before, segments_after)
+        - anchored_before: 带 [Before N] 标记的治理前文本
+        - anchored_after: 带 [After N] 标记的治理后文本
+        - segments_before: before 的分段信息列表
+        - segments_after: after 的分段信息列表
+    """
+    paras_before = _split_paragraphs(before_text)
+    paras_after = _split_paragraphs(after_text)
+
+    # 匹配状态追踪
+    matched_after: set[int] = set()
+    pairs: list[tuple[int, int | None]] = []  # (before_idx, after_idx | None)
+
+    # 用 before 去 after 里找最佳匹配
+    for i, bp in enumerate(paras_before):
+        remaining = [j for j in range(len(paras_after)) if j not in matched_after]
+        if not remaining:
+            pairs.append((i, None))
+            continue
+        candidates = [paras_after[j] for j in remaining]
+        best_local_idx, ratio = _find_best_match(bp, candidates)
+        if best_local_idx >= 0:
+            actual_after_idx = remaining[best_local_idx]
+            matched_after.add(actual_after_idx)
+            pairs.append((i, actual_after_idx))
+        else:
+            pairs.append((i, None))
+
+    # after 中未被匹配的段落 = 新增内容
+    added_after = [j for j in range(len(paras_after)) if j not in matched_after]
+
+    # 构建带锚点标记的文本
+    anchored_before_lines: list[str] = []
+    anchored_after_lines: list[str] = []
+    segments_before: list[dict[str, Any]] = []
+    segments_after: list[dict[str, Any]] = []
+    char_offset_b = 0
+    char_offset_a = 0
+    pair_num = 0
+
+    for before_idx, after_idx in pairs:
+        pair_num += 1
+        bp = paras_before[before_idx]
+        tag_b = f"[Before {pair_num}]"
+        line_b = f"{tag_b} {bp}"
+        anchored_before_lines.append(line_b)
+        segments_before.append({
+            "segment_id": str(pair_num),
+            "text": bp,
+            "start_char": char_offset_b,
+            "end_char": char_offset_b + len(bp),
+        })
+        char_offset_b += len(line_b) + 1  # +1 for newline
+
+        if after_idx is not None:
+            ap = paras_after[after_idx]
+            tag_a = f"[After {pair_num}]"
+            line_a = f"{tag_a} {ap}"
+            anchored_after_lines.append(line_a)
+            segments_after.append({
+                "segment_id": str(pair_num),
+                "text": ap,
+                "start_char": char_offset_a,
+                "end_char": char_offset_a + len(ap),
+            })
+            char_offset_a += len(line_a) + 1
+        else:
+            # before 有但 after 没有 → 被删除
+            tag_a = f"[After {pair_num}: 已删除]"
+            anchored_after_lines.append(tag_a)
+            char_offset_a += len(tag_a) + 1
+
+    # after 中新增的段落
+    for after_idx in added_after:
+        pair_num += 1
+        ap = paras_after[after_idx]
+        tag_a = f"[After {pair_num}: 新增]"
+        line_a = f"{tag_a} {ap}"
+        anchored_after_lines.append(line_a)
+        segments_after.append({
+            "segment_id": str(pair_num),
+            "text": ap,
+            "start_char": char_offset_a,
+            "end_char": char_offset_a + len(ap),
+        })
+        char_offset_a += len(line_a) + 1
+        # before 中对应位置标记
+        anchored_before_lines.append(f"[Before {pair_num}: 无对应]")
+        char_offset_b += len(f"[Before {pair_num}: 无对应]") + 1
+
+    return (
+        "\n".join(anchored_before_lines),
+        "\n".join(anchored_after_lines),
+        segments_before,
+        segments_after,
+    )
+
+
+# ============================================================
 # 7. 主评估函数（LCEL Chain 流程）
 # ============================================================
 
 def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     """
     LCEL 风格的评估流程：
-      build_prompt → llm.invoke → parse → post_process → response
+      alignment → build_prompt → llm.invoke → parse → post_process → response
 
     保留与原 evaluate() 相同的接口签名，确保向后兼容。
     """
     callback = EvalCallbackHandler()
 
-    # Step 1: 构建 prompt
+    # Step 0: 对齐预处理 —— 将 before/after 按段落配对，添加锚点标记
+    anchored_before, anchored_after, seg_before, seg_after = build_anchored_text(
+        request.before_text, request.after_text
+    )
+
+    # Step 1: 构建 prompt（使用对齐后的文本和分段信息）
     messages = build_prompt_messages(
         profile_key=request.evaluation_profile,
-        before_text=request.before_text,
-        after_text=request.after_text,
-        segments_before=request.segments_before,
-        segments_after=request.segments_after,
+        before_text=anchored_before,
+        after_text=anchored_after,
+        segments_before=seg_before if not request.segments_before else request.segments_before,
+        segments_after=seg_after if not request.segments_after else request.segments_after,
     )
 
     # Step 2: 调用 LLM（带 callback，启用 JSON mode）

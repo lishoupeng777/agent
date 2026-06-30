@@ -379,9 +379,12 @@ def page_single(api_key: str, base_url: str, model_name: str, evaluation_profile
 
         # 继续评估按钮
         st.divider()
-        if st.button("🔄 继续评估下一条", use_container_width=True, key="single_next"):
-            del st.session_state["single_result"]
-            st.rerun()
+        def _clear_and_next():
+            for k in ("single_result", "single_before", "single_after"):
+                st.session_state.pop(k, None)
+
+        st.button("🔄 继续评估下一条", use_container_width=True,
+                  key="single_next", on_click=_clear_and_next)
 
 
 # ── 批量评估页 ────────────────────────────────────────────────────────────
