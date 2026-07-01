@@ -808,7 +808,8 @@ def detect_flaws(
     after_pipe = anchored_after.count("|")
     has_table_separator = "|---" in anchored_before or "| ---" in anchored_before
 
-    if before_pipe >= 6 and has_table_separator and after_pipe < 2:
+    table_detected = before_pipe >= 6 and has_table_separator and after_pipe < 2
+    if table_detected:
         flaws.append({
             "type": "structure_loss",
             "anchor_before": "[Before] Markdown 表格结构",
@@ -845,6 +846,9 @@ def detect_flaws(
 
         # ── 整段被删 ──
         if b_text and not a_text:
+            # 表格行被转为文本不算 omission，已在第一层标记为 structure
+            if table_detected and "|" in b_text:
+                continue
             flaws.append({
                 "type": "omission",
                 "anchor_before": f"[Before {sid}] {b_text[:80]}",
