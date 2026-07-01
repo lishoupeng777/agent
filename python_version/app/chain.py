@@ -149,6 +149,7 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
     _llm_instance = ChatOpenAI(
         model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         temperature=temperature,
+        top_p=1.0,           # 固定 top_p，确保确定性输出
         max_tokens=2048,
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.getenv("DEEPSEEK_API_KEY", ""),
@@ -277,9 +278,13 @@ def extract_dimensions(parsed: dict[str, Any]) -> list[DimensionScore]:
     if not dimensions:
         overall = _normalize_score(parsed.get("overall_score", 0.5))
         dimensions = [
-            DimensionScore(dimension="语义一致性", score=overall, weight=0.5,
+            DimensionScore(dimension="semantic", score=overall, weight=0.35,
                           reason="LLM 未返回分维度得分，使用总分估计"),
-            DimensionScore(dimension="可读性与结构", score=overall, weight=0.5,
+            DimensionScore(dimension="factual", score=overall, weight=0.35,
+                          reason="LLM 未返回分维度得分，使用总分估计"),
+            DimensionScore(dimension="structure", score=overall, weight=0.15,
+                          reason="LLM 未返回分维度得分，使用总分估计"),
+            DimensionScore(dimension="readability", score=overall, weight=0.15,
                           reason="LLM 未返回分维度得分，使用总分估计"),
         ]
     return dimensions
@@ -313,29 +318,58 @@ def compute_overall_score(dimensions: list[DimensionScore]) -> float:
 
 
 # ============================================================
-# 4. 后处理（veto 规则 + profile 惩罚）
+# 4. 后处理（软惩罚 + profile 惩罚）
 # ============================================================
 
-def apply_veto_rules(
-    overall_score: float,
+def apply_soft_penalty(
+    base_score: float,
+    dimensions: list[DimensionScore],
     flaws: list[FlawItem],
 ) -> float:
-    """一票否决规则"""
-    has_critical_structure = any(f.category == "structure" and f.severity == "critical" for f in flaws)
-    has_critical_over_clean = any(f.category == "over_clean" and f.severity == "critical" for f in flaws)
-    has_critical_mis_edit = any(f.category == "mis_edit" and f.severity == "critical" for f in flaws)
+    """软惩罚机制（乘法衰减，替代硬 veto）
 
-    if has_critical_structure or has_critical_over_clean:
-        overall_score = min(overall_score, 0.25)
-    elif has_critical_mis_edit:
-        overall_score = min(overall_score, 0.35)
+    工业界主流做法：不用一票否决，用连续化的惩罚因子。
+    - factual 维度低 → 乘法衰减
+    - critical 瑕疵 → 额外衰减
+    - 最终分数 = base_score * penalty_factor
 
-    return overall_score
+    penalty_factor 取值参考：
+      minor issue:        0.95
+      structure issue:    0.8
+      major factual:      0.5~0.7
+      critical factual:   0.3~0.6
+    """
+    penalty = 1.0
+
+    # 根据瑕疵严重程度施加惩罚（只惩罚一次，不重复惩罚）
+    # 注意：LLM 已通过维度分数反映了问题严重程度（如 factual 低分已拉低 base），
+    # 这里只对瑕疵列表中的问题施加额外衰减，避免同一错误被多重惩罚。
+    for f in flaws:
+        if f.severity == "critical":
+            if f.category in ("factual", "mis_edit"):
+                penalty *= 0.6   # 关键事实错误（从 0.5 放宽到 0.6）
+            elif f.category in ("structure",):
+                penalty *= 0.75  # 结构破坏
+            elif f.category in ("omission", "over_clean"):
+                penalty *= 0.65  # 大量删除
+            else:
+                penalty *= 0.8
+        elif f.severity == "major":
+            penalty *= 0.85
+        elif f.severity == "minor":
+            penalty *= 0.95
+
+    # 最低下限（确保极端情况不会得 0 分）
+    penalty = max(penalty, 0.15)
+
+    return _normalize_score(base_score * penalty)
 
 
 def determine_verdict(overall_score: float) -> str:
     """根据总分判定结果"""
-    if overall_score >= 0.8:
+    # 缓冲带：0.78~0.82 之间默认 review，防止边界值波动导致判定跳变
+    # 只有 ≥ 0.82 才直接 pass，确保 pass 的文本是绝对安全的
+    if overall_score >= 0.82:
         return "pass"
     elif overall_score >= 0.5:
         return "review"
@@ -382,24 +416,18 @@ def apply_profile_penalties(
             suggestion=f"请保留原文中的关键数据「{fact['value']}」",
         ))
 
-    # 分层惩罚
+    # 软惩罚（乘法衰减，替代硬 cap）
     critical_count = sum(1 for f in flaws if f.severity == "critical")
     major_count = sum(1 for f in flaws if f.severity == "major")
 
-    if critical_count >= 2:
-        cap = float(penalty_policy.get("fail_cap", 0.35))
-        overall_score = min(overall_score, cap)
-        verdict = "fail"
-    elif critical_count >= 1:
-        overall_score = min(overall_score, 0.45)
-        verdict = "review" if overall_score >= 0.35 else "fail"
-    elif major_count >= 2:
-        if penalty_policy.get("review_cap_on_major_fact_loss"):
-            overall_score = min(overall_score, 0.55)
-            verdict = "review"
-    elif major_count >= 1:
-        if penalty_policy.get("review_cap_on_major_fact_loss"):
-            verdict = "review"
+    penalty = 1.0
+    for _ in range(critical_count):
+        penalty *= 0.6
+    for _ in range(major_count):
+        penalty *= 0.85
+
+    overall_score = _normalize_score(overall_score * penalty)
+    verdict = determine_verdict(overall_score)
 
     return overall_score, verdict, flaws
 
@@ -422,6 +450,18 @@ def _extract_key_facts(text: str) -> list[dict[str, Any]]:
 # 5. 可复现令牌
 # ============================================================
 
+# 评分规则版本：维度权重、惩罚因子等变更时递增
+RULE_VERSION = "v2.0"  # v2.0: 4维度(semantic/factual/structure/readability) + 软惩罚
+
+
+def _get_rule_hash() -> str:
+    """基于当前评分规则生成哈希（维度权重 + 惩罚因子）"""
+    rule_str = "semantic:0.35,factual:0.35,structure:0.15,readability:0.15," \
+               "penalty:critical_factual=0.6,critical_structure=0.75,critical_omission=0.65," \
+               "major=0.85,minor=0.95"
+    return hashlib.sha256(rule_str.encode("utf-8")).hexdigest()[:8]
+
+
 def build_reproducibility_token(request: EvalRequest, temperature: float) -> str:
     """生成可复现令牌"""
     from .prompts import SYSTEM_PROMPT
@@ -429,8 +469,10 @@ def build_reproducibility_token(request: EvalRequest, temperature: float) -> str
         "before": request.before_text,
         "after": request.after_text,
         "temperature": temperature,
+        "top_p": 1.0,
         "model": os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         "prompt_version": hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()[:8],
+        "rule_version": _get_rule_hash(),
         "evaluation_profile": request.evaluation_profile,
     }, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
@@ -891,13 +933,8 @@ def detect_flaws(
 # 7. 主评估函数（LCEL Chain 流程）
 # ============================================================
 
-def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
-    """
-    LCEL 风格的评估流程：
-      alignment → build_prompt → llm.invoke → parse → post_process → response
-
-    保留与原 evaluate() 相同的接口签名，确保向后兼容。
-    """
+def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
+    """单次评估（不含临界区多次采样），供内部调用。"""
     callback = EvalCallbackHandler()
 
     # Step 0: 对齐预处理 —— 将 before/after 按段落配对，添加锚点标记
@@ -941,11 +978,64 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
     # 用验证后的数据（Pydantic 已做类型/范围校验）
     dimensions = extract_dimensions(validated.model_dump())
     flaws = extract_flaws(validated.model_dump())
+
+    # Step 3b: 锚点增强 —— 用 Diff 模块的实际位置补充 LLM 输出的 0/0 锚点
+    # 建立 Diff 检测结果的 snippet → position 映射
+    diff_positions: dict[str, tuple[int, int]] = {}
+    for df in detected_flaws:
+        if df.get("anchor_after"):
+            # 从 "[After 1] ...片段..." 中提取片段和位置
+            snippet = df["anchor_after"].split("] ...")[-1].rstrip("...") if "] ..." in df["anchor_after"] else ""
+            if snippet and len(snippet) > 3:
+                # 在 after_text 中查找该片段的位置
+                pos = request.after_text.find(snippet[:20])
+                if pos >= 0:
+                    diff_positions[snippet[:20]] = (pos, pos + len(snippet[:20]))
+
+    for flaw in flaws:
+        loc = flaw.location
+        if loc.start_char == 0 and loc.end_char == 0 and loc.snippet:
+            # 尝试从 Diff 检测结果中找到精确位置
+            for snip, (s, e) in diff_positions.items():
+                if snip in loc.snippet or loc.snippet[:15] in snip:
+                    flaw.location = AnchorSpan(
+                        segment_id=loc.segment_id,
+                        start_char=s,
+                        end_char=e,
+                        snippet=loc.snippet,
+                    )
+                    break
+            # 如果 Diff 没找到，直接在 after_text 中搜索
+            if flaw.location.start_char == 0 and flaw.location.end_char == 0:
+                search_text = loc.snippet[:15]
+                pos = request.after_text.find(search_text)
+                if pos >= 0:
+                    flaw.location = AnchorSpan(
+                        segment_id=loc.segment_id,
+                        start_char=pos,
+                        end_char=pos + len(search_text),
+                        snippet=loc.snippet,
+                    )
+
     overall_score = compute_overall_score(dimensions)
 
-    # Step 4: 后处理
-    overall_score = apply_veto_rules(overall_score, flaws)
+    # Step 4: 后处理（软惩罚替代硬 veto）
+    overall_score = apply_soft_penalty(overall_score, dimensions, flaws)
     verdict = determine_verdict(overall_score)
+
+    # Step 4b: 临界区自动多次采样（分数在 0.75~0.85 时，再跑 2 次取均值）
+    # 防止边界值波动导致 pass/review 跳变
+    if 0.75 <= overall_score <= 0.85:
+        extra_scores = [overall_score]
+        for _ in range(2):
+            try:
+                resp2 = _evaluate_once(request, temperature)
+                extra_scores.append(resp2.overall_score)
+            except Exception:
+                pass
+        overall_score = sum(extra_scores) / len(extra_scores)
+        verdict = determine_verdict(overall_score)
+
     overall_score, verdict, flaws = apply_profile_penalties(
         request.evaluation_profile, overall_score, verdict, flaws,
         request.before_text, request.after_text,
@@ -964,9 +1054,37 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         prompt_version=hashlib.sha256(
             __import__("app.prompts", fromlist=["SYSTEM_PROMPT"]).SYSTEM_PROMPT.encode("utf-8")
         ).hexdigest()[:8],
+        rule_version=_get_rule_hash(),
         raw_llm_output=raw_output,
         latency_seconds=callback.latency_seconds,
         input_tokens=callback.input_tokens,
         output_tokens=callback.output_tokens,
         total_tokens=callback.total_tokens,
     )
+
+
+def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
+    """
+    LCEL 风格的评估流程（含临界区多次采样）：
+      单次评估 → 判定 → 临界区自动多次采样 → 最终结果
+
+    保留与原 evaluate() 相同的接口签名，确保向后兼容。
+    """
+    # 单次评估
+    resp = _evaluate_once(request, temperature)
+
+    # 临界区自动多次采样（分数在 0.75~0.85 时，再跑 2 次取均值）
+    # 防止边界值波动导致 pass/review 跳变
+    if 0.75 <= resp.overall_score <= 0.85:
+        extra_scores = [resp.overall_score]
+        for _ in range(2):
+            try:
+                resp2 = _evaluate_once(request, temperature)
+                extra_scores.append(resp2.overall_score)
+            except Exception:
+                pass
+        avg_score = round(sum(extra_scores) / len(extra_scores), 4)
+        resp.overall_score = avg_score
+        resp.verdict = determine_verdict(avg_score)
+
+    return resp

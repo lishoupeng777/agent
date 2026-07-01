@@ -269,6 +269,10 @@ def page_single(api_key: str, base_url: str, model_name: str, evaluation_profile
 
     with col_l:
         st.markdown("### 📝 输入")
+        # 清空标记：点击"下一条"后先清空再渲染
+        if st.session_state.pop("_clear_inputs", False):
+            st.session_state["single_before"] = ""
+            st.session_state["single_after"] = ""
         before = st.text_area("治理前原始文本", height=200, key="single_before",
                               placeholder="输入治理前的原始文本…")
         after = st.text_area("治理后文本", height=200, key="single_after",
@@ -380,8 +384,8 @@ def page_single(api_key: str, base_url: str, model_name: str, evaluation_profile
         # 继续评估按钮
         st.divider()
         def _clear_and_next():
-            for k in ("single_result", "single_before", "single_after"):
-                st.session_state.pop(k, None)
+            st.session_state.pop("single_result", None)
+            st.session_state["_clear_inputs"] = True
 
         st.button("🔄 继续评估下一条", use_container_width=True,
                   key="single_next", on_click=_clear_and_next)
@@ -476,10 +480,10 @@ def page_batch(api_key: str, base_url: str, model_name: str, evaluation_profile:
                 "综合得分": res.get("overall_score", 0),
                 "判定": res.get("verdict", ""),
                 "瑕疵数": len(res.get("flaws", [])),
-                "语义一致性": dims.get("语义一致性", ""),
-                "过度清洗/误改": dims.get("过度清洗/误改识别", ""),
-                "可读性": dims.get("可读性", ""),
-                "结构质量": dims.get("结构质量", ""),
+                "semantic": dims.get("semantic", ""),
+                "factual": dims.get("factual", ""),
+                "structure": dims.get("structure", ""),
+                "readability": dims.get("readability", ""),
                 "来自缓存": "是" if r.get("from_cache") else "否",
             })
         else:

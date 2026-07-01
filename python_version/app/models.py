@@ -68,6 +68,7 @@ class EvalResponse(BaseModel):
     reproducibility_token: str = Field(..., description="可复现令牌（输入+模型+prompt 指纹）")
     model_version: str = Field("", description="评估时使用的模型标识")
     prompt_version: str = Field("", description="评估时使用的 prompt 版本哈希（前8位）")
+    rule_version: str = Field("", description="评分规则版本（维度权重/惩罚因子等变更时递增）")
     raw_llm_output: Optional[str] = Field(None, description="LLM 原始输出（留存判定依据）")
     latency_seconds: float | None = Field(None, description="LLM 响应延迟（秒）")
     input_tokens: int | None = Field(None, description="输入 token 数")

@@ -17,7 +17,7 @@ from .metrics import compute_anchor_accuracy, compute_flaw_metrics
 from .stability import run_stability
 from .debias import detect_length_bias, detect_position_bias
 from .reporter import run_full_evaluation
-from .storage import save_evaluation, load_history, find_by_token, history_stats
+from .storage import save_evaluation, load_history, find_by_token, history_stats, update_human_verdict
 from .batch import batch_evaluate, cache_stats, clear_cache
 
 router = APIRouter(prefix="/api/v1", tags=["quality-judge"])
@@ -180,6 +180,17 @@ def reproduce_endpoint(token: str) -> dict[str, Any]:
     if record is None:
         return {"found": False, "token": token, "message": "未找到对应历史记录，可能尚未入库或令牌已过期"}
     return {"found": True, "token": token, "record": record}
+
+
+@router.post("/review/{request_id}")
+def review_endpoint(request_id: str, human_verdict: str = Query(..., description="人工判定: pass 或 fail")) -> dict[str, Any]:
+    """人工审核覆写：对 verdict=review 的记录进行人工判定。"""
+    if human_verdict not in ("pass", "fail"):
+        return {"success": False, "message": "human_verdict 只能是 pass 或 fail"}
+    ok = update_human_verdict(request_id, human_verdict)
+    if ok:
+        return {"success": True, "request_id": request_id, "human_verdict": human_verdict}
+    return {"success": False, "message": f"未找到 request_id={request_id} 的记录"}
 
 
 # ---------- 缓存管理 ----------

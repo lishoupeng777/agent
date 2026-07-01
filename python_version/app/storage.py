@@ -22,9 +22,8 @@ def save_evaluation(response: Any) -> None:
     将 EvalResponse 追加写入历史文件。
 
     每行一条 JSON 记录，包含：
-      ts, request_id, before_hash, after_hash,
-      overall_score, verdict, model_version, prompt_version,
-      reproducibility_token
+      ts, request_id, overall_score, verdict, human_verdict,
+      model_version, prompt_version, rule_version, reproducibility_token
     """
     _ensure_dir()
     record = {
@@ -32,8 +31,10 @@ def save_evaluation(response: Any) -> None:
         "request_id": response.request_id,
         "overall_score": response.overall_score,
         "verdict": response.verdict,
+        "human_verdict": None,  # 人工覆写：None=未审核, "pass"/"fail"=已审核
         "model_version": getattr(response, "model_version", ""),
         "prompt_version": getattr(response, "prompt_version", ""),
+        "rule_version": getattr(response, "rule_version", ""),
         "reproducibility_token": response.reproducibility_token,
         "flaw_count": len(response.flaws),
         "dimension_scores": {d.dimension: d.score for d in response.dimensions},
@@ -104,6 +105,41 @@ def find_by_token(token: str) -> dict[str, Any] | None:
             except json.JSONDecodeError:
                 continue
     return None
+
+
+def update_human_verdict(request_id: str, human_verdict: str) -> bool:
+    """人工覆写 verdict（pass / fail）。
+
+    Args:
+        request_id: 要覆写的记录 ID
+        human_verdict: 人工判定结果 ("pass" 或 "fail")
+
+    Returns:
+        是否找到并更新成功
+    """
+    if not HISTORY_PATH.exists():
+        return False
+
+    lines = HISTORY_PATH.read_text(encoding="utf-8").splitlines()
+    updated = False
+    new_lines: list[str] = []
+
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+            if rec.get("request_id") == request_id:
+                rec["human_verdict"] = human_verdict
+                updated = True
+            new_lines.append(json.dumps(rec, ensure_ascii=False))
+        except json.JSONDecodeError:
+            new_lines.append(line)
+
+    if updated:
+        HISTORY_PATH.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+    return updated
 
 
 def history_stats() -> dict[str, Any]:
