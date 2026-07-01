@@ -9,6 +9,12 @@
 3. 生产环境中，模型输出经校准后再返回
 
 公式：calibrated = slope * raw + intercept
+
+当前实现说明：
+- 训练数据：gold_dataset_v1.json（34 条人工标注样本）
+- 方法：简单线性回归（scipy.stats.linregress）
+- 局限：数据量较小（34 条），回归参数（slope/intercept）基于有限样本
+- 适用场景：当引入新模型时，用于快速对齐评分尺度
 """
 from __future__ import annotations
 

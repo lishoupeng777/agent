@@ -333,36 +333,41 @@ def apply_soft_penalty(
     - critical 瑕疵 → 额外衰减
     - 最终分数 = base_score * penalty_factor
 
-    penalty_factor 取值参考：
-      minor issue:        0.95
-      structure issue:    0.8
-      major factual:      0.5~0.7
-      critical factual:   0.3~0.6
+    采用风险聚合（Risk Aggregation）策略：
+    - 每个瑕疵有对应的惩罚因子
+    - 最终惩罚取所有因子中最重的一个（min），不连续相乘
+    - 避免多个瑕疵导致分数归零（隐式 veto）
+
+    penalty_factor 取值：
+      critical factual:   0.6
+      critical structure: 0.75
+      critical omission:  0.65
+      major:              0.85
+      minor:              0.95
     """
-    penalty = 1.0
+    # 风险聚合（Risk Aggregation）：取所有瑕疵中最重的惩罚因子
+    # 不连续相乘，避免多个瑕疵导致分数归零（隐式 veto）
+    penalty_map = {
+        ("critical", "factual"): 0.6,
+        ("critical", "mis_edit"): 0.6,
+        ("critical", "structure"): 0.75,
+        ("critical", "omission"): 0.65,
+        ("critical", "over_clean"): 0.65,
+    }
 
-    # 根据瑕疵严重程度施加惩罚（只惩罚一次，不重复惩罚）
-    # 注意：LLM 已通过维度分数反映了问题严重程度（如 factual 低分已拉低 base），
-    # 这里只对瑕疵列表中的问题施加额外衰减，避免同一错误被多重惩罚。
+    worst_penalty = 1.0
     for f in flaws:
-        if f.severity == "critical":
-            if f.category in ("factual", "mis_edit"):
-                penalty *= 0.6   # 关键事实错误（从 0.5 放宽到 0.6）
-            elif f.category in ("structure",):
-                penalty *= 0.75  # 结构破坏
-            elif f.category in ("omission", "over_clean"):
-                penalty *= 0.65  # 大量删除
-            else:
-                penalty *= 0.8
+        key = (f.severity, f.category)
+        if key in penalty_map:
+            worst_penalty = min(worst_penalty, penalty_map[key])
+        elif f.severity == "critical":
+            worst_penalty = min(worst_penalty, 0.8)
         elif f.severity == "major":
-            penalty *= 0.85
+            worst_penalty = min(worst_penalty, 0.85)
         elif f.severity == "minor":
-            penalty *= 0.95
+            worst_penalty = min(worst_penalty, 0.95)
 
-    # 最低下限（确保极端情况不会得 0 分）
-    penalty = max(penalty, 0.15)
-
-    return _normalize_score(base_score * penalty)
+    return _normalize_score(base_score * worst_penalty)
 
 
 def determine_verdict(overall_score: float) -> str:
@@ -420,11 +425,12 @@ def apply_profile_penalties(
     critical_count = sum(1 for f in flaws if f.severity == "critical")
     major_count = sum(1 for f in flaws if f.severity == "major")
 
+    # 风险聚合：取最重惩罚，不连续相乘
     penalty = 1.0
-    for _ in range(critical_count):
-        penalty *= 0.6
-    for _ in range(major_count):
-        penalty *= 0.85
+    if critical_count > 0:
+        penalty = 0.6
+    elif major_count > 0:
+        penalty = 0.85
 
     overall_score = _normalize_score(overall_score * penalty)
     verdict = determine_verdict(overall_score)
@@ -457,8 +463,8 @@ RULE_VERSION = "v2.0"  # v2.0: 4维度(semantic/factual/structure/readability) +
 def _get_rule_hash() -> str:
     """基于当前评分规则生成哈希（维度权重 + 惩罚因子）"""
     rule_str = "semantic:0.35,factual:0.35,structure:0.15,readability:0.15," \
-               "penalty:critical_factual=0.6,critical_structure=0.75,critical_omission=0.65," \
-               "major=0.85,minor=0.95"
+               "penalty:risk_aggregation(max),critical_factual=0.6,critical_structure=0.75," \
+               "critical_omission=0.65,major=0.85,minor=0.95"
     return hashlib.sha256(rule_str.encode("utf-8")).hexdigest()[:8]
 
 
