@@ -28,18 +28,26 @@ print("=" * 70)
 print(f"  校准测试 — 共 {len(samples)} 条样本（统一调用 engine.py）")
 print("=" * 70)
 
+# ── 维度权重（与 prompts.py / chain.py 保持一致）──
+# 数据集字段名 → 系统维度名 映射：
+#   semantic_consistency → semantic
+#   factual_accuracy     → factual
+#   readability_structure → structure
+#   over_cleaning        → readability
+WEIGHTS = {
+    "semantic_consistency": 0.35,
+    "factual_accuracy": 0.35,
+    "readability_structure": 0.15,
+    "over_cleaning": 0.15,
+}
+
 # ── 构建请求 ──────────────────────────────────────────────────────────────
 requests: list[EvalRequest] = []
 for s in samples:
-    # 从四维度 human_scores 计算加权总分（与系统权重一致）
+    # 从四维度 human_scores 计算加权总分
     hs = s.get("human_scores", {})
     if hs:
-        overall = (
-            hs.get("semantic_consistency", 0.5) * 0.35
-            + hs.get("factual_accuracy", 0.5) * 0.35
-            + hs.get("readability_structure", 0.5) * 0.15
-            + hs.get("over_cleaning", 0.5) * 0.15
-        )
+        overall = sum(hs.get(dim, 0.5) * w for dim, w in WEIGHTS.items())
     else:
         overall = s.get("human_score", 0.5)
 

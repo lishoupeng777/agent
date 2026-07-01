@@ -980,22 +980,46 @@ def compute_confidence(
     reason_score = reasons_with_content / max(len(dimensions), 1)
     score += reason_score * 0.33
 
-    # ③ 维度一致性（0~1）
-    # 维度分数的标准差在合理范围内（0.05~0.4）→ 说明 LLM 在认真区分
-    dim_scores = [d.score for d in dimensions]
-    if len(dim_scores) >= 2:
-        std = float(np.std(dim_scores))
-        if 0.05 <= std <= 0.4:
-            consistency_score = 1.0
-        elif std < 0.05:
-            consistency_score = 0.6  # 所有维度都一样，可能没认真打分
-        else:
-            consistency_score = 0.7  # 差异过大，可能有异常
-    else:
-        consistency_score = 0.5
-    score += consistency_score * 0.34
+    # ③ 规则一致性（0~1）
+    # Diff 判定的严重程度是否与 LLM 维度分数一致
+    # 例：Diff 检测到 critical factual，但 LLM 给 factual=0.95 → 冲突
+    rule_score = 1.0
+    dim_map = {d.dimension: d.score for d in dimensions}
+    for df in detected_flaws:
+        df_severity = df.get("severity", "")
+        df_category = df.get("category", "")
+        if df_severity == "critical" and df_category in ("factual", "mis_edit"):
+            factual_score = dim_map.get("factual", 0.5)
+            if factual_score > 0.7:
+                rule_score *= 0.5  # Diff 说 critical 但 LLM 给高分 → 冲突
+        elif df_severity == "critical" and df_category == "structure":
+            structure_score = dim_map.get("structure", 0.5)
+            if structure_score > 0.7:
+                rule_score *= 0.5
+        elif df_severity == "critical" and df_category in ("omission", "over_clean"):
+            semantic_score = dim_map.get("semantic", 0.5)
+            if semantic_score > 0.7:
+                rule_score *= 0.6
+    score += rule_score * 0.34
 
     return round(min(max(score, 0.0), 1.0), 4)
+
+
+def compute_risk_level(overall_score: float, confidence: float) -> str:
+    """计算风险等级，指导人工审核优先级。
+
+    结合分数和置信度：
+    - score < 0.3 或 (score < 0.5 且 confidence < 0.6) → high
+    - score < 0.7 或 confidence < 0.5 → medium
+    - 其他 → low
+    """
+    if overall_score < 0.3:
+        return "high"
+    if overall_score < 0.5 and confidence < 0.6:
+        return "high"
+    if overall_score < 0.7 or confidence < 0.5:
+        return "medium"
+    return "low"
 
 
 # ============================================================
@@ -1128,6 +1152,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
         ).hexdigest()[:8],
         rule_version=_get_rule_hash(),
         confidence=confidence,
+        risk_level=compute_risk_level(overall_score, confidence),
         raw_llm_output=raw_output,
         latency_seconds=callback.latency_seconds,
         input_tokens=callback.input_tokens,
