@@ -960,7 +960,25 @@ def detect_flaws(
                 "severity": sev,
             })
 
-    return flaws
+    # ── 合并同类瑕疵（同一 category+severity 的多条合并为一条）──
+    # 避免"表格→文本"产生 5 条独立 flaw
+    merged: list[dict[str, Any]] = []
+    seen_keys: dict[str, int] = {}  # key → index in merged
+
+    for f in flaws:
+        key = f"{f['category']}_{f['severity']}"
+        if key in seen_keys:
+            # 合并到已有条目
+            idx = seen_keys[key]
+            merged[idx]["description"] = merged[idx].get("description", "") + "; " + f.get("description", "")[:40]
+            # 更新 anchor 为范围
+            if f.get("anchor_before"):
+                merged[idx]["anchor_after"] = f["anchor_after"]
+        else:
+            seen_keys[key] = len(merged)
+            merged.append(f)
+
+    return merged
 
 
 # ============================================================
@@ -1142,10 +1160,11 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
     # 如果 Diff 检测到 critical structure/omission 但 LLM 瑕疵列表中没有对应条目，
     # 将算法检测结果合并进来（算法负责"发现"，LLM 负责"解释"）
     llm_categories = {(f.category, f.severity) for f in flaws}
+    merged_categories: set[tuple[str, str]] = set()  # 防止同类瑕疵重复补充
     for df in detected_flaws:
         df_cat = df.get("category", "")
         df_sev = df.get("severity", "")
-        if df_sev == "critical" and (df_cat, df_sev) not in llm_categories:
+        if df_sev == "critical" and (df_cat, df_sev) not in llm_categories and (df_cat, df_sev) not in merged_categories:
             # 算法检测到 critical 但 LLM 漏检 → 补充
             flaws.append(FlawItem(
                 category=df_cat,
@@ -1159,6 +1178,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
                 ),
                 suggestion="算法预检标记，建议人工复核",
             ))
+            merged_categories.add((df_cat, df_sev))
     # 记录算法修正（不修改 LLM 原始输出）
     algo_adjustments: dict[str, dict[str, Any]] = {}
     for df in detected_flaws:
