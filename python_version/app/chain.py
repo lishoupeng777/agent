@@ -1159,14 +1159,46 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
                 ),
                 suggestion="算法预检标记，建议人工复核",
             ))
-            # 同时修正对应维度分数
-            if df_cat == "structure":
-                for d in dimensions:
-                    if d.dimension == "structure" and d.score > 0.5:
-                        d.score = 0.3
-                        d.reason = "[算法修正] 检测到表格/列表结构被破坏"
+    # 记录算法修正（不修改 LLM 原始输出）
+    algo_adjustments: dict[str, dict[str, Any]] = {}
+    for df in detected_flaws:
+        df_cat = df.get("category", "")
+        df_sev = df.get("severity", "")
+        if df_sev == "critical" and df_cat == "structure":
+            # 找 LLM 给的 structure 分数
+            llm_struct = next((d.score for d in dimensions if d.dimension == "structure"), 0.5)
+            if llm_struct > 0.5:
+                algo_adjustments["structure"] = {
+                    "llm_score": llm_struct,
+                    "penalty": -0.5,
+                    "adjusted_score": 0.3,
+                    "reason": "Markdown 表格/列表结构被破坏（算法检测）",
+                }
+        elif df_sev == "critical" and df_cat in ("omission", "over_clean"):
+            llm_semantic = next((d.score for d in dimensions if d.dimension == "semantic"), 0.5)
+            if llm_semantic > 0.6:
+                algo_adjustments["semantic"] = {
+                    "llm_score": llm_semantic,
+                    "penalty": -0.3,
+                    "adjusted_score": max(0.0, llm_semantic - 0.3),
+                    "reason": "大量内容被删除（算法检测）",
+                }
 
-    overall_score = compute_overall_score(dimensions)
+    # 用调整后的维度分数计算最终得分（LLM 原始分数保留在 dimensions 中）
+    scoring_dimensions = []
+    for d in dimensions:
+        if d.dimension in algo_adjustments:
+            adj = algo_adjustments[d.dimension]
+            scoring_dimensions.append(DimensionScore(
+                dimension=d.dimension,
+                score=adj["adjusted_score"],
+                weight=d.weight,
+                reason=d.reason,
+            ))
+        else:
+            scoring_dimensions.append(d)
+
+    overall_score = compute_overall_score(scoring_dimensions)
 
     # Step 4: 后处理（软惩罚替代硬 veto）
     overall_score = apply_soft_penalty(overall_score, dimensions, flaws)
@@ -1209,6 +1241,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
         rule_version=_get_rule_hash(),
         confidence=confidence,
         risk_level=compute_risk_level(overall_score, confidence),
+        algorithm_adjustment=algo_adjustments if algo_adjustments else None,
         raw_llm_output=raw_output,
         latency_seconds=callback.latency_seconds,
         input_tokens=callback.input_tokens,

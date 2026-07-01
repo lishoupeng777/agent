@@ -71,6 +71,7 @@ class EvalResponse(BaseModel):
     rule_version: str = Field("", description="评分规则版本（维度权重/惩罚因子等变更时递增）")
     confidence: float | None = Field(None, ge=0.0, le=1.0, description="评估置信度（0~1，基于Diff一致性/理由完整度/规则一致性）")
     risk_level: str | None = Field(None, description="风险等级：high(0~0.3) / medium(0.3~0.7) / low(0.7+)")
+    algorithm_adjustment: dict[str, dict[str, float | str]] | None = Field(None, description="算法修正记录（保留LLM原始分数，单独记录修正值和原因）")
     raw_llm_output: Optional[str] = Field(None, description="LLM 原始输出（留存判定依据）")
     latency_seconds: float | None = Field(None, description="LLM 响应延迟（秒）")
     input_tokens: int | None = Field(None, description="输入 token 数")
