@@ -802,6 +802,34 @@ def detect_flaws(
     """
     flaws: list[dict[str, Any]] = []
 
+    # ── 第一层：确定性规则检测（Markdown 表格 / 列表结构破坏）──
+    # 这类结构变化是算法 100% 能判断的，不需要依赖 LLM
+    before_pipe = anchored_before.count("|")
+    after_pipe = anchored_after.count("|")
+    has_table_separator = "|---" in anchored_before or "| ---" in anchored_before
+
+    if before_pipe >= 6 and has_table_separator and after_pipe < 2:
+        flaws.append({
+            "type": "structure_loss",
+            "anchor_before": "[Before] Markdown 表格结构",
+            "anchor_after": "[After] 表格已转为纯文本",
+            "category": "structure",
+            "severity": "critical",
+        })
+
+    # 检测有序列表被压缩（1. 2. 3. → 单行文本）
+    import re
+    before_list_items = len(re.findall(r"(?:^|\n)\s*\d+[\.\)]\s", anchored_before))
+    after_list_items = len(re.findall(r"(?:^|\n)\s*\d+[\.\)]\s", anchored_after))
+    if before_list_items >= 3 and after_list_items == 0:
+        flaws.append({
+            "type": "structure_loss",
+            "anchor_before": "[Before] 有序列表结构",
+            "anchor_after": "[After] 列表已压缩为单行文本",
+            "category": "structure",
+            "severity": "major",
+        })
+
     # 建立 segment_id → text 的映射
     before_map = {s["segment_id"]: s["text"] for s in segments_before}
     after_map = {s["segment_id"]: s["text"] for s in segments_after}
@@ -1109,6 +1137,34 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
                         end_char=pos + len(search_text),
                         snippet=loc.snippet,
                     )
+
+    # Step 3c: Merge —— 算法瑕疵补充到 LLM 输出
+    # 如果 Diff 检测到 critical structure/omission 但 LLM 瑕疵列表中没有对应条目，
+    # 将算法检测结果合并进来（算法负责"发现"，LLM 负责"解释"）
+    llm_categories = {(f.category, f.severity) for f in flaws}
+    for df in detected_flaws:
+        df_cat = df.get("category", "")
+        df_sev = df.get("severity", "")
+        if df_sev == "critical" and (df_cat, df_sev) not in llm_categories:
+            # 算法检测到 critical 但 LLM 漏检 → 补充
+            flaws.append(FlawItem(
+                category=df_cat,
+                severity=df_sev,
+                description=f"[算法检测] {df.get('type', 'unknown')}: {df.get('anchor_before', '')[:60]}",
+                location=AnchorSpan(
+                    segment_id="algo",
+                    start_char=0,
+                    end_char=0,
+                    snippet=df.get("anchor_before", "")[:50],
+                ),
+                suggestion="算法预检标记，建议人工复核",
+            ))
+            # 同时修正对应维度分数
+            if df_cat == "structure":
+                for d in dimensions:
+                    if d.dimension == "structure" and d.score > 0.5:
+                        d.score = 0.3
+                        d.reason = "[算法修正] 检测到表格/列表结构被破坏"
 
     overall_score = compute_overall_score(dimensions)
 
