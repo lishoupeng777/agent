@@ -31,12 +31,24 @@ print("=" * 70)
 # ── 构建请求 ──────────────────────────────────────────────────────────────
 requests: list[EvalRequest] = []
 for s in samples:
+    # 从四维度 human_scores 计算加权总分（与系统权重一致）
+    hs = s.get("human_scores", {})
+    if hs:
+        overall = (
+            hs.get("semantic_consistency", 0.5) * 0.35
+            + hs.get("factual_accuracy", 0.5) * 0.35
+            + hs.get("readability_structure", 0.5) * 0.15
+            + hs.get("over_cleaning", 0.5) * 0.15
+        )
+    else:
+        overall = s.get("human_score", 0.5)
+
     requests.append(EvalRequest(
         request_id=s["id"],
         before_text=s["before_text"],
         after_text=s["after_text"],
         human_label={
-            "overall_score": s["human_score"],
+            "overall_score": round(overall, 4),
             "label": s.get("label", ""),
             "flaws": s.get("flaws_gt", []),
         },
@@ -52,7 +64,7 @@ all_predicted_flaws: list[dict] = []
 all_gt_flaws: list[dict] = []
 
 for i, (req, s) in enumerate(zip(requests, samples)):
-    human = s["human_score"]
+    human = (req.human_label or {}).get("overall_score", 0.5)
     print(f"  [{i+1}/{len(samples)}] {req.request_id} ({s.get('label','')}) ... ", end="", flush=True)
 
     try:

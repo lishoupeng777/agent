@@ -936,6 +936,69 @@ def detect_flaws(
 
 
 # ============================================================
+# 6d. 置信度计算
+# ============================================================
+
+def compute_confidence(
+    dimensions: list[DimensionScore],
+    flaws: list[FlawItem],
+    detected_flaws: list[dict[str, Any]],
+    diff_info: str,
+) -> float:
+    """计算评估置信度（0~1）。
+
+    三个因子各占 1/3：
+    1. Diff 一致性：算法预检的变更是否被 LLM 瑕疵列表覆盖
+    2. 理由完整度：LLM 给出的 reason 是否足够详细
+    3. 维度一致性：各维度分数是否合理分布（不是全 0 或全 1）
+    """
+    score = 0.0
+
+    # ① Diff 一致性（0~1）
+    # 算法检测到 N 个变更，LLM 瑕疵列表覆盖了 M 个 → M/N
+    if detected_flaws:
+        algo_categories = set()
+        for df in detected_flaws:
+            cat = df.get("category", "")
+            if cat and cat != "addition":
+                algo_categories.add(cat)
+        llm_categories = set(f.category for f in flaws)
+        if algo_categories:
+            covered = len(algo_categories & llm_categories)
+            diff_score = covered / len(algo_categories)
+        else:
+            diff_score = 1.0  # 算法没检测到变更，LLM 也没报瑕疵 → 一致
+    else:
+        diff_score = 0.8  # 没有 diff 信息，给中等置信度
+    score += diff_score * 0.33
+
+    # ② 理由完整度（0~1）
+    # 每个维度的 reason 长度 > 5 字 → 算有理由
+    reasons_with_content = sum(
+        1 for d in dimensions if d.reason and len(d.reason.strip()) > 5
+    )
+    reason_score = reasons_with_content / max(len(dimensions), 1)
+    score += reason_score * 0.33
+
+    # ③ 维度一致性（0~1）
+    # 维度分数的标准差在合理范围内（0.05~0.4）→ 说明 LLM 在认真区分
+    dim_scores = [d.score for d in dimensions]
+    if len(dim_scores) >= 2:
+        std = float(np.std(dim_scores))
+        if 0.05 <= std <= 0.4:
+            consistency_score = 1.0
+        elif std < 0.05:
+            consistency_score = 0.6  # 所有维度都一样，可能没认真打分
+        else:
+            consistency_score = 0.7  # 差异过大，可能有异常
+    else:
+        consistency_score = 0.5
+    score += consistency_score * 0.34
+
+    return round(min(max(score, 0.0), 1.0), 4)
+
+
+# ============================================================
 # 7. 主评估函数（LCEL Chain 流程）
 # ============================================================
 
@@ -1047,7 +1110,10 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
         request.before_text, request.after_text,
     )
 
-    # Step 5: 组装响应（含 callback 追踪数据）
+    # Step 5: 计算置信度
+    confidence = compute_confidence(dimensions, flaws, detected_flaws, diff_info)
+
+    # Step 6: 组装响应（含 callback 追踪数据）
     return EvalResponse(
         request_id=request.request_id,
         evaluation_profile=request.evaluation_profile,
@@ -1061,6 +1127,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
             __import__("app.prompts", fromlist=["SYSTEM_PROMPT"]).SYSTEM_PROMPT.encode("utf-8")
         ).hexdigest()[:8],
         rule_version=_get_rule_hash(),
+        confidence=confidence,
         raw_llm_output=raw_output,
         latency_seconds=callback.latency_seconds,
         input_tokens=callback.input_tokens,
