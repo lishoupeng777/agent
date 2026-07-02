@@ -383,45 +383,59 @@ def run_full_evaluation(
 
 
 def _generate_checklist() -> list[dict[str, Any]]:
-    """课题12验收标准清单"""
+    """课题12验收标准清单（I1-I8）"""
     return [
         {
+            "id": "I1",
             "requirement": "与人工一致性",
             "metric": "Pearson r ≥ 0.8",
             "status": "待验证",
             "note": "核心考核项",
         },
         {
+            "id": "I2",
             "requirement": "评分稳定性",
             "metric": "同一输入多次评估方差 < 0.005",
             "status": "待验证",
             "note": "低温度/固定策略下可复现",
         },
         {
-            "requirement": "瑕疵检出",
+            "id": "I3",
+            "requirement": "瑕疵检出 F1",
             "metric": "Precision/Recall → F1 ≥ 0.8",
             "status": "待验证",
             "note": "过度清洗/误改识别",
         },
         {
+            "id": "I4",
+            "requirement": "锚点定位准确率",
+            "metric": "锚点定位准确率 ≥ 90%",
+            "status": "待验证",
+            "note": "segment_id + start_char + end_char + snippet，字符容差 ≤ 10",
+        },
+        {
+            "id": "I5",
             "requirement": "可解释性",
-            "metric": "判定理由合理可被人工复核",
+            "metric": "每维度含 reason 字段",
             "status": "已实现",
             "note": "每维度含 reason 字段，每瑕疵含 description",
         },
         {
+            "id": "I6",
             "requirement": "瑕疵可定位",
-            "metric": "锚点定位准确率 ≥ 90%",
-            "status": "待验证",
-            "note": "segment_id + start_char + end_char + snippet",
-        },
-        {
-            "requirement": "可复现",
-            "metric": "固定策略下可复现",
+            "metric": "行级锚点定位",
             "status": "已实现",
-            "note": "temperature=0.0 + SHA256 令牌",
+            "note": "flaw.location 含 segment_id + start_char + end_char",
         },
         {
+            "id": "I7",
+            "requirement": "可复现",
+            "metric": "temperature=0.0 + SHA256 令牌",
+            "status": "已实现",
+            "note": "固定策略下同输入同输出",
+        },
+        {
+            "id": "I8",
             "requirement": "抗偏置",
             "metric": "长度/位置偏置检测 + 缓解策略",
             "status": "已实现",

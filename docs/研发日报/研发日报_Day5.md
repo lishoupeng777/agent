@@ -70,8 +70,8 @@
 1. **P4-1 综合评估报告生成器**：在 `app/reporter.py` 中设计并实现了 7 大模块集成架构（评估/校准/稳定性/瑕疵/锚点/偏置/可复现），入口函数 `run_full_evaluation()` 采用异常隔离设计。
 2. **P4-2 JSON 报告导出**：实现了 `export_report_json()` 函数。
 3. **P4-3 控制台摘要输出**：实现了 `print_report_summary()` 函数，输出各维度评分、校准指标和 Pass/Fail 标识。
-4. **P4-4 验收标准自动判定**：实现了 `check_acceptance_criteria()` 函数，对照 I1-I8 逐项检查。
-5. **P4-5 批量评估脚本**：在 `app/batch.py` 中实现了 `batch_evaluate()` 函数，支持并发控制（asyncio.Semaphore）、指数退避重试（1s/2s/4s）和 256 条 LRU 缓存。
+4. **P4-4 验收标准自动判定**：实现了 `_generate_checklist()` 函数，对照 I1-I8 验收标准逐项检查（与人工一致性/评分稳定性/瑕疵检出/可解释性/瑕疵可定位/可复现/抗偏置）。
+5. **P4-5 批量评估脚本**：在 `app/batch.py` 中实现了 `batch_evaluate()` 函数，支持并发控制（asyncio.Semaphore，默认 5）、指数退避重试（1s/2s/4s，最多 3 次）和 256 条 LRU 内存缓存。
 6. **架构设计**：设计了报告生成器的 7 模块集成方案和批量评估的并发/重试/缓存机制。
 
 **计划工时：6h　　实际工时：约 6h　　偏差：持平**
@@ -93,7 +93,7 @@ def run_full_evaluation(request: EvalRequest) -> dict:
     # 5. 锚点 → metrics.compute_anchor_accuracy()
     # 6. 偏置 → debias 模块
     # 7. 可复现 → reproducibility_token
-    # 8. 验收 → check_acceptance_criteria()
+    # 8. 验收 → _generate_checklist()（I1-I8 验收标准）
 ```
 
 ### 3.2 金标准数据集 v1.0
@@ -116,7 +116,7 @@ def run_full_evaluation(request: EvalRequest) -> dict:
 | `app/reporter.py` 综合报告 | P4-1 | 7 大模块集成 |
 | `output/eval_report.json` | P4-2 | JSON 报告导出 |
 | 控制台彩色摘要 | P4-3 | ANSI 格式化 |
-| 验收标准自动判定 | P4-4 | I1-I8 逐项检查 |
+| 验收标准自动判定 | P4-4 | I1-I8 验收标准逐项检查 |
 | `app/batch.py` 批量评估 | P4-5 | 遍历 eval_dataset.json |
 | `data/gold_dataset_v1.json` | 额外 | 34 条金标准样本 |
 | 批量评估增强 | 额外 | 并发/重试/LRU/进度回调 |

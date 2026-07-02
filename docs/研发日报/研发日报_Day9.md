@@ -100,7 +100,7 @@
 1. **全指标复核**：逐一验证 9 项指标（Pearson/Spearman/Kappa/Kendall's W/ROUGE-L/BERTScore/F1/锚点/偏置）的计算逻辑和最新数值，确认 I1-I8 全部达标。
 2. **性能优化**：分析 EvalCallbackHandler 延迟数据，精简 Prompt（减少 ~200 tokens），调整 max_tokens（2048→1024），响应时间从 3.2s 降至 2.7s。
 3. **UI 细节打磨**：优化 Metric 卡片间距、DataFrame 列宽、徽章颜色对比度，增加评分维度雷达图。
-4. **验收标准自动判定验证**：确认 `check_acceptance_criteria()` 的 I1-I8 判定逻辑与计划书一致。
+4. **验收标准自动判定验证**：确认 `_generate_checklist()` 的 I1-I8 判定逻辑与计划书一致。
 5. **第二次彩排终审**：确认讲解内容准确、时间控制在 17 分钟、技术重点突出。
 
 **计划工时：6h　　实际工时：约 6h（含 7/8）　　偏差：持平**
