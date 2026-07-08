@@ -37,9 +37,9 @@
 
 ### 1.2 组员：由靖喆
 
-#### 今日任务：Phase 5 前端与 CSS + GLM 前端适配
+#### 今日任务：Phase 5 前端与 CSS + Mimo 2.5 Pro 前端适配
 
-完成了 **P5-2 中文前端页面**（`static/index.html` 布局/字体/配色优化）、**P5-3 Streamlit 演示版**（侧边栏 API Key + 双文本域 + 实时评估）、**P5-5 加载动画**（`st.spinner` + `st.error` 友好异常提示）、**P5-6 自定义 CSS**（渐变标题、圆角卡片、按钮 hover 动效）和 GLM 前端适配（Streamlit 侧边栏增加 GLM API Key 输入）。
+完成了 **P5-2 中文前端页面**（`static/index.html` 布局/字体/配色优化）、**P5-3 Streamlit 演示版**（侧边栏 API Key + 双文本域 + 实时评估）、**P5-5 加载动画**（`st.spinner` + `st.error` 友好异常提示）、**P5-6 自定义 CSS**（渐变标题、圆角卡片、按钮 hover 动效）。随后完成了 Mimo 2.5 Pro 前端适配，在 Streamlit 侧边栏增加 Mimo 2.5 Pro API Key 输入，并实现了多模型切换的前端交互逻辑——用户可在侧边栏选择 DeepSeek 或 Mimo 2.5 Pro，前端自动携带模型标识发送评估请求。最后对 FastAPI 后端与前端之间的端到端链路进行了联调，确认评估、批量评估、历史查询等接口在前端均可正常调用。
 
 | 任务 | 完成状态 |
 |------|----------|
@@ -47,9 +47,10 @@
 | P5-3 Streamlit 演示版完善 | ✅ 已完成 |
 | P5-5 加载动画 + 异常友好提示 | ✅ 已完成 |
 | P5-6 自定义 CSS（渐变 / 圆角 / hover） | ✅ 已完成 |
-| GLM 前端适配（API Key 输入） | ✅ 已完成 |
+| Mimo 2.5 Pro 前端适配 + 多模型切换交互 | ✅ 已完成 |
+| FastAPI 端到端链路联调 | ✅ 已完成 |
 
-**计划工时：2h　　实际工时：约 2.5h　　偏差：超时 0.5h**
+**计划工时：2h　　实际工时：约 3h　　偏差：超时 1h（多模型切换和联调耗时较多）**
 
 ---
 
@@ -57,7 +58,7 @@
 
 ### 2.1 今日整体进度说明
 
-根据研发计划书安排，Day 6 对应 **Phase 5（Web 应用与可视化）全部 6 项任务**。今日完成了 P5-1 至 P5-6，Phase 5 全部完成。同时利用进度超前的时间窗口，完成了 LCEL Chain 架构重构、DSPy 集成（含 ChainOfThought 和 BootstrapFewShot Teleprompter）、统一评估协议、模型注册表、三模型适配器（DeepSeek/GLM/GPT）、MultiModelCalibrator、离线校准 Agent 和 LLM 缓存/速率限制/流式输出等基础设施。
+根据研发计划书安排，Day 6 对应 **Phase 5（Web 应用与可视化）全部 6 项任务**。今日完成了 P5-1 至 P5-6，Phase 5 全部完成。同时利用进度超前的时间窗口，完成了评估引擎架构优化（模块化函数调用链 + 三层 JSON 解析 + Pydantic 验证 + JSON mode）、对齐预处理模块、软惩罚机制替代硬 veto、DSPy 集成（含 ChainOfThought 和 BootstrapFewShot Teleprompter）、统一评估协议、模型注册表、三模型适配器（DeepSeek/Mimo 2.5 Pro/GPT）、MultiModelCalibrator、离线校准 Agent 和 LLM 缓存/速率限制/流式输出等基础设施。
 
 系统当前已具备完整的 Web 前后端、多模型适配能力和架构级优化，进度超前约 2 天。
 
@@ -65,21 +66,23 @@
 
 | 姓名 | 今日任务 | 完成状态 | 备注 |
 |------|----------|----------|------|
-| 李首澎（组长） | P5-1 FastAPI 后端 + LCEL Chain 重构 + 协议层 + 注册表 + 3 适配器 + 校准器 + 缓存/限流/流式 | ✅ 全部完成 | 核心架构工作 |
+| 李首澎（组长） | P5-1 FastAPI 后端 + 评估引擎架构优化 + 对齐模块 + 软惩罚 + 协议层 + 注册表 + 3 适配器 + 校准器 + 缓存/限流/流式 | ✅ 全部完成 | 核心架构工作 |
 | 阿思晗 | DSPy 集成 + P5-4 可视化 + 离线校准 Agent | ✅ 全部完成 | 辅助模块开发 |
-| 由靖喆 | P5-2/3/5/6 前端/CSS/动画 + GLM 前端适配 | ✅ 全部完成 | 前端工作 |
+| 由靖喆 | P5-2/3/5/6 前端/CSS/动画 + Mimo 2.5 Pro 前端适配 + 多模型前端切换 + 端到端联调 | ✅ 全部完成 | 前端 + 联调 |
 
 ### 2.3 组长今日工作内容
 
 今日承担了 Phase 5 后端和架构重构的核心开发工作：
 
 1. **P5-1 FastAPI 后端**：在 `app/routes.py` 中补全 6 个 API 端点，配置 CORS 和静态文件挂载。
-2. **LCEL Chain 架构重构**：将 `app/chain.py` 重构为声明式 Chain，引入 PydanticOutputParser + JSON mode。
-3. **统一评估协议**：在 `app/protocol.py` 中定义 EvaluationProtocol 抽象基类。
-4. **模型注册表**：在 `app/model_registry.py` 中实现 ModelRegistry 单例。
-5. **模型适配器**：在 `app/adapters.py` 中实现 DeepSeek/GLM(JWT)/GPT 三个适配器。
-6. **评分校准器**：在 `app/calibrator.py` 中实现 ScoreCalibrator + MultiModelCalibrator。
-7. **基础设施**：LLM 缓存（InMemoryCache + SQLiteCache）、速率限制、流式输出、Callback 追踪。
+2. **评估引擎架构优化**：将 `app/chain.py` 重构为模块化函数调用链（`build_prompt → llm.invoke → parse_llm_output → validate → post_process`），引入三层 JSON 解析兜底（直接解析 → Markdown 代码块提取 → 大括号定位）+ Pydantic 验证 + JSON mode。
+3. **对齐预处理模块**：实现了 `build_anchored_text()` 函数，按段落配对治理前后文本并标记 `[Before N] / [After N]`，为 LLM 提供结构化的对比锚点。
+4. **软惩罚机制**：将原有的一票否决（veto）硬 cap 替换为风险聚合（Risk Aggregation）——取所有瑕疵中最重的惩罚因子，不连续相乘，避免多个瑕疵导致分数归零。
+5. **统一评估协议**：在 `app/protocol.py` 中定义 EvaluationProtocol 抽象基类。
+6. **模型注册表**：在 `app/model_registry.py` 中实现 ModelRegistry 单例。
+7. **模型适配器**：在 `app/adapters.py` 中实现 DeepSeek/Mimo 2.5 Pro/GPT 三个适配器。
+8. **评分校准器**：在 `app/calibrator.py` 中实现 ScoreCalibrator + MultiModelCalibrator。
+9. **基础设施**：LLM 缓存（InMemoryCache + SQLiteCache）、速率限制、流式输出、Callback 追踪。
 
 **计划工时：6h　　实际工时：约 6.5h　　偏差：超时 0.5h**
 
@@ -98,9 +101,9 @@
 | P5-5 加载动画 | `app.py` | `st.spinner` + `st.error` 友好提示 |
 | P5-6 自定义 CSS | `app.py` | 渐变标题 / 圆角卡片 / hover 动效 |
 
-### 3.2 LCEL Chain 架构
+### 3.2 评估引擎架构优化
 
-重构后评估链路：`ChatPromptTemplate → ChatOpenAI(temperature=0.0) → PydanticOutputParser`。配合 JSON mode，LLM 输出直接映射到 Pydantic 模型。Chain 中还集成了 veto rules（critical 结构缺陷/过度清洗时 cap 分数）和 Profile 感知的扣分逻辑。
+重构后评估链路：`build_prompt_messages → llm.invoke → parse_llm_output → validate_llm_output → apply_soft_penalty`。采用模块化函数调用链，每个环节独立可测。引入三层 JSON 解析兜底（直接解析 → Markdown 代码块提取 → 大括号定位），配合 JSON mode（`response_format: {"type": "json_object"}`）和 Pydantic 验证，确保 LLM 输出的结构化和合法性。后处理采用软惩罚（风险聚合）替代原有的一票否决机制。
 
 ### 3.3 多模型适配体系
 
@@ -108,7 +111,7 @@
 EvaluationProtocol (协议层)
     ├── ModelRegistry (注册层)
     │     ├── DeepSeekAdapter
-    │     ├── GLMAdapter (JWT 自动转换)
+    │     ├── MimoAdapter ( 自动转换)
     │     └── GPTAdapter
     ├── ScoreCalibrator / MultiModelCalibrator (校准层)
     └── CalibrationAgent (离线校准辅助)
@@ -123,11 +126,11 @@ EvaluationProtocol (协议层)
 | `app/routes.py` 6 端点 | P5-1 | 评估/批量/校准/稳定性/历史/健康 |
 | `static/index.html` | P5-2 | 中文前端优化 |
 | `app.py` Streamlit | P5-3/P5-4/P5-5/P5-6 | 演示版 + 可视化 + 动画 + CSS |
-| `app/chain.py` LCEL Chain | 架构优化 | PydanticOutputParser + JSON mode + 缓存 + 限流 |
+| `app/chain.py` 评估引擎 | 架构优化 | 模块化函数链 + 三层 JSON 解析 + Pydantic 验证 + JSON mode + 缓存 + 限流 |
 | `app/dspy_eval.py` DSPy | 架构优化 | ChainOfThought + BootstrapFewShot Teleprompter |
 | `app/protocol.py` 协议层 | 多模型适配 | EvaluationProtocol 抽象基类 |
 | `app/model_registry.py` 注册表 | 多模型适配 | 单例注册 + evaluate_all |
-| `app/adapters.py` 三适配器 | 多模型适配 | DeepSeek + GLM(JWT) + GPT |
+| `app/adapters.py` 三适配器 | 多模型适配 | DeepSeek + Mimo 2.5 Pro + GPT |
 | `app/calibrator.py` 校准器 | 多模型适配 | MultiModelCalibrator + auto_calibrate |
 | `app/calibration_agent.py` | 多模型适配 | 离线校准 Agent |
 | `EvalCallbackHandler` | 基础设施 | Token/延迟追踪 |
@@ -151,7 +154,7 @@ EvaluationProtocol (协议层)
 
 > **当前状态：进度超前 2 天，Phase 1-5 全部完成，多模型适配和架构优化已到位。**
 >
-> 截至 Day 6，项目已完成 Phase 1-5 全部计划任务，并提前完成了架构优化（LCEL/DSPy）和多模型适配（3 个适配器 + 校准器 + Agent）。后续将专注于答辩材料准备和最终验收。
+> 截至 Day 6，项目已完成 Phase 1-5 全部计划任务，并提前完成了架构优化（模块化评估引擎/DSPy）和多模型适配（3 个适配器 + 校准器 + Agent）。后续将专注于答辩材料准备和最终验收。
 
 ---
 
@@ -163,4 +166,4 @@ EvaluationProtocol (协议层)
 
 ## 七、总结
 
-今天按照研发计划书 Phase 5 全部任务完成了 Web 应用与可视化工作，同时完成了 LCEL Chain 架构重构、DSPy 集成（含 Teleprompter 自动优化）、多模型适配体系（协议/注册表/3 个适配器/校准器/Agent）和缓存/限流/流式等基础设施。系统已具备最终演示和验收的技术基础。
+今天按照研发计划书 Phase 5 全部任务完成了 Web 应用与可视化工作，同时完成了评估引擎架构优化（模块化函数链 + 对齐预处理 + 软惩罚）、DSPy 集成（含 Teleprompter 自动优化）、多模型适配体系（协议/注册表/3 个适配器/校准器/Agent）和缓存/限流/流式等基础设施。系统已具备最终演示和验收的技术基础。

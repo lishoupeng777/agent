@@ -376,6 +376,22 @@
         .stat-pass { color: #10b981; }
         .stat-warn { color: #f59e0b; }
 
+        /* 状态标签（替代 Emoji，确保跨平台一致渲染） */
+        .status-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        .status-tag--pass  { background: #d1fae5; color: #065f46; }
+        .status-tag--warn  { background: #fef3c7; color: #92400e; }
+        .status-tag--fail  { background: #fee2e2; color: #991b1b; }
+        .status-tag--ok    { background: #d1fae5; color: #065f46; }
+        .status-tag--off   { background: #fee2e2; color: #991b1b; }
+
         /* 校准结果 */
         .cal-metrics {
             display: grid;
@@ -436,7 +452,7 @@
     <!-- 标签页 -->
     <div class="tabs">
         <button class="tab-btn active" data-tab="evaluate">📝 核心评估</button>
-        <button class="tab-btn" data-tab="stability">📊 稳定性分析</button>
+        <button class="tab-btn" data-tab="batch">📦 批量评估</button>
         <button class="tab-btn" data-tab="calibrate">🎯 一致性校准</button>
         <button class="tab-btn" data-tab="metrics">📐 指标计算</button>
         <button class="tab-btn" data-tab="about">ℹ️ 使用说明</button>
@@ -453,6 +469,14 @@
                     <option value="general">通用文本</option>
                     <option value="government_notice_strict">政务通告/公告（严格保真）</option>
                     <option value="legal_strict">法规合同/条款（严格保真）</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>🤖 评估模型</label>
+                <select id="evalModel" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
+                    <option value="deepseek">DeepSeek V4 Flash（默认）</option>
+                    <option value="mimo">小米 Mimo 2.5 Pro</option>
                 </select>
             </div>
 
@@ -514,74 +538,174 @@
                 <summary style="cursor:pointer;color:var(--primary);font-weight:600;">查看 LLM 原始输出</summary>
                 <div class="raw-output" id="evalRaw" style="margin-top:8px;"></div>
             </details>
+
+            <!-- 稳定性分析（勾选稳定化时显示） -->
+            <div id="evalStability" style="display:none;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+                <h4 style="margin-bottom:12px;">📊 稳定性分析（<span id="stabSampleCountText"></span>次采样）</h4>
+                <div class="stats-row" style="margin-bottom:12px;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="stabMeanInline">--</div>
+                        <div class="stat-label">均值</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stabVarInline">--</div>
+                        <div class="stat-label">方差</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stabStdInline">--</div>
+                        <div class="stat-label">标准差</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stabStableInline">--</div>
+                        <div class="stat-label">是否稳定</div>
+                    </div>
+                </div>
+                <div id="stabSamplesInline" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+            </div>
+        </div>
+
+        <!-- 参数调优面板（热重算） -->
+        <div class="card" style="margin-top:20px;">
+            <details>
+                <summary style="cursor:pointer;font-weight:600;font-size:16px;padding:4px 0;">⚙️ 高级参数调优（热重算，不调 LLM）</summary>
+                <p style="color:var(--text-secondary);font-size:13px;margin:8px 0 16px;">
+                    调整参数后点"应用新参数"，系统基于已存储的 LLM 原始数据毫秒级重算，不消耗 API 额度。
+                </p>
+
+                <h4 style="margin-bottom:8px;">维度权重 <span id="wSumDisplay" style="font-size:13px;font-weight:400;color:#6b7280;">（当前总和：1.00）</span></h4>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:8px;">拖动滑块调整权重，后端自动归一化（总和始终为 1）</p>
+                <div class="row" style="margin-bottom:12px;">
+                    <div class="form-group">
+                        <label>semantic（语义一致性）: <span id="wSemanticVal">0.35</span></label>
+                        <input type="range" id="wSemantic" min="0" max="100" value="35" style="width:100%;" oninput="updateWeightDisplay()">
+                    </div>
+                    <div class="form-group">
+                        <label>factual（事实准确性）: <span id="wFactualVal">0.35</span></label>
+                        <input type="range" id="wFactual" min="0" max="100" value="35" style="width:100%;" oninput="updateWeightDisplay()">
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom:12px;">
+                    <div class="form-group">
+                        <label>structure（结构质量）: <span id="wStructureVal">0.15</span></label>
+                        <input type="range" id="wStructure" min="0" max="100" value="15" style="width:100%;" oninput="updateWeightDisplay()">
+                    </div>
+                    <div class="form-group">
+                        <label>readability（可读性）: <span id="wReadabilityVal">0.15</span></label>
+                        <input type="range" id="wReadability" min="0" max="100" value="15" style="width:100%;" oninput="updateWeightDisplay()">
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:8px;">惩罚系数</h4>
+                <div class="row" style="margin-bottom:12px;">
+                    <div class="form-group">
+                        <label>critical（严重）: <span id="pCriticalVal">0.60</span></label>
+                        <input type="range" id="pCritical" min="0" max="100" value="60" style="width:100%;" oninput="document.getElementById('pCriticalVal').textContent=(this.value/100).toFixed(2)">
+                    </div>
+                    <div class="form-group">
+                        <label>major（主要）: <span id="pMajorVal">0.85</span></label>
+                        <input type="range" id="pMajor" min="0" max="100" value="85" style="width:100%;" oninput="document.getElementById('pMajorVal').textContent=(this.value/100).toFixed(2)">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label>minor（次要）: <span id="pMinorVal">0.95</span></label>
+                    <input type="range" id="pMinor" min="0" max="100" value="95" style="width:100%;" oninput="document.getElementById('pMinorVal').textContent=(this.value/100).toFixed(2)">
+                </div>
+
+                <h4 style="margin-bottom:8px;">判定阈值</h4>
+                <div class="row" style="margin-bottom:16px;">
+                    <div class="form-group">
+                        <label>通过阈值（pass）: <span id="tPassVal">0.82</span></label>
+                        <input type="range" id="tPass" min="0" max="100" value="82" style="width:100%;" oninput="document.getElementById('tPassVal').textContent=(this.value/100).toFixed(2)">
+                    </div>
+                    <div class="form-group">
+                        <label>复审阈值（review）: <span id="tReviewVal">0.50</span></label>
+                        <input type="range" id="tReview" min="0" max="100" value="50" style="width:100%;" oninput="document.getElementById('tReviewVal').textContent=(this.value/100).toFixed(2)">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="doRecalculate()">⚡ 应用新参数（热重算）</button>
+                <div class="loading" id="recalcLoading"><div class="spinner"></div><p>重算中……</p></div>
+                <div class="error-msg" id="recalcError"></div>
+
+                <!-- 重算结果 -->
+                <div id="recalcResult" style="display:none;margin-top:16px;">
+                    <h4 style="margin-bottom:8px;">重算结果</h4>
+                    <div class="stats-row" style="margin-bottom:12px;">
+                        <div class="stat-item">
+                            <div class="stat-value" id="recalcMean">--</div>
+                            <div class="stat-label">均值</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="recalcPass">--</div>
+                            <div class="stat-label">通过</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="recalcReview">--</div>
+                            <div class="stat-label">复审</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="recalcFail">--</div>
+                            <div class="stat-label">不通过</div>
+                        </div>
+                    </div>
+                    <div id="recalcDetails"></div>
+                </div>
+            </details>
         </div>
     </div>
 
-    <!-- ==================== 标签页2：稳定性分析 ==================== -->
-    <div class="tab-content" id="tab-stability">
+    <!-- ==================== 标签页：批量评估 ==================== -->
+    <div class="tab-content" id="tab-batch">
         <div class="card">
-            <h3><span class="icon">📊</span> 评分稳定性分析</h3>
+            <h3><span class="icon">📦</span> 批量评估（异步任务）</h3>
             <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">
-                对同一输入进行多次独立评估，检测评分的一致性（方差越小越稳定）。
+                上传多组文本对，后台异步评估，实时查看进度。支持断点续评。
             </p>
 
             <div class="form-group">
-                <label>📋 评估模式</label>
-                <select id="stabProfile" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
-                    <option value="general">通用文本</option>
-                    <option value="government_notice_strict">政务通告/公告（严格保真）</option>
-                    <option value="legal_strict">法规合同/条款（严格保真）</option>
-                </select>
-            </div>
-
-            <div class="row">
-                <div class="form-group">
-                    <label><span class="required">*</span> 治理前原文</label>
-                    <textarea class="large" id="stabBefore" placeholder="请输入治理前的原始文本……"></textarea>
-                </div>
-                <div class="form-group">
-                    <label><span class="required">*</span> 治理后文本</label>
-                    <textarea class="large" id="stabAfter" placeholder="请输入治理后的文本……"></textarea>
-                </div>
+                <label><span class="required">*</span> 批量数据（JSON 数组格式）</label>
+                <textarea class="large" id="batchData" placeholder='[
+  {"request_id": "batch-001", "before_text": "原文1", "after_text": "改后1"},
+  {"request_id": "batch-002", "before_text": "原文2", "after_text": "改后2"}
+]'></textarea>
             </div>
 
             <div class="form-group">
-                <label>采样次数（建议 3~5 次）</label>
-                <input type="number" id="stabSampleCount" value="3" min="1" max="5" style="width:100px;" />
+                <label>最大并发数</label>
+                <input type="number" id="batchConcurrency" value="3" min="1" max="10" style="width:100px;" />
             </div>
 
-            <button class="btn btn-primary" id="btnStability" onclick="doStability()">📊 开始稳定性分析</button>
-            <div class="loading" id="stabLoading"><div class="spinner"></div><p>多次评估中，请稍候……</p></div>
-            <div class="error-msg" id="stabError"></div>
+            <button class="btn btn-primary" id="btnBatchSubmit" onclick="doBatchSubmit()">🚀 提交批量评估</button>
+            <div class="loading" id="batchLoading"><div class="spinner"></div><p>提交中……</p></div>
+            <div class="error-msg" id="batchError"></div>
         </div>
 
-        <div class="card result-card" id="stabResult">
-            <h3>📊 稳定性分析结果</h3>
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-value" id="stabMean">--</div>
-                    <div class="stat-label">均值</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="stabStd">--</div>
-                    <div class="stat-label">标准差</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="stabVar">--</div>
-                    <div class="stat-label">方差</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="stabStable">--</div>
-                    <div class="stat-label">是否稳定</div>
-                </div>
+        <!-- 任务进度 -->
+        <div class="card result-card" id="batchProgress">
+            <h3>📊 任务进度</h3>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <span>任务ID：<strong id="batchTaskId">--</strong></span>
+                <span id="batchStatus" class="status-tag status-tag--ok">--</span>
             </div>
-            <h4 style="margin-top:20px;margin-bottom:8px;">各次采样得分</h4>
-            <div class="stability-chart" id="stabChart"></div>
-            <div id="stabSamples" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+            <div style="background:#e5e7eb;border-radius:8px;height:24px;overflow:hidden;margin-bottom:8px;">
+                <div id="batchProgressBar" style="background:linear-gradient(90deg,#4f46e5,#7c3aed);height:100%;width:0%;transition:width 0.5s;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+                <span>进度：<span id="batchProgressText">0/0</span></span>
+                <span>成功：<span id="batchSuccess">0</span> | 失败：<span id="batchErrors">0</span></span>
+            </div>
+
+            <!-- 断点续评 -->
+            <div id="batchResumeSection" style="display:none;margin-bottom:16px;">
+                <button class="btn btn-secondary" onclick="doBatchResume()">🔄 继续评估（断点续评）</button>
+            </div>
+
+            <!-- 逐条结果 -->
+            <div id="batchResults"></div>
         </div>
     </div>
 
-    <!-- ==================== 标签页3：一致性校准 ==================== -->
+    <!-- ==================== 标签页2：一致性校准 ==================== -->
     <div class="tab-content" id="tab-calibrate">
         <div class="card">
             <h3><span class="icon">🎯</span> 一致性校准 —— 与人工标注对比</h3>
@@ -596,13 +720,13 @@
     "request_id": "cal-001",
     "before_text": "治理前原文……",
     "after_text": "治理后文本……",
-    "human_label": {"score": 0.85}
+    "human_label": {"overall_score": 0.85}
   },
   {
     "request_id": "cal-002",
     "before_text": "另一段原文……",
     "after_text": "另一段治理后文本……",
-    "human_label": {"score": 0.6}
+    "human_label": {"overall_score": 0.6}
   }
 ]'></textarea>
             </div>
@@ -636,6 +760,18 @@
                     <div class="stat-label">一致率</div>
                 </div>
             </div>
+            <!-- 散点图 -->
+            <div id="calScatterSection" style="margin-top:20px;display:none;">
+                <h4 style="margin-bottom:8px;">散点图（人工评分 vs LLM 评分）</h4>
+                <canvas id="calScatter" width="400" height="400" style="border:1px solid #e5e7eb;border-radius:8px;max-width:100%;"></canvas>
+            </div>
+
+            <!-- 混淆矩阵 -->
+            <div id="calMatrixSection" style="margin-top:20px;display:none;">
+                <h4 style="margin-bottom:8px;">混淆矩阵（人工判定 vs LLM 判定）</h4>
+                <div id="calMatrix"></div>
+            </div>
+
             <div id="calDetails" style="margin-top:16px;"></div>
         </div>
     </div>
@@ -649,6 +785,7 @@
                 <div class="form-group">
                     <label><span class="required">*</span> 预测瑕疵列表（JSON 数组）</label>
                     <textarea id="flawPredicted" placeholder='[{"category":"over_clean","severity":"major","description":"..."}]'></textarea>
+                    <button class="btn btn-secondary" style="margin-top:8px;font-size:12px;padding:6px 12px;" onclick="importFlawsFromEval()">从评估结果导入</button>
                 </div>
                 <div class="form-group">
                     <label><span class="required">*</span> 人工标注瑕疵列表（JSON 数组）</label>
@@ -674,6 +811,7 @@
                 <div class="form-group">
                     <label><span class="required">*</span> 预测瑕疵（含 location）</label>
                     <textarea id="anchorPredicted" placeholder='[{"location":{"start_char":0,"end_char":10}},...]'></textarea>
+                    <button class="btn btn-secondary" style="margin-top:8px;font-size:12px;padding:6px 12px;" onclick="importFlawsForAnchor()">从评估结果导入</button>
                 </div>
                 <div class="form-group">
                     <label><span class="required">*</span> 人工标注（含 location）</label>
@@ -778,7 +916,8 @@
 
 <script>
 // ==================== 全局状态 ====================
-const API_BASE = 'http://localhost:8081/api/v1';
+const API_BASE = '/api/v1';
+let lastEvalFlaws = []; // 存储最近一次评估的瑕玼结果
 
 // ==================== 标签页切换 ====================
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -801,16 +940,17 @@ async function checkHealth() {
         const res = await fetch(API_BASE + '/health');
         const data = await res.json();
         document.getElementById('statusDot').classList.add('ok');
-        document.getElementById('statusText').textContent = '运行中 ✅ (服务: ' + data.service + ')';
+        document.getElementById('statusText').innerHTML = '运行中 <span class="status-tag status-tag--ok">正常</span> (服务: ' + data.service + ')';
         document.getElementById('statusText').style.color = '#10b981';
     } catch(e) {
         document.getElementById('statusDot').classList.add('off');
-        document.getElementById('statusText').textContent = '未启动 ❌ —— 请先运行 run.bat';
+        document.getElementById('statusText').innerHTML = '未启动 <span class="status-tag status-tag--off">离线</span> —— 请先运行 run.bat';
         document.getElementById('statusText').style.color = '#fca5a5';
     }
 }
 checkHealth();
 setInterval(checkHealth, 30000);
+
 
 // ==================== 工具函数 ====================
 function getScoreColor(score) {
@@ -826,9 +966,9 @@ function getVerdictClass(verdict) {
 }
 
 function getVerdictText(verdict) {
-    if (verdict === 'pass') return '✅ 通过';
-    if (verdict === 'review') return '⚠️ 需复审';
-    return '❌ 不通过';
+    if (verdict === 'pass') return '<span class="status-tag status-tag--pass">通过</span>';
+    if (verdict === 'review') return '<span class="status-tag status-tag--warn">需复审</span>';
+    return '<span class="status-tag status-tag--fail">不通过</span>';
 }
 
 // ==================== 核心评估 ====================
@@ -856,6 +996,7 @@ async function doEvaluate() {
     const stabilize = document.getElementById('evalStabilize').checked;
     const sampleCount = parseInt(document.getElementById('evalSampleCount').value) || 3;
     const evaluationProfile = document.getElementById('evalProfile').value;
+    const model = document.getElementById('evalModel').value || null;
 
     try {
         const res = await fetch(API_BASE + '/evaluate', {
@@ -866,18 +1007,242 @@ async function doEvaluate() {
                 before_text: before,
                 after_text: after,
                 evaluation_profile: evaluationProfile,
+                model: model,
                 stabilize: stabilize,
                 sample_count: sampleCount
             })
         });
         if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()));
         const data = await res.json();
+        // 存储瑕玼供指标计算页使用
+        lastEvalFlaws = (data.flaws || []).map(f => ({
+            category: f.category,
+            severity: f.severity,
+            description: f.description,
+            location: f.location || {}
+        }));
         renderEvalResult(data);
     } catch(e) {
         showError('evalError', '请求失败：' + e.message + '\n请确认后端服务已启动（运行 run.bat）');
     } finally {
         btn.disabled = false;
         loading.classList.remove('active');
+    }
+}
+
+// ==================== 批量评估 ====================
+let batchPollTimer = null;
+
+async function doBatchSubmit() {
+    const raw = document.getElementById('batchData').value.trim();
+    if (!raw) { showError('batchError', '请输入批量数据'); return; }
+
+    let payload;
+    try { payload = JSON.parse(raw); } catch(e) { showError('batchError', 'JSON 格式错误：' + e.message); return; }
+    if (!Array.isArray(payload)) { showError('batchError', '请输入 JSON 数组'); return; }
+
+    const btn = document.getElementById('btnBatchSubmit');
+    const loading = document.getElementById('batchLoading');
+    const error = document.getElementById('batchError');
+    error.classList.remove('active');
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    const concurrency = parseInt(document.getElementById('batchConcurrency').value) || 3;
+
+    try {
+        const res = await fetch(API_BASE + '/batch/submit?max_concurrency=' + concurrency, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.error) { showError('batchError', data.error); return; }
+
+        // 显示进度面板
+        document.getElementById('batchProgress').classList.add('active');
+        document.getElementById('batchTaskId').textContent = data.task_id;
+        document.getElementById('batchStatus').textContent = '运行中';
+        document.getElementById('batchStatus').className = 'status-tag status-tag--warn';
+        document.getElementById('batchProgressBar').style.width = '0%';
+        document.getElementById('batchProgressText').textContent = '0/' + data.total;
+        document.getElementById('batchResults').innerHTML = '';
+
+        // 开始轮询
+        startBatchPolling(data.task_id);
+    } catch(e) {
+        showError('batchError', '提交失败：' + e.message);
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function startBatchPolling(taskId) {
+    if (batchPollTimer) clearInterval(batchPollTimer);
+    document.getElementById('batchResumeSection').style.display = 'none';
+    batchPollTimer = setInterval(() => pollBatchStatus(taskId), 2000);
+}
+
+async function doBatchResume() {
+    const taskId = document.getElementById('batchTaskId').textContent;
+    if (!taskId) return;
+
+    try {
+        const res = await fetch(API_BASE + '/batch/resume/' + taskId, { method: 'POST' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.error) { showError('batchError', data.error); return; }
+
+        document.getElementById('batchStatus').textContent = '运行中';
+        document.getElementById('batchStatus').className = 'status-tag status-tag--warn';
+        document.getElementById('batchResumeSection').style.display = 'none';
+        startBatchPolling(taskId);
+    } catch(e) {
+        showError('batchError', '续评失败：' + e.message);
+    }
+}
+
+async function pollBatchStatus(taskId) {
+    try {
+        const res = await fetch(API_BASE + '/batch/status/' + taskId);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const progress = data.progress || 0;
+        const total = data.total || 1;
+        const pct = (progress / total * 100).toFixed(0);
+
+        document.getElementById('batchProgressBar').style.width = pct + '%';
+        document.getElementById('batchProgressBar').textContent = pct + '%';
+        document.getElementById('batchProgressText').textContent = progress + '/' + total;
+        document.getElementById('batchSuccess').textContent = data.results_count || 0;
+        document.getElementById('batchErrors').textContent = data.errors_count || 0;
+
+        // 渲染已完成的结果
+        const results = data.results || [];
+        const errors = data.errors || [];
+        let html = '';
+        results.forEach(r => {
+            const score = r.result?.overall_score?.toFixed(4) || '--';
+            const verdict = r.result?.verdict || '--';
+            const color = verdict === 'pass' ? '#10b981' : verdict === 'review' ? '#f59e0b' : '#ef4444';
+            html += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #f3f4f6;"><span>${r.request_id}</span><span><strong>${score}</strong> <span style="color:${color}">${verdict}</span></span></div>`;
+        });
+        errors.forEach(e => {
+            html += `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #f3f4f6;color:#ef4444;"><span>${e.request_id}</span><span>失败: ${e.error}</span></div>`;
+        });
+        document.getElementById('batchResults').innerHTML = html;
+
+        // 检查是否完成
+        if (data.status === 'success' || data.status === 'failed') {
+            clearInterval(batchPollTimer);
+            batchPollTimer = null;
+            const statusEl = document.getElementById('batchStatus');
+            statusEl.textContent = data.status === 'success' ? '已完成' : '已失败';
+            statusEl.className = data.status === 'success' ? 'status-tag status-tag--pass' : 'status-tag status-tag--fail';
+            // 有错误时显示"继续评估"按钮
+            if (data.errors_count > 0) {
+                document.getElementById('batchResumeSection').style.display = 'block';
+            }
+        }
+    } catch(e) {
+        // 轮询失败不中断
+    }
+}
+
+// ==================== 权重显示更新 ====================
+function updateWeightDisplay() {
+    const wS = parseInt(document.getElementById('wSemantic').value) / 100;
+    const wF = parseInt(document.getElementById('wFactual').value) / 100;
+    const wT = parseInt(document.getElementById('wStructure').value) / 100;
+    const wR = parseInt(document.getElementById('wReadability').value) / 100;
+
+    document.getElementById('wSemanticVal').textContent = wS.toFixed(2);
+    document.getElementById('wFactualVal').textContent = wF.toFixed(2);
+    document.getElementById('wStructureVal').textContent = wT.toFixed(2);
+    document.getElementById('wReadabilityVal').textContent = wR.toFixed(2);
+
+    const sum = wS + wF + wT + wR;
+    const sumEl = document.getElementById('wSumDisplay');
+    sumEl.textContent = `（当前总和：${sum.toFixed(2)}，后端自动归一化）`;
+    sumEl.style.color = Math.abs(sum - 1.0) < 0.01 ? '#6b7280' : '#f59e0b';
+}
+
+// ==================== 热重算 ====================
+async function doRecalculate() {
+    const btn = event.target;
+    const loading = document.getElementById('recalcLoading');
+    const error = document.getElementById('recalcError');
+    const result = document.getElementById('recalcResult');
+    error.classList.remove('active');
+    result.style.display = 'none';
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    const params = {
+        dimension_weights: {
+            semantic: parseInt(document.getElementById('wSemantic').value) / 100,
+            factual: parseInt(document.getElementById('wFactual').value) / 100,
+            structure: parseInt(document.getElementById('wStructure').value) / 100,
+            readability: parseInt(document.getElementById('wReadability').value) / 100,
+        },
+        penalty_factors: {
+            critical: parseInt(document.getElementById('pCritical').value) / 100,
+            major: parseInt(document.getElementById('pMajor').value) / 100,
+            minor: parseInt(document.getElementById('pMinor').value) / 100,
+        },
+        pass_threshold: parseInt(document.getElementById('tPass').value) / 100,
+        review_threshold: parseInt(document.getElementById('tReview').value) / 100,
+    };
+
+    try {
+        const res = await fetch(API_BASE + '/recalculate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(params)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        renderRecalcResult(data);
+    } catch(e) {
+        showError('recalcError', '重算失败：' + e.message);
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function renderRecalcResult(data) {
+    const result = document.getElementById('recalcResult');
+    result.style.display = 'block';
+
+    const summary = data.summary || {};
+    document.getElementById('recalcMean').textContent = (summary.mean_score || 0).toFixed(4);
+    document.getElementById('recalcPass').textContent = summary.pass_count || 0;
+    document.getElementById('recalcReview').textContent = summary.review_count || 0;
+    document.getElementById('recalcFail').textContent = summary.fail_count || 0;
+
+    // 逐条详情
+    const results = data.results || [];
+    let detailsHtml = '';
+    results.forEach(r => {
+        const color = r.verdict === 'pass' ? '#10b981' : r.verdict === 'review' ? '#f59e0b' : '#ef4444';
+        detailsHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6;">`;
+        detailsHtml += `<span style="font-size:13px;">${r.request_id}</span>`;
+        detailsHtml += `<span><strong>${r.overall_score.toFixed(4)}</strong> <span style="color:${color};font-size:12px;">${r.verdict}</span></span>`;
+        detailsHtml += `</div>`;
+    });
+    document.getElementById('recalcDetails').innerHTML = detailsHtml;
+
+    // 显示校准指标（如果有）
+    if (data.calibration) {
+        const cal = data.calibration;
+        detailsHtml += `<div style="margin-top:12px;padding:12px;background:#f9fafb;border-radius:8px;">`;
+        detailsHtml += `<div style="font-size:13px;">Pearson r: <strong>${cal.pearson_r}</strong> | MAE: <strong>${cal.mae}</strong> | 一致率: <strong>${(cal.consistency_rate*100).toFixed(1)}%</strong></div>`;
+        detailsHtml += `</div>`;
+        document.getElementById('recalcDetails').innerHTML = detailsHtml;
     }
 }
 
@@ -895,11 +1260,37 @@ function renderEvalResult(data) {
 
     // 综合判定
     const v = document.getElementById('evalVerdict');
-    v.textContent = getVerdictText(data.verdict);
+    v.innerHTML = getVerdictText(data.verdict);
     v.className = 'verdict-badge ' + getVerdictClass(data.verdict);
 
-    // 评估模式
-    document.getElementById('evalProfileBadge').textContent = '📋 ' + profileUsed;
+    // 判定原因码
+    const reasonCode = data.reason_code || '';
+    const rejectReasons = data.reject_reasons || [];
+    if (reasonCode) {
+        const reasonLabels = {
+            'PASS_ALL_CLEAR': '全部通过',
+            'CRITICAL_FLAW_DETECTED': '严重瑕玼',
+            'SCORE_BELOW_THRESHOLD': '分数不足',
+            'REVIEW_REQUIRED': '需复审'
+        };
+        let reasonHtml = `<div style="margin-top:8px;font-size:13px;">原因码：<strong>${reasonLabels[reasonCode] || reasonCode}</strong>`;
+        if (rejectReasons.length > 0) {
+            reasonHtml += '<ul style="margin:4px 0 0 16px;padding:0;">';
+            rejectReasons.forEach(r => {
+                reasonHtml += `<li>${r.description || r.code}</li>`;
+            });
+            reasonHtml += '</ul>';
+        }
+        reasonHtml += '</div>';
+        // 插入到 verdict 后面
+        const badgeParent = v.parentNode;
+        badgeParent.insertAdjacentHTML('beforeend', reasonHtml);
+    }
+
+    // 评估模式 + 模型
+    const modelVer = data.model_version || '';
+    const badgeText = modelVer ? '📋 ' + profileUsed + ' | 🤖 ' + modelVer : '📋 ' + profileUsed;
+    document.getElementById('evalProfileBadge').textContent = badgeText;
 
     // 维度评分
     let dimsHtml = '';
@@ -922,7 +1313,7 @@ function renderEvalResult(data) {
     const flaws = data.flaws || [];
     let flawsHtml = '';
     if (flaws.length === 0) {
-        flawsHtml = '<div class="no-flaws">✅ 未发现瑕疵，治理质量良好</div>';
+        flawsHtml = '<div class="no-flaws"><span class="status-tag status-tag--pass">通过</span> 未发现瑕疵，治理质量良好</div>';
     } else {
         flaws.forEach(f => {
             flawsHtml += `
@@ -943,6 +1334,28 @@ function renderEvalResult(data) {
     // 原始输出
     document.getElementById('evalRaw').textContent = data.raw_llm_output || '(无)';
 
+    // 稳定性分析（如果有）
+    const stab = data.stability;
+    const stabSection = document.getElementById('evalStability');
+    if (stab) {
+        stabSection.style.display = 'block';
+        document.getElementById('stabSampleCountText').textContent = stab.sample_count || 3;
+        document.getElementById('stabMeanInline').textContent = stab.mean_score.toFixed(4);
+        document.getElementById('stabVarInline').textContent = stab.variance.toFixed(6);
+        document.getElementById('stabStdInline').textContent = stab.std_dev.toFixed(4);
+        const stableEl = document.getElementById('stabStableInline');
+        stableEl.innerHTML = stab.is_stable
+            ? '<span class="status-tag status-tag--pass">稳定</span>'
+            : '<span class="status-tag status-tag--warn">不稳定</span>';
+        // 各次采样得分
+        const samples = stab.samples || [];
+        document.getElementById('stabSamplesInline').innerHTML = samples.map((s, i) =>
+            `<span style="font-size:12px;background:#f3f4f6;padding:4px 8px;border-radius:4px;">第${i+1}次：${(s.overall || 0).toFixed(4)}</span>`
+        ).join('');
+    } else {
+        stabSection.style.display = 'none';
+    }
+
     // 滚动到结果
     document.getElementById('evalResult').scrollIntoView({behavior:'smooth'});
 }
@@ -954,75 +1367,6 @@ function getCategoryText(cat) {
 function getSeverityText(sev) {
     const map = {critical:'🔴 严重',major:'🟡 主要',minor:'🔵 次要'};
     return map[sev] || sev || '未知';
-}
-
-// ==================== 稳定性分析 ====================
-async function doStability() {
-    const before = document.getElementById('stabBefore').value.trim();
-    const after = document.getElementById('stabAfter').value.trim();
-    if (!before || !after) {
-        showError('stabError', '请输入治理前和治理后的文本');
-        return;
-    }
-
-    const btn = document.getElementById('btnStability');
-    const loading = document.getElementById('stabLoading');
-    const error = document.getElementById('stabError');
-    error.classList.remove('active');
-    document.getElementById('stabResult').classList.remove('active');
-    btn.disabled = true;
-    loading.classList.add('active');
-
-    const sampleCount = parseInt(document.getElementById('stabSampleCount').value) || 3;
-    const stabProfile = document.getElementById('stabProfile').value;
-
-    try {
-        const res = await fetch(API_BASE + '/stability', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                request_id: 'stab-' + Date.now(),
-                before_text: before,
-                after_text: after,
-                evaluation_profile: stabProfile,
-                stabilize: false,
-                sample_count: sampleCount
-            })
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        renderStabilityResult(data);
-    } catch(e) {
-        showError('stabError', '请求失败：' + e.message);
-    } finally {
-        btn.disabled = false;
-        loading.classList.remove('active');
-    }
-}
-
-function renderStabilityResult(data) {
-    document.getElementById('stabResult').classList.add('active');
-    document.getElementById('stabMean').textContent = data.mean_score.toFixed(4);
-    document.getElementById('stabStd').textContent = data.std_dev.toFixed(4);
-    document.getElementById('stabVar').textContent = data.variance.toFixed(6);
-    const stableEl = document.getElementById('stabStable');
-    stableEl.textContent = data.is_stable ? '✅ 稳定' : '⚠️ 不稳定';
-    stableEl.className = data.is_stable ? 'stat-pass' : 'stat-warn';
-
-    // 柱状图
-    const samples = data.samples || [];
-    const maxScore = Math.max(...samples.map(s => s.score || s.overall_score || 0), 0.1);
-    document.getElementById('stabChart').innerHTML = samples.map(s => {
-        const sc = s.score || s.overall_score || 0;
-        const h = (sc / maxScore * 100).toFixed(0);
-        return `<div class="stability-bar" style="height:${h}%">${sc.toFixed(2)}</div>`;
-    }).join('');
-
-    document.getElementById('stabSamples').innerHTML = samples.map((s,i) =>
-        `<span style="font-size:12px;background:#f3f4f6;padding:4px 8px;border-radius:4px;">第${i+1}次：${(s.score||s.overall_score||0).toFixed(4)}</span>`
-    ).join('');
-
-    document.getElementById('stabResult').scrollIntoView({behavior:'smooth'});
 }
 
 // ==================== 一致性校准 ====================
@@ -1043,7 +1387,7 @@ async function doCalibrate() {
     loading.classList.add('active');
 
     try {
-        const res = await fetch(API_BASE + '/calibrate', {
+        const res = await fetch(API_BASE + '/calibrate/visual', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
@@ -1061,12 +1405,175 @@ async function doCalibrate() {
 
 function renderCalibrateResult(data) {
     document.getElementById('calResult').classList.add('active');
-    document.getElementById('calPearson').textContent = data.pearson_r.toFixed(4);
-    document.getElementById('calSpearman').textContent = data.spearman_rho.toFixed(4);
-    document.getElementById('calMae').textContent = data.mae.toFixed(4);
-    document.getElementById('calRmse').textContent = data.rmse.toFixed(4);
-    document.getElementById('calConsistency').textContent = (data.consistency_rate*100).toFixed(1) + '%';
+
+    const cal = data.calibration || data;
+    document.getElementById('calPearson').textContent = (cal.pearson_r || 0).toFixed(4);
+    document.getElementById('calSpearman').textContent = (cal.spearman_rho || 0).toFixed(4);
+    document.getElementById('calMae').textContent = (cal.mae || 0).toFixed(4);
+    document.getElementById('calRmse').textContent = (cal.rmse || 0).toFixed(4);
+    document.getElementById('calConsistency').textContent = ((cal.consistency_rate || 0)*100).toFixed(1) + '%';
+
+    // 散点图
+    const scatter = data.scatter || [];
+    if (scatter.length > 0) {
+        document.getElementById('calScatterSection').style.display = 'block';
+        drawScatterPlot(scatter);
+    }
+
+    // 混淆矩阵
+    const matrix = data.confusion_matrix;
+    if (matrix) {
+        document.getElementById('calMatrixSection').style.display = 'block';
+        drawConfusionMatrix(matrix);
+    }
+
+    // 逐条详情
+    const details = data.details || [];
+    let detailsHtml = '<h4 style="margin-top:20px;margin-bottom:12px;">逐条对比详情</h4>';
+    details.forEach(d => {
+        const diff = d.diff || 0;
+        const diffColor = diff <= 0.1 ? '#10b981' : diff <= 0.2 ? '#f59e0b' : '#ef4444';
+        const ev = d.evaluation || {};
+        const dims = ev.dimensions || [];
+        const flaws = ev.flaws || [];
+
+        detailsHtml += `<div style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:12px;">`;
+        detailsHtml += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">`;
+        detailsHtml += `<strong>${d.request_id}</strong>`;
+        detailsHtml += `<span>人工: <strong>${(d.human_score||0).toFixed(2)}</strong> → LLM: <strong>${(d.llm_score||0).toFixed(4)}</strong> `;
+        detailsHtml += `<span style="color:${diffColor};font-weight:700;">差值 ${diff.toFixed(4)}</span></span>`;
+        detailsHtml += `</div>`;
+
+        if (dims.length > 0) {
+            detailsHtml += `<div style="font-size:13px;margin-bottom:6px;">`;
+            dims.forEach(dim => {
+                detailsHtml += `<span style="margin-right:12px;">${dim.dimension}: <strong>${dim.score.toFixed(2)}</strong></span>`;
+            });
+            detailsHtml += `</div>`;
+        }
+
+        if (flaws.length > 0) {
+            detailsHtml += `<div style="font-size:12px;color:#6b7280;">`;
+            flaws.forEach(f => {
+                detailsHtml += `<div>[${f.severity}] ${f.category}: ${f.description}</div>`;
+            });
+            detailsHtml += `</div>`;
+        }
+
+        detailsHtml += `</div>`;
+    });
+    document.getElementById('calDetails').innerHTML = detailsHtml;
+
     document.getElementById('calResult').scrollIntoView({behavior:'smooth'});
+}
+
+// 散点图绘制
+function drawScatterPlot(scatter) {
+    const canvas = document.getElementById('calScatter');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const pad = 50;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // 背景
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, W, H);
+
+    // 坐标轴
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, pad);
+    ctx.lineTo(pad, H - pad);
+    ctx.lineTo(W - pad, H - pad);
+    ctx.stroke();
+
+    // 对角线 y=x
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad);
+    ctx.lineTo(W - pad, pad);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 标签
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('人工评分', W / 2, H - 10);
+    ctx.save();
+    ctx.translate(15, H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('LLM 评分', 0, 0);
+    ctx.restore();
+
+    // 刻度
+    for (let i = 0; i <= 4; i++) {
+        const v = i * 0.25;
+        const x = pad + v * (W - 2 * pad);
+        const y = H - pad - v * (H - 2 * pad);
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(v.toFixed(2), x, H - pad + 15);
+        ctx.textAlign = 'right';
+        ctx.fillText(v.toFixed(2), pad - 5, y + 4);
+    }
+
+    // 数据点
+    scatter.forEach(p => {
+        const x = pad + p.human * (W - 2 * pad);
+        const y = H - pad - p.llm * (H - 2 * pad);
+        ctx.beginPath();
+        ctx.arc(x, y, p.outlier ? 6 : 4, 0, Math.PI * 2);
+        ctx.fillStyle = p.outlier ? '#ef4444' : '#4f46e5';
+        ctx.fill();
+        if (p.outlier) {
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+    });
+}
+
+// 混淆矩阵绘制
+function drawConfusionMatrix(matrix) {
+    const labels = ['pass', 'review', 'fail'];
+    const labelNames = {pass: '通过', review: '复审', fail: '不通过'};
+
+    let html = '<table style="border-collapse:collapse;text-align:center;font-size:14px;">';
+    html += '<tr><td style="padding:8px;"></td>';
+    labels.forEach(l => { html += `<td style="padding:8px;font-weight:600;background:#f3f4f6;">LLM-${labelNames[l]}</td>`; });
+    html += '</tr>';
+
+    labels.forEach(row => {
+        html += `<tr><td style="padding:8px;font-weight:600;background:#f3f4f6;">人工-${labelNames[row]}</td>`;
+        labels.forEach(col => {
+            const val = matrix[row]?.[col] || 0;
+            const isDiag = row === col;
+            const bg = val === 0 ? '#f9fafb' : (isDiag ? '#d1fae5' : '#fee2e2');
+            const color = val === 0 ? '#9ca3af' : (isDiag ? '#065f46' : '#991b1b');
+            html += `<td style="padding:12px 16px;background:${bg};color:${color};font-weight:700;border:1px solid #e5e7eb;">${val}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</table>';
+    html += '<p style="font-size:12px;color:#6b7280;margin-top:8px;">绿色对角线 = 人工与LLM判定一致，红色非对角线 = 判定不一致</p>';
+
+    document.getElementById('calMatrix').innerHTML = html;
+}
+
+function importFlawsFromEval() {
+    if (lastEvalFlaws.length === 0) {
+        showError('flawError', '请先在核心评估页跑一次评估');
+        return;
+    }
+    document.getElementById('flawPredicted').value = JSON.stringify(lastEvalFlaws, null, 2);
+    // 清除错误提示
+    const errEl = document.getElementById('flawError');
+    if (errEl) errEl.classList.remove('active');
 }
 
 // ==================== 瑕疵指标 ====================
@@ -1101,6 +1608,16 @@ async function doFlawMetrics() {
     } finally {
         loading.classList.remove('active');
     }
+}
+
+function importFlawsForAnchor() {
+    if (lastEvalFlaws.length === 0) {
+        showError('anchorError', '请先在核心评估页跑一次评估');
+        return;
+    }
+    document.getElementById('anchorPredicted').value = JSON.stringify(lastEvalFlaws, null, 2);
+    const errEl = document.getElementById('anchorError');
+    if (errEl) errEl.classList.remove('active');
 }
 
 // ==================== 锚点准确率 ====================
@@ -1138,7 +1655,7 @@ async function doAnchorMetrics() {
 // ==================== 错误显示 ====================
 function showError(id, msg) {
     const el = document.getElementById(id);
-    if (el) { el.textContent = '⚠️ ' + msg; el.classList.add('active'); }
+    if (el) { el.textContent = '[警告] ' + msg; el.classList.add('active'); }
 }
 </script>
 

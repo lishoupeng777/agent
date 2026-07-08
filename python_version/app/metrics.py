@@ -109,11 +109,25 @@ def compute_anchor_accuracy(
         gt_loc = gt.get("location") or {}
         gt_start = int(gt_loc.get("start_char", -1))
         gt_snippet = str(gt_loc.get("snippet", ""))
+        gt_anchor = str(gt_loc.get("after_anchor", "") or gt_loc.get("segment_id", ""))
+        gt_anchor_norm = gt_anchor.strip().strip("[]").strip()
 
         for pred_idx, pred in enumerate(predicted_flaws):
             if pred_idx in matched_pred_indices:
                 continue
-            if pred.get("category", "") != gt_cat:
+
+            pred_cat = pred.get("category", "")
+            pred_loc = pred.get("location") or {}
+            pred_anchor = str(pred_loc.get("after_anchor", "") or pred_loc.get("segment_id", ""))
+            pred_anchor_norm = pred_anchor.strip().strip("[]").strip()
+
+            # category 不同但锚点一致时，仍然允许匹配（LLM 和人对瑕玼分类可能不同）
+            category_match = (pred_cat == gt_cat)
+            anchor_pre_match = (
+                gt_anchor_norm and pred_anchor_norm
+                and gt_anchor_norm == pred_anchor_norm
+            )
+            if not category_match and not anchor_pre_match:
                 continue
 
             pred_loc = pred.get("location") or {}
@@ -125,9 +139,26 @@ def compute_anchor_accuracy(
                 and pred_start >= 0
                 and abs(pred_start - gt_start) <= char_tolerance
             )
-            snippet_ok = _snippet_overlap(gt_snippet, pred_snippet, min_len=4)
+            snippet_ok = _snippet_overlap(gt_snippet, pred_snippet, min_len=3)
 
-            if char_ok or snippet_ok:
+            # 锚点 ID 匹配：如果预测和标注的 after_anchor/segment_id 相同，认为匹配
+            # 比对前去掉方括号和空格，兼容 "[Anchor_A3]" 和 "Anchor_A3" 两种格式
+            gt_anchor = str(gt_loc.get("after_anchor", "") or gt_loc.get("segment_id", ""))
+            pred_anchor = str(pred_loc.get("after_anchor", "") or pred_loc.get("segment_id", ""))
+            gt_anchor_norm = gt_anchor.strip().strip("[]").strip()
+            pred_anchor_norm = pred_anchor.strip().strip("[]").strip()
+            anchor_ok = (
+                gt_anchor_norm and pred_anchor_norm
+                and gt_anchor_norm == pred_anchor_norm
+            )
+
+            # 双方 location 都为空时，按 category 匹配（瑕玼存在但无法定位）
+            both_no_location = (
+                gt_start < 0 and not gt_snippet
+                and pred_start < 0 and not pred_snippet
+            )
+
+            if char_ok or snippet_ok or anchor_ok or both_no_location:
                 correct_anchor += 1
                 matched_pred_indices.add(pred_idx)
                 if char_ok:

@@ -12,8 +12,6 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-import jwt  # PyJWT — 智谱 API 认证需要
-
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -73,24 +71,6 @@ div.stButton > button {
 
 # ── 辅助函数 ──────────────────────────────────────────────────────────────
 
-def _generate_zhipu_token(api_key: str) -> str:
-    """将智谱 API Key（格式：{id}.{secret}）转换为 JWT Token"""
-    try:
-        key_id, secret = api_key.split(".", 1)
-    except ValueError:
-        raise ValueError("智谱 API Key 格式应为 {id}.{secret}")
-    payload = {
-        "api_key": key_id,
-        "exp": int(time.time()) + 3600,
-        "timestamp": int(time.time()),
-    }
-    headers = {
-        "alg": "HS256",
-        "sign_type": "SIGN",
-    }
-    return jwt.encode(payload, secret, algorithm="HS256", headers=headers)
-
-
 def _setup_env(api_key: str, base_url: str, model: str) -> None:
     """将侧边栏配置写入环境变量，供 engine.py 读取"""
     if api_key and api_key.strip():
@@ -104,9 +84,8 @@ def _setup_env(api_key: str, base_url: str, model: str) -> None:
         pass
 
 
-def _run_single(before: str, after: str, evaluation_profile: str = "general") -> dict[str, Any]:
+def _run_single(before: str, after: str, evaluation_profile: str = "general", model: str | None = None) -> dict[str, Any]:
     """调用统一的 engine.evaluate()，返回序列化后的结果"""
-    from app.engine import evaluate
     from app.models import EvalRequest
 
     req = EvalRequest(
@@ -114,8 +93,32 @@ def _run_single(before: str, after: str, evaluation_profile: str = "general") ->
         before_text=before,
         after_text=after,
         evaluation_profile=evaluation_profile,
+        model=model,
     )
-    resp = evaluate(req, temperature=0.0)
+
+    # 指定模型时用 ModelRegistry，否则用默认 chain
+    if model:
+        from app.model_registry import get_registry
+        registry = get_registry()
+        # 模型名 → 注册表 key 映射
+        model_key_map = {
+            "deepseek-v4-flash": "deepseek",
+            "deepseek-v4-pro": "deepseek",
+            "deepseek-reasoner": "deepseek",
+            "mimo-v2.5-pro": "mimo",
+            "gpt-4o": "gpt",
+            "gpt-4o-mini": "gpt",
+        }
+        registry_key = model_key_map.get(model, model)
+        try:
+            result = registry.evaluate(registry_key, req, temperature=0.0)
+            resp = result.response
+        except KeyError:
+            from app.engine import evaluate
+            resp = evaluate(req, temperature=0.0)
+    else:
+        from app.engine import evaluate
+        resp = evaluate(req, temperature=0.0)
 
     # 持久化
     try:
@@ -178,8 +181,7 @@ PRESET_MODELS = {
     "DeepSeek V4 Flash（默认）": ("https://api.deepseek.com/v1", "deepseek-v4-flash"),
     "DeepSeek V4 Pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro"),
     "DeepSeek Reasoner": ("https://api.deepseek.com/v1", "deepseek-reasoner"),
-    "智谱 GLM-4-Flash（免费）": ("https://open.bigmodel.cn/api/paas/v4", "glm-4-flash"),
-    "智谱 GLM-4-Plus": ("https://open.bigmodel.cn/api/paas/v4", "glm-4-plus"),
+    "Mimo 2.5 Pro": ("https://api.xiaomimimo.com/v1", "mimo-v2.5-pro"),
     "OpenAI GPT-4o": ("https://api.openai.com/v1", "gpt-4o"),
     "OpenAI GPT-4o mini": ("https://api.openai.com/v1", "gpt-4o-mini"),
     "自定义（手动填写）": ("", ""),
@@ -205,28 +207,43 @@ def render_sidebar() -> tuple[str, str, str, str]:
             key="sidebar_api_key",
         )
 
-        # ── 智谱 GLM（可选） ──
-        with st.expander("🔗 智谱 GLM（可选，用于多模型对比）", expanded=False):
-            glm_key = st.text_input(
-                "GLM API Key",
-                type="password",
-                value="",
-                placeholder="{id}.{secret}",
-                key="sidebar_glm_key",
-            )
-            if glm_key:
-                os.environ["GLM_API_KEY"] = glm_key.strip()
-                st.caption("✅ GLM 已配置")
-                # 注册 GLM 到注册表
-                try:
-                    from app.model_registry import get_registry
-                    from app.adapters import GLMAdapter
-                    registry = get_registry()
-                    if "glm" not in registry.list_models():
-                        registry.register("glm", GLMAdapter())
-                        st.caption(f"已注册到模型注册表")
-                except Exception as e:
-                    st.caption(f"注册失败：{e}")
+        # ── Mimo 2.5 Pro（多模型对比） ──
+        with st.expander("🔗 Mimo 2.5 Pro（多模型对比）", expanded=False):
+            st.caption("✅ Mimo 已配置（mimo-v2.5-pro）")
+            try:
+                from app.model_registry import get_registry
+                from app.adapters import MimoAdapter
+                registry = get_registry()
+                if "mimo" not in registry.list_models():
+                    registry.register("mimo", MimoAdapter())
+                    st.caption("已注册到模型注册表")
+            except Exception as e:
+                st.caption(f"注册失败：{e}")
+
+        st.divider()
+
+        # ── 模型选择 ──
+        st.markdown("### 🤖 评估模型")
+        MODEL_OPTIONS = {
+            "DeepSeek V4 Flash（默认）": {
+                "base_url": "https://api.deepseek.com/v1",
+                "model": "deepseek-v4-flash",
+                "env_key": "DEEPSEEK_API_KEY",
+            },
+            "小米 Mimo 2.5 Pro": {
+                "base_url": "https://api.xiaomimimo.com/v1",
+                "model": "mimo-v2.5-pro",
+                "env_key": "MIMO_API_KEY",
+            },
+        }
+        selected_model_label = st.selectbox(
+            "选择评估模型",
+            list(MODEL_OPTIONS.keys()),
+            key="sidebar_model",
+        )
+        model_cfg = MODEL_OPTIONS[selected_model_label]
+        base_url = model_cfg["base_url"]
+        ACTIVE_MODEL_ID = model_cfg["model"]
 
         st.divider()
 
@@ -257,9 +274,8 @@ LLM-as-Judge 架构，4维度评估：
 3. **可读性**（权重0.15）
 4. **结构质量**（权重0.15）
 
-基于 DeepSeek V4 Flash 模型。
 """)
-    return api_key, "https://api.deepseek.com/v1", ACTIVE_MODEL_ID, evaluation_profile
+    return api_key, base_url, ACTIVE_MODEL_ID, evaluation_profile
 
 
 # ── 单条评估页 ────────────────────────────────────────────────────────────
@@ -296,7 +312,7 @@ def page_single(api_key: str, base_url: str, model_name: str, evaluation_profile
 
             with st.spinner("裁判模型评估中…"):
                 try:
-                    result = _run_single(before.strip(), after.strip(), evaluation_profile)
+                    result = _run_single(before.strip(), after.strip(), evaluation_profile, model=model_name)
 
                     if run_stab:
                         from app.stability import run_stability

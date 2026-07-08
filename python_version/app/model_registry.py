@@ -17,7 +17,7 @@ class ModelRegistry:
     使用方式：
         registry = ModelRegistry()
         registry.register("deepseek", DeepSeekAdapter())
-        registry.register("glm", GLMAdapter())
+        registry.register("mimo", MimoAdapter())
 
         # 用指定模型评估
         result = registry.evaluate("deepseek", request)
@@ -34,7 +34,7 @@ class ModelRegistry:
         """注册模型适配器。
 
         Args:
-            name: 模型名称（如 "deepseek", "glm", "gpt4o"）
+            name: 模型名称（如 "deepseek", "mimo", "gpt"）
             adapter: 评估协议实现
             default: 是否设为默认模型
         """
@@ -154,7 +154,7 @@ def register_default_models() -> None:
 
     默认注册 DeepSeek，其他模型按环境变量可用性注册。
     """
-    from .adapters import DeepSeekAdapter, GLMAdapter, GPTAdapter
+    from .adapters import DeepSeekAdapter, MimoAdapter, GPTAdapter
     import os
 
     registry = get_registry()
@@ -162,9 +162,8 @@ def register_default_models() -> None:
     # DeepSeek（默认）
     registry.register("deepseek", DeepSeekAdapter(), default=True)
 
-    # GLM（如果配置了 API Key）
-    if os.getenv("GLM_API_KEY"):
-        registry.register("glm", GLMAdapter())
+    # Mimo 2.5 Pro
+    registry.register("mimo", MimoAdapter())
 
     # GPT（如果配置了 API Key）
     if os.getenv("GPT_API_KEY"):

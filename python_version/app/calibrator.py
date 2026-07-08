@@ -1,7 +1,7 @@
 """评分校准器（Score Calibrator）
 
 解决不同模型评分尺度不一致的问题。
-例如：DeepSeek 偏严（给 0.3），GLM 偏松（给 0.7），但实际都是"中等问题"。
+例如：DeepSeek 偏严（给 0.3），Mimo 偏松（给 0.7），但实际都是"中等问题"。
 
 校准流程：
 1. 用 Calibration Set（带 Gold Label）分别让各模型评分

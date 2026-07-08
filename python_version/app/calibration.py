@@ -57,6 +57,17 @@ def calibrate(
                 "human_score": human_score,
                 "diff": round(abs(llm_score - human_score), 4),
                 "consistent": abs(llm_score - human_score) <= tolerance,
+                "evaluation": {
+                    "verdict": resp.verdict,
+                    "dimensions": [
+                        {"dimension": d.dimension, "score": d.score, "reason": d.reason}
+                        for d in resp.dimensions
+                    ],
+                    "flaws": [
+                        {"category": f.category, "severity": f.severity, "description": f.description}
+                        for f in resp.flaws
+                    ],
+                },
             }
         )
 

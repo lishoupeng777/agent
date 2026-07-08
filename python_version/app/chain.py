@@ -205,6 +205,7 @@ class LLMDimensionScore(BaseModel):
 
 class LLMAnchorSpan(BaseModel):
     """LLM 输出的锚点信息"""
+    model_config = {"coerce_numbers_to_str": True}  # LLM 返回 segment_id=1 (int) 时自动转为 "1"
     segment_id: str = ""
     start_char: int = 0
     end_char: int = 0
@@ -228,24 +229,27 @@ class LLMOutput(BaseModel):
 
 
 def parse_llm_output(raw: str) -> dict[str, Any]:
-    """从 LLM 原始输出中提取 JSON（三级降级策略 + Pydantic 验证）"""
-    # 1) 直接解析
+    """从 LLM 原始输出中提取 JSON（三级降级策略 + Pydantic 验证）
+
+    使用 strict=False 允许控制字符（LLM 有时在 reason 中输出裸换行符）。
+    """
+    # 1) 直接解析（strict=False 允许控制字符）
     try:
-        return json.loads(raw)
+        return json.loads(raw, strict=False)
     except json.JSONDecodeError:
         pass
     # 2) 提取 ```json ... ``` 块
     m = re.search(r"```(?:json)?\s*([\s\S]*?)```", raw)
     if m:
         try:
-            return json.loads(m.group(1))
+            return json.loads(m.group(1), strict=False)
         except json.JSONDecodeError:
             pass
     # 3) 提取最外层 { ... }
     m = re.search(r"\{[\s\S]*\}", raw)
     if m:
         try:
-            return json.loads(m.group())
+            return json.loads(m.group(), strict=False)
         except json.JSONDecodeError:
             pass
     return {}
@@ -255,8 +259,11 @@ def validate_llm_output(parsed: dict[str, Any]) -> LLMOutput:
     """用 Pydantic 验证 LLM 输出结构，容错处理异常字段"""
     try:
         return LLMOutput(**parsed)
-    except Exception:
-        # 验证失败时返回默认值
+    except Exception as e:
+        # 验证失败时打印错误详情，方便排查
+        import logging
+        logging.warning(f"LLM 输出 Pydantic 验证失败: {e}")
+        print(f"[WARNING] LLM 输出 Pydantic 验证失败: {e}")
         return LLMOutput()
 
 
@@ -264,13 +271,26 @@ def _normalize_score(val: float) -> float:
     return max(0.0, min(1.0, float(val)))
 
 
+# 维度名称映射（兼容新旧两种命名）
+_DIM_NAME_MAP = {
+    "semantic": "semantic",
+    "semantic_fidelity": "semantic",
+    "factual": "factual",
+    "factual_consistency": "factual",
+    "structure": "structure",
+    "readability": "readability",
+}
+
+
 def extract_dimensions(parsed: dict[str, Any]) -> list[DimensionScore]:
-    """从解析结果中提取维度评分"""
+    """从解析结果中提取维度评分（兼容新旧维度命名）"""
     dimensions = []
     for d in parsed.get("dimensions", []):
         if isinstance(d, dict):
+            raw_name = d.get("dimension", "未知")
+            canonical = _DIM_NAME_MAP.get(raw_name, raw_name)
             dimensions.append(DimensionScore(
-                dimension=d.get("dimension", "未知"),
+                dimension=canonical,
                 score=_normalize_score(d.get("score", 0)),
                 weight=float(d.get("weight", 0.25)),
                 reason=d.get("reason", ""),
@@ -291,23 +311,82 @@ def extract_dimensions(parsed: dict[str, Any]) -> list[DimensionScore]:
 
 
 def extract_flaws(parsed: dict[str, Any]) -> list[FlawItem]:
-    """从解析结果中提取瑕疵清单"""
+    """从解析结果中提取瑕疵清单（兼容新旧锚点格式）"""
     flaws = []
     for f in parsed.get("flaws", []):
         if isinstance(f, dict):
             loc_raw = f.get("location") or f.get("anchor") or {}
+            # 兼容新格式（before_anchor/after_anchor）和旧格式（segment_id/start_char）
+            segment_id = str(
+                loc_raw.get("segment_id", "")
+                or loc_raw.get("after_anchor", "")
+                or loc_raw.get("before_anchor", "")
+            )
+            start_char = int(loc_raw.get("start_char", 0))
+            end_char = int(loc_raw.get("end_char", 0))
+            snippet = str(loc_raw.get("snippet", ""))
+
+            # 如果有 after_anchor 但没有 start_char，记录锚点信息供后处理解析
+            after_anchor = loc_raw.get("after_anchor", "")
+            before_anchor = loc_raw.get("before_anchor", "")
+
             flaws.append(FlawItem(
                 category=str(f.get("category", "unknown")),
                 severity=str(f.get("severity", "minor")),
                 description=str(f.get("description", "")),
                 location=AnchorSpan(
-                    segment_id=str(loc_raw.get("segment_id", "")),
-                    start_char=int(loc_raw.get("start_char", 0)),
-                    end_char=int(loc_raw.get("end_char", 0)),
-                    snippet=str(loc_raw.get("snippet", "")),
+                    segment_id=segment_id,
+                    start_char=start_char,
+                    end_char=end_char,
+                    snippet=snippet,
                 ),
                 suggestion=f.get("suggestion"),
             ))
+    return flaws
+
+
+def resolve_anchor_offsets(
+    flaws: list[FlawItem],
+    anchored_text: str,
+    original_text: str,
+) -> list[FlawItem]:
+    """将锚点标识符映射为字符偏移。
+
+    支持多种锚点格式：[Before N], [After N], [Anchor_PN], [Anchor_GN], [PN], [GN]。
+    如果 LLM 输出的瑕玼 location 有 segment_id 但 start_char=0，
+    通过在 anchored_text 中查找锚点标记，映射到 original_text 中的实际偏移。
+    """
+    import re
+
+    for flaw in flaws:
+        loc = flaw.location
+        if loc.start_char == 0 and loc.end_char == 0 and loc.segment_id:
+            # 在 anchored_text 中查找该锚点标记
+            escaped_id = re.escape(loc.segment_id.strip())
+            pattern = rf"{escaped_id}\s*"
+            m = re.search(pattern, anchored_text)
+            if m:
+                anchor_pos = m.end()
+                # 提取该锚点后的段落内容（到下一个锚点或文本结尾）
+                next_anchor = re.search(r"\[[\w\s_]+\d+\]", anchored_text[anchor_pos:])
+                if next_anchor:
+                    para_text = anchored_text[anchor_pos:anchor_pos + next_anchor.start()]
+                else:
+                    para_text = anchored_text[anchor_pos:]
+
+                # 在 original_text 中查找该段落的起始位置
+                search_text = para_text.strip()[:30]
+                if search_text:
+                    pos = original_text.find(search_text)
+                    if pos >= 0:
+                        # 用实际段落内容更新 snippet（LLM 的 snippet 可能不准确）
+                        actual_snippet = para_text.strip()[:80]
+                        flaw.location = AnchorSpan(
+                            segment_id=loc.segment_id,
+                            start_char=pos,
+                            end_char=pos + len(para_text.strip()),
+                            snippet=actual_snippet,
+                        )
     return flaws
 
 
@@ -379,6 +458,53 @@ def determine_verdict(overall_score: float) -> str:
     elif overall_score >= 0.5:
         return "review"
     return "fail"
+
+
+def determine_reason_code(
+    overall_score: float,
+    verdict: str,
+    flaws: list[FlawItem],
+) -> tuple[str, list[dict[str, Any]]]:
+    """判定原因码 + 详细原因列表。
+
+    Returns:
+        (reason_code, reject_reasons)
+        reason_code: 机器可读的判定原因
+        reject_reasons: 详细原因列表
+    """
+    reasons: list[dict[str, Any]] = []
+
+    # 检查 critical 级瑕玼
+    critical_flaws = [f for f in flaws if f.severity == "critical"]
+    if critical_flaws:
+        for f in critical_flaws:
+            code = "CONSTRAINT_DELETION" if f.category == "over_clean" else "FACTUAL_DISTORTION"
+            reasons.append({
+                "code": code,
+                "description": f.description[:100],
+                "severity": "critical",
+                "category": f.category,
+            })
+
+    # 检查分数阈值
+    if overall_score < 0.5:
+        reasons.append({
+            "code": "SCORE_BELOW_THRESHOLD",
+            "description": f"综合得分 {overall_score:.4f} 低于 0.5",
+            "severity": "major",
+        })
+
+    # 确定主原因码
+    if not reasons:
+        reason_code = "PASS_ALL_CLEAR"
+    elif critical_flaws:
+        reason_code = "CRITICAL_FLAW_DETECTED"
+    elif overall_score < 0.5:
+        reason_code = "SCORE_BELOW_THRESHOLD"
+    else:
+        reason_code = "REVIEW_REQUIRED"
+
+    return reason_code, reasons
 
 
 def apply_profile_penalties(
@@ -560,17 +686,43 @@ def _find_best_match(
     return -1, 0.0
 
 
+def _detect_user_anchors(text: str) -> list[dict[str, Any]] | None:
+    """检测用户输入是否自带锚点标记。
+
+    支持格式：[Anchor_P1], [Anchor_G1], [P1], [G1], [Before 1], [After 1] 等。
+    如果检测到锚点，返回解析后的段落列表；否则返回 None。
+    """
+    import re
+    # 匹配常见的锚点格式
+    pattern = r"\[(?:Anchor_)?(?:P|G|Before|After|锚点)[\s_]*(\d+[a-zA-Z]?)\]\s*"
+    matches = list(re.finditer(pattern, text))
+    if len(matches) < 2:  # 至少 2 个锚点才算有效
+        return None
+
+    segments = []
+    for i, m in enumerate(matches):
+        anchor_id = m.group(0).strip()
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        para_text = text[start:end].strip()
+        if para_text:
+            segments.append({
+                "segment_id": anchor_id,
+                "text": para_text,
+                "start_char": m.start(),
+                "end_char": end,
+            })
+    return segments if segments else None
+
+
 def build_anchored_text(
     before_text: str, after_text: str
 ) -> tuple[str, str, list[dict[str, Any]], list[dict[str, Any]]]:
-    """锚点预处理：将治理前后文本按段落对齐，添加 [Before N] / [After N] 标记。
+    """锚点预处理：将治理前后文本按段落对齐，添加锚点标记。
 
-    对齐策略：
-    - 按段落切分 before/after 文本
-    - 用 difflib.SequenceMatcher 做相似度匹配（阈值 0.4）
-    - 匹配上的段落标同一编号
-    - before 中未匹配的段落标记为 [Before N]（after 中对应 [After N: 已删除]）
-    - after 中未匹配的段落标记为 [After N]（新增内容）
+    策略：
+    1. 如果用户输入自带锚点（如 [Anchor_P1]），直接使用用户的锚点
+    2. 如果用户输入不带锚点，系统自动生成 [Before N] / [After N] 标记
 
     Args:
         before_text: 治理前原始文本
@@ -578,11 +730,18 @@ def build_anchored_text(
 
     Returns:
         (anchored_before, anchored_after, segments_before, segments_after)
-        - anchored_before: 带 [Before N] 标记的治理前文本
-        - anchored_after: 带 [After N] 标记的治理后文本
-        - segments_before: before 的分段信息列表
-        - segments_after: after 的分段信息列表
     """
+    # 检测用户是否自带锚点
+    user_before_segs = _detect_user_anchors(before_text)
+    user_after_segs = _detect_user_anchors(after_text)
+
+    if user_before_segs and user_after_segs:
+        # 用户自带锚点，直接使用
+        anchored_before = before_text
+        anchored_after = after_text
+        return anchored_before, anchored_after, user_before_segs, user_after_segs
+
+    # 用户不带锚点，系统自动生成
     paras_before = _split_paragraphs(before_text)
     paras_after = _split_paragraphs(after_text)
 
@@ -1110,10 +1269,15 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
         diff_info=diff_info,
     )
 
-    # Step 2: 调用 LLM（带 callback，启用 JSON mode）
+    # Step 2: 调用 LLM（带 callback，启用 JSON mode，空返回自动重试 1 次）
     llm = create_llm(temperature=temperature, json_mode=True)
     response = llm.invoke(messages, config={"callbacks": [callback]})
     raw_output = str(response.content) if hasattr(response, "content") else str(response)
+
+    # 空返回重试：API 偶尔返回空 content（token 消耗了但内容为空）
+    if not raw_output.strip():
+        response = llm.invoke(messages, config={"callbacks": [callback]})
+        raw_output = str(response.content) if hasattr(response, "content") else str(response)
 
     # Step 3: 解析输出 + Pydantic 验证
     parsed = parse_llm_output(raw_output)
@@ -1122,7 +1286,26 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
     dimensions = extract_dimensions(validated.model_dump())
     flaws = extract_flaws(validated.model_dump())
 
-    # Step 3b: 锚点增强 —— 用 Diff 模块的实际位置补充 LLM 输出的 0/0 锚点
+    # Step 3a: 保存原始数据（供热重算使用，在任何后处理之前）
+    try:
+        from .raw_store import save_raw
+        save_raw(
+            request_id=request.request_id,
+            raw_dimensions=[{"dimension": d.dimension, "score": d.score, "weight": d.weight, "reason": d.reason} for d in dimensions],
+            raw_flaws=[{"category": f.category, "severity": f.severity, "description": f.description, "location": {"segment_id": f.location.segment_id, "start_char": f.location.start_char, "end_char": f.location.end_char, "snippet": f.location.snippet}} for f in flaws],
+            raw_llm_output=raw_output,
+            before_text=request.before_text,
+            after_text=request.after_text,
+            evaluation_profile=request.evaluation_profile,
+            model_version=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
+        )
+    except Exception:
+        pass  # 保存失败不影响主流程
+
+    # Step 3b: 锚点增强 —— 将 LLM 输出的锚点标识符映射为字符偏移
+    # 优先用锚点解析，再用 Diff 模块补充
+    flaws = resolve_anchor_offsets(flaws, anchored_after, request.after_text)
+
     # 建立 Diff 检测结果的 snippet → position 映射
     diff_positions: dict[str, tuple[int, int]] = {}
     for df in detected_flaws:
@@ -1160,29 +1343,10 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
                         snippet=loc.snippet,
                     )
 
-    # Step 3c: Merge —— 算法瑕疵补充到 LLM 输出
-    # 如果 Diff 检测到 critical structure/omission 但 LLM 瑕疵列表中没有对应条目，
-    # 将算法检测结果合并进来（算法负责"发现"，LLM 负责"解释"）
+    # Step 3c: Merge —— 算法检测结果仅用于评分修正和 Confidence，不暴露给用户
+    # 算法检测到的瑕疵不直接加入 flaws 列表（用户看不懂 [算法检测] substitution...），
+    # 而是通过 algorithm_adjustment 修正维度分数，通过 Confidence 反映检测一致性
     llm_categories = {(f.category, f.severity) for f in flaws}
-    merged_categories: set[tuple[str, str]] = set()  # 防止同类瑕疵重复补充
-    for df in detected_flaws:
-        df_cat = df.get("category", "")
-        df_sev = df.get("severity", "")
-        if df_sev == "critical" and (df_cat, df_sev) not in llm_categories and (df_cat, df_sev) not in merged_categories:
-            # 算法检测到 critical 但 LLM 漏检 → 补充
-            flaws.append(FlawItem(
-                category=df_cat,
-                severity=df_sev,
-                description=f"[算法检测] {df.get('type', 'unknown')}: {df.get('anchor_before', '')[:60]}",
-                location=AnchorSpan(
-                    segment_id="algo",
-                    start_char=0,
-                    end_char=0,
-                    snippet=df.get("anchor_before", "")[:50],
-                ),
-                suggestion="算法预检标记，建议人工复核",
-            ))
-            merged_categories.add((df_cat, df_sev))
     # 记录算法修正（不修改 LLM 原始输出）
     algo_adjustments: dict[str, dict[str, Any]] = {}
     for df in detected_flaws:
@@ -1249,7 +1413,10 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
     # Step 5: 计算置信度
     confidence = compute_confidence(dimensions, flaws, detected_flaws, diff_info)
 
-    # Step 6: 组装响应（含 callback 追踪数据）
+    # Step 6: 计算判定原因码
+    reason_code, reject_reasons = determine_reason_code(overall_score, verdict, flaws)
+
+    # Step 7: 组装响应（含 callback 追踪数据）
     return EvalResponse(
         request_id=request.request_id,
         evaluation_profile=request.evaluation_profile,
@@ -1257,6 +1424,8 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
         overall_score=round(overall_score, 4),
         flaws=flaws,
         verdict=verdict,
+        reason_code=reason_code,
+        reject_reasons=reject_reasons,
         reproducibility_token=build_reproducibility_token(request, temperature),
         model_version=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         prompt_version=hashlib.sha256(

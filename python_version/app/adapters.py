@@ -40,14 +40,14 @@ class BaseAdapter(EvaluationProtocol):
 
         # 解析输出
         from .chain import parse_llm_output, extract_dimensions, extract_flaws, compute_overall_score
-        from .chain import apply_veto_rules, determine_verdict, apply_profile_penalties
+        from .chain import apply_soft_penalty, determine_verdict, apply_profile_penalties
         from .chain import build_reproducibility_token
 
         parsed = parse_llm_output(raw_output)
         dimensions = extract_dimensions(parsed)
         flaws = extract_flaws(parsed)
         overall_score = compute_overall_score(dimensions)
-        overall_score = apply_veto_rules(overall_score, flaws)
+        overall_score = apply_soft_penalty(overall_score, dimensions, flaws)
         verdict = determine_verdict(overall_score)
         overall_score, verdict, flaws = apply_profile_penalties(
             request.evaluation_profile, overall_score, verdict, flaws,
@@ -135,64 +135,29 @@ class DeepSeekAdapter(BaseAdapter):
         return self._prompt_version()
 
 
-class GLMAdapter(BaseAdapter):
-    """智谱 GLM 适配器。
+class MimoAdapter(BaseAdapter):
+    """小米 Mimo 2.5 Pro 适配器。
 
-    GLM 对指令的响应方式与 DeepSeek 不同，需要定制：
-    - 更明确的输出格式指令
-    - 更详细的 few-shot 示例
-    - API Key 格式：{id}.{secret}，需转换为 JWT
+    Mimo 使用 OpenAI 兼容协议，无需特殊转换。
+    API Key 从 .env 读取（MIMO_API_KEY / MIMO_BASE_URL / MIMO_MODEL）。
     """
-
-    def _get_glm_api_key(self) -> str:
-        """获取 GLM API Key（自动处理 JWT 转换）"""
-        key = os.getenv("GLM_API_KEY", "")
-        if not key:
-            return ""
-        # 如果是 {id}.{secret} 格式，转换为 JWT
-        if "." in key and not key.startswith("eyJ"):
-            try:
-                import time
-                import jwt
-                key_id, secret = key.split(".", 1)
-                payload = {
-                    "api_key": key_id,
-                    "exp": int(time.time()) + 3600,
-                    "timestamp": int(time.time()),
-                }
-                headers = {"alg": "HS256", "sign_type": "SIGN"}
-                return jwt.encode(payload, secret, algorithm="HS256", headers=headers)
-            except Exception:
-                return key
-        return key
 
     def get_model_config(self) -> dict[str, Any]:
         return {
-            "model": os.getenv("GLM_MODEL", "glm-4.7-flash"),
-            "base_url": os.getenv("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
-            "api_key": self._get_glm_api_key(),
+            "model": os.getenv("MIMO_MODEL", "mimo-v2.5-pro"),
+            "base_url": os.getenv("MIMO_BASE_URL", "https://api.xiaomimimo.com/v1"),
+            "api_key": os.getenv("MIMO_API_KEY", ""),
             "max_tokens": 2048,
         }
 
     def get_model_name(self) -> str:
-        return os.getenv("GLM_MODEL", "glm-4.7-flash")
+        return os.getenv("MIMO_MODEL", "mimo-v2.5-pro")
 
     def get_model_version(self) -> str:
-        return self._prompt_version() + "-glm"
+        return self._prompt_version() + "-mimo"
 
     def get_prompt_customization(self) -> dict[str, str]:
-        return {
-            "system_suffix": """
-【GLM 特别指令】
-请严格按照以下 JSON 格式输出，不要添加任何额外文字或解释：
-{
-  "dimensions": [...],
-  "overall_score": 0.0-1.0,
-  "flaws": [...]
-}
-确保 JSON 可被直接解析，不要包含 markdown 代码块标记。
-""",
-        }
+        return {}
 
 
 class GPTAdapter(BaseAdapter):

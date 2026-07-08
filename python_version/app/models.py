@@ -48,6 +48,7 @@ class EvalRequest(BaseModel):
     human_label: Optional[dict[str, Any]] = Field(
         None, description="人工标注（用于一致性校准，可选）"
     )
+    model: Optional[str] = Field(None, description="指定模型（deepseek/mimo/gpt），None 则使用默认模型")
     stabilize: bool = Field(False, description="是否启用多次采样稳定化")
     sample_count: int = Field(3, ge=1, le=5, description="稳定化采样次数")
 
@@ -65,6 +66,8 @@ class EvalResponse(BaseModel):
     overall_score: float = Field(..., ge=0.0, le=1.0, description="加权总分")
     flaws: list[FlawItem] = Field(default_factory=list, description="瑕疵清单（可锚点定位）")
     verdict: str = Field(..., description="综合判定: pass | review | fail")
+    reason_code: str = Field("PASS_ALL_CLEAR", description="判定原因码: PASS_ALL_CLEAR | CRITICAL_FLAW_DETECTED | SCORE_BELOW_THRESHOLD | REVIEW_REQUIRED")
+    reject_reasons: list[dict[str, Any]] = Field(default_factory=list, description="详细判定原因列表")
     reproducibility_token: str = Field(..., description="可复现令牌（输入+模型+prompt 指纹）")
     model_version: str = Field("", description="评估时使用的模型标识")
     prompt_version: str = Field("", description="评估时使用的 prompt 版本哈希（前8位）")
@@ -103,3 +106,48 @@ class CalibrationReport(BaseModel):
     consistency_rate: float = Field(..., description="一致率（阈值容差内一致的比例）")
     sample_count: int
     details: list[dict[str, Any]] = Field(default_factory=list, description="逐条对比详情")
+
+
+class RecalcParams(BaseModel):
+    """热重算参数（用户可调）"""
+    dimension_weights: dict[str, float] = Field(
+        default_factory=lambda: {
+            "semantic": 0.35,
+            "factual": 0.35,
+            "structure": 0.15,
+            "readability": 0.15,
+        },
+        description="维度权重（自动归一化）"
+    )
+    penalty_factors: dict[str, float] = Field(
+        default_factory=lambda: {
+            "critical": 0.6,
+            "major": 0.85,
+            "minor": 0.95,
+        },
+        description="惩罚系数（severity -> 惩罚因子）"
+    )
+    pass_threshold: float = Field(0.82, ge=0.0, le=1.0, description="通过阈值")
+    review_threshold: float = Field(0.5, ge=0.0, le=1.0, description="复审阈值")
+    anchor_tolerance: int = Field(10, ge=0, le=100, description="锚点容差（字符数）")
+
+
+class RecalcResultItem(BaseModel):
+    """单条重算结果"""
+    request_id: str
+    dimensions: list[dict[str, Any]]
+    overall_score: float
+    verdict: str
+    flaws: list[dict[str, Any]]
+    penalty_applied: float
+
+
+class RecalcReport(BaseModel):
+    """批量重算报告"""
+    params: RecalcParams
+    results: list[RecalcResultItem]
+    pearson_r: float | None = None
+    spearman_rho: float | None = None
+    mae: float | None = None
+    rmse: float | None = None
+    consistency_rate: float | None = None
