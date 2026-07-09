@@ -13,3 +13,7 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+python_version/data/raw_evaluations.jsonl
+python_version/data/tasks.jsonl
+python_version/data/eval_history.jsonl
+python_version/eval_report.json
