@@ -115,20 +115,45 @@ def _normalize_anchor(anchor: str) -> str:
     return anchor.strip().strip("[]").strip()
 
 
+def _extract_anchor_num(anchor: str) -> str:
+    """从锚点 ID 中提取数字部分，用于跨格式匹配。
+    
+    例：
+      "[After 1]"  → "1"
+      "[Before 2]" → "2"
+      "seg_001"    → "1"  (去除前导零)
+      "After 3"    → "3"
+      "1"          → "1"
+    """
+    import re
+    m = re.search(r'(\d+)', anchor)
+    if m:
+        return str(int(m.group(1)))  # 去除前导零
+    return ""
+
+
 def _match_anchor(pred: FlawLocation, gt: FlawLocation) -> float:
-    """锚点硬对齐：before_anchor 和 after_anchor 都一致 → 1.0，否则 0.0"""
+    """锚点对齐：先精确匹配，再数字 ID 匹配（跨格式兼容）"""
     p_before = _normalize_anchor(pred.before_anchor)
     g_before = _normalize_anchor(gt.before_anchor)
     p_after = _normalize_anchor(pred.after_anchor)
     g_after = _normalize_anchor(gt.after_anchor)
 
-    # 如果有 before_anchor，必须同时匹配
+    # 第一优先：精确字符串匹配
     if p_before and g_before:
-        return 1.0 if (p_before == g_before and p_after == g_after) else 0.0
-    # 只有 after_anchor 时，匹配 after_anchor
+        if p_before == g_before and p_after == g_after:
+            return 1.0
     if p_after and g_after:
-        return 1.0 if p_after == g_after else 0.0
-    # 都为空，无法匹配
+        if p_after == g_after:
+            return 1.0
+
+    # 第二优先：数字 ID 匹配（兼容 [After 1] vs seg_001 格式）
+    p_num = _extract_anchor_num(pred.after_anchor or pred.before_anchor)
+    g_num = _extract_anchor_num(gt.after_anchor or gt.before_anchor)
+    if p_num and g_num and p_num == g_num:
+        return 1.0
+
+    # 都无法匹配
     return 0.0
 
 

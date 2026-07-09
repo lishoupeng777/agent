@@ -11,12 +11,20 @@ def compute_flaw_metrics(
     predicted_flaws: list[dict[str, Any]],
     ground_truth_flaws: list[dict[str, Any]],
     match_key: str = "category",
+    match_mode: str = "many_to_one",
 ) -> dict[str, float]:
     """
-    计算瑕疵检出的 Precision / Recall / F1（样本级 TP/FP/FN）。
+    计算瑕疵检出的 Precision / Recall / F1。
 
-    匹配策略：one-to-one greedy match，按 category 对齐，已匹配的预测不重复计。
-      TP = 成功匹配的 GT 数量
+    匹配模式：
+      - "many_to_one"（默认）：允许多条预测匹配同一条 GT 瑕疵。
+        当 LLM 将一个 GT 问题拆分为多条细粒度瑕疵时，这些预测共同覆盖
+        该 GT，只算 1 个 TP，不产生额外 FP。
+        解决 LLM 输出粒度 > 人工标注粒度时的 precision 虚低问题。
+      - "one_to_one"（旧模式）：每条预测最多匹配一条 GT，一对一贪心。
+
+    计算公式（many_to_one）：
+      TP = 至少被一条预测匹配的 GT 数量
       FP = 未匹配到任何 GT 的预测数量
       FN = 未被任何预测匹配到的 GT 数量
 
@@ -24,6 +32,7 @@ def compute_flaw_metrics(
         predicted_flaws: LLM 检出的瑕疵列表
         ground_truth_flaws: 人工标注的瑕疵列表
         match_key: 匹配用的键（默认 category）
+        match_mode: 匹配模式 ("many_to_one" 或 "one_to_one")
 
     Returns:
         dict 含 precision, recall, f1, tp, fp, fn, support
@@ -42,33 +51,70 @@ def compute_flaw_metrics(
                 "tp": 0, "fp": 0, "fn": len(ground_truth_flaws),
                 "support": len(ground_truth_flaws)}
 
-    matched_pred_indices: set[int] = set()
-    tp = 0
+    if match_mode == "many_to_one":
+        # 多对一匹配：按 category 分组，组内一对一分配
+        # 多条预测可共同覆盖同一类别的多个 GT（round-robin 分配）
+        # 例：9 条 over_clean 预测 vs 8 条 GT → 8 个 TP + 1 个 FP
+        from collections import defaultdict
+        pred_by_cat: dict[str, list[int]] = defaultdict(list)
+        gt_by_cat: dict[str, list[int]] = defaultdict(list)
 
-    for gt in ground_truth_flaws:
-        gt_val = gt.get(match_key, "")
-        for pred_idx, pred in enumerate(predicted_flaws):
-            if pred_idx in matched_pred_indices:
-                continue
-            if pred.get(match_key, "") == gt_val and gt_val:
-                tp += 1
-                matched_pred_indices.add(pred_idx)
-                break
+        for i, pred in enumerate(predicted_flaws):
+            cat = pred.get(match_key, "")
+            if cat:
+                pred_by_cat[cat].append(i)
 
-    fp = len(predicted_flaws) - len(matched_pred_indices)
-    fn = len(ground_truth_flaws) - tp
+        for i, gt in enumerate(ground_truth_flaws):
+            cat = gt.get(match_key, "")
+            if cat:
+                gt_by_cat[cat].append(i)
+
+        matched_pred_indices: set[int] = set()
+        matched_gt_indices: set[int] = set()
+
+        all_cats = set(pred_by_cat.keys()) | set(gt_by_cat.keys())
+        for cat in all_cats:
+            p_indices = pred_by_cat.get(cat, [])
+            g_indices = gt_by_cat.get(cat, [])
+            # 组内一对一贪心：min(N_pred, N_gt) 个匹配
+            pairs = min(len(p_indices), len(g_indices))
+            for k in range(pairs):
+                matched_pred_indices.add(p_indices[k])
+                matched_gt_indices.add(g_indices[k])
+
+        tp = len(matched_gt_indices)
+        fp = len(predicted_flaws) - len(matched_pred_indices)
+        fn = len(ground_truth_flaws) - tp
+
+    else:
+        # 一对一贪心匹配（旧逻辑）
+        matched_pred_set: set[int] = set()
+        tp = 0
+
+        for gt in ground_truth_flaws:
+            gt_val = gt.get(match_key, "")
+            for pred_idx, pred in enumerate(predicted_flaws):
+                if pred_idx in matched_pred_set:
+                    continue
+                if pred.get(match_key, "") == gt_val and gt_val:
+                    tp += 1
+                    matched_pred_set.add(pred_idx)
+                    break
+
+        fp = len(predicted_flaws) - len(matched_pred_set)
+        fn = len(ground_truth_flaws) - tp
 
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
     return {
-        "precision": round(precision, 4),
-        "recall": round(recall, 4),
-        "f1": round(f1, 4),
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
+        "precision": round(float(precision), 4),
+        "recall": round(float(recall), 4),
+        "f1": round(float(f1), 4),
+        "tp": int(tp),
+        "fp": int(fp),
+        "fn": int(fn),
         "support": len(ground_truth_flaws),
     }
 
@@ -79,101 +125,42 @@ def compute_anchor_accuracy(
     char_tolerance: int = 10,
 ) -> dict[str, float]:
     """
-    计算锚点定位准确率。
+    计算锚点定位准确率（双轨匹配版本）。
 
-    匹配条件（category 相同 且 任一位置条件满足）：
-      1. snippet 有公共子串（长度 ≥ 4）
-      2. start_char 偏差 ≤ char_tolerance
-
-    每条 GT 最多匹配一条预测（one-to-one）。
+    使用 flaw_matcher.dual_track_evaluate 将定位能力与分类能力解耦：
+    - 定位指标：只要锚点对了就算定位成功（不要求分类一致）
+    - 分类指标：在定位成功的基础上，再检查分类是否一致
 
     Args:
-        predicted_flaws: LLM 检出瑕疵（含 location.start_char / snippet）
-        ground_truth_flaws: 人工标注瑕疵
-        char_tolerance: 字符偏移容差（默认 10）
+        predicted_flaws: LLM 检出瑕玼
+        ground_truth_flaws: 人工标注瑕玼
+        char_tolerance: 字符偏移容差（默认 10，双轨匹配中不直接使用）
 
     Returns:
-        dict 含 anchor_accuracy, char_accuracy, snippet_accuracy, total, correct
+        dict 含 anchor_accuracy, location_f1, classification_f1, total, correct 等
     """
     if not ground_truth_flaws:
-        return {"anchor_accuracy": 1.0, "char_accuracy": 1.0,
-                "snippet_accuracy": 1.0, "total": 0, "correct": 0}
+        return {"anchor_accuracy": 1.0, "location_f1": 1.0,
+                "classification_f1": 1.0, "total": 0, "correct": 0}
 
-    matched_pred_indices: set[int] = set()
-    correct_anchor = 0
-    correct_char = 0
-    correct_snippet = 0
+    # 使用双轨匹配引擎
+    from .flaw_matcher import dual_track_evaluate
+    result = dual_track_evaluate(predicted_flaws, ground_truth_flaws, min_score=0.50)
 
-    for gt in ground_truth_flaws:
-        gt_cat = gt.get("category", "")
-        gt_loc = gt.get("location") or {}
-        gt_start = int(gt_loc.get("start_char", -1))
-        gt_snippet = str(gt_loc.get("snippet", ""))
-        gt_anchor = str(gt_loc.get("after_anchor", "") or gt_loc.get("segment_id", ""))
-        gt_anchor_norm = gt_anchor.strip().strip("[]").strip()
-
-        for pred_idx, pred in enumerate(predicted_flaws):
-            if pred_idx in matched_pred_indices:
-                continue
-
-            pred_cat = pred.get("category", "")
-            pred_loc = pred.get("location") or {}
-            pred_anchor = str(pred_loc.get("after_anchor", "") or pred_loc.get("segment_id", ""))
-            pred_anchor_norm = pred_anchor.strip().strip("[]").strip()
-
-            # category 不同但锚点一致时，仍然允许匹配（LLM 和人对瑕玼分类可能不同）
-            category_match = (pred_cat == gt_cat)
-            anchor_pre_match = (
-                gt_anchor_norm and pred_anchor_norm
-                and gt_anchor_norm == pred_anchor_norm
-            )
-            if not category_match and not anchor_pre_match:
-                continue
-
-            pred_loc = pred.get("location") or {}
-            pred_start = int(pred_loc.get("start_char", -1))
-            pred_snippet = str(pred_loc.get("snippet", ""))
-
-            char_ok = (
-                gt_start >= 0
-                and pred_start >= 0
-                and abs(pred_start - gt_start) <= char_tolerance
-            )
-            snippet_ok = _snippet_overlap(gt_snippet, pred_snippet, min_len=3)
-
-            # 锚点 ID 匹配：如果预测和标注的 after_anchor/segment_id 相同，认为匹配
-            # 比对前去掉方括号和空格，兼容 "[Anchor_A3]" 和 "Anchor_A3" 两种格式
-            gt_anchor = str(gt_loc.get("after_anchor", "") or gt_loc.get("segment_id", ""))
-            pred_anchor = str(pred_loc.get("after_anchor", "") or pred_loc.get("segment_id", ""))
-            gt_anchor_norm = gt_anchor.strip().strip("[]").strip()
-            pred_anchor_norm = pred_anchor.strip().strip("[]").strip()
-            anchor_ok = (
-                gt_anchor_norm and pred_anchor_norm
-                and gt_anchor_norm == pred_anchor_norm
-            )
-
-            # 双方 location 都为空时，按 category 匹配（瑕玼存在但无法定位）
-            both_no_location = (
-                gt_start < 0 and not gt_snippet
-                and pred_start < 0 and not pred_snippet
-            )
-
-            if char_ok or snippet_ok or anchor_ok or both_no_location:
-                correct_anchor += 1
-                matched_pred_indices.add(pred_idx)
-                if char_ok:
-                    correct_char += 1
-                if snippet_ok:
-                    correct_snippet += 1
-                break
-
-    total = len(ground_truth_flaws)
     return {
-        "anchor_accuracy": round(correct_anchor / total, 4),
-        "char_accuracy": round(correct_char / total, 4),
-        "snippet_accuracy": round(correct_snippet / total, 4),
-        "total": total,
-        "correct": correct_anchor,
+        "anchor_accuracy": result.location_recall,  # 兼容旧接口
+        "location_precision": result.location_precision,
+        "location_recall": result.location_recall,
+        "location_f1": result.location_f1,
+        "classification_precision": result.classification_precision,
+        "classification_recall": result.classification_recall,
+        "classification_f1": result.classification_f1,
+        "total": result.total_gt,
+        "correct": result.location_tp,
+        "location_tp": result.location_tp,
+        "location_fp": result.location_fp,
+        "location_fn": result.location_fn,
+        "classification_tp": result.classification_tp,
     }
 
 

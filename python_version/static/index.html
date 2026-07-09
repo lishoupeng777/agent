@@ -438,6 +438,60 @@
             display: none;
         }
         .error-msg.active { display: block; }
+
+        /* CSV 上传区域 */
+        .csv-upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+            margin-bottom: 16px;
+        }
+        .csv-upload-zone:hover { border-color: var(--primary); background: #f5f3ff; }
+        .csv-upload-zone.dragover { border-color: var(--primary); background: #ede9fe; }
+        .csv-upload-zone .upload-icon { font-size: 28px; margin-bottom: 6px; }
+        .csv-upload-zone .upload-text { font-size: 14px; color: var(--text-secondary); }
+        .csv-upload-zone .upload-hint { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+        .csv-upload-zone input[type="file"] { display: none; }
+        .csv-info {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #065f46;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .csv-info.active { display: flex; align-items: center; gap: 8px; }
+
+        /* 批量下载按钮区 */
+        .batch-download-bar {
+            display: none;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .batch-download-bar.active { display: flex; flex-wrap: wrap; }
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: #fff;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .btn-download:hover { border-color: var(--primary); color: var(--primary); background: #f5f3ff; }
     </style>
 </head>
 <body>
@@ -659,8 +713,21 @@
         <div class="card">
             <h3><span class="icon">📦</span> 批量评估（异步任务）</h3>
             <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">
-                上传多组文本对，后台异步评估，实时查看进度。支持断点续评。
+                上传 CSV 文件或在下方粘贴 JSON 数组，后台异步评估，实时查看进度。支持断点续评。
             </p>
+
+            <!-- CSV 快捷导入 -->
+            <div class="csv-upload-zone" id="csvDropZone" onclick="document.getElementById('csvFileInput').click()">
+                <div class="upload-icon">📂</div>
+                <div class="upload-text">点击或拖拽 CSV 文件到此处</div>
+                <div class="upload-hint">自动识别 before/before_text、after/after_text 列，最多 50 条</div>
+                <input type="file" id="csvFileInput" accept=".csv" onchange="handleCsvUpload(this)" />
+            </div>
+            <div class="csv-info" id="csvInfo">
+                <span>✅</span>
+                <span id="csvInfoText"></span>
+                <a href="javascript:void(0)" onclick="clearCsvImport()" style="margin-left:auto;color:#065f46;font-weight:600;text-decoration:none;">清除</a>
+            </div>
 
             <div class="form-group">
                 <label><span class="required">*</span> 批量数据（JSON 数组格式）</label>
@@ -702,6 +769,12 @@
 
             <!-- 逐条结果 -->
             <div id="batchResults"></div>
+
+            <!-- 下载按钮栏 -->
+            <div class="batch-download-bar" id="batchDownloads">
+                <button class="btn-download" onclick="downloadBatchJson()">📄 下载 JSON 报告</button>
+                <button class="btn-download" onclick="downloadBatchCsv()">📊 下载结果 CSV</button>
+            </div>
         </div>
     </div>
 
@@ -826,9 +899,35 @@
             <div class="loading" id="anchorLoading"><div class="spinner"></div><p>计算中……</p></div>
             <div class="error-msg" id="anchorError"></div>
             <div class="result-card" id="anchorResult" style="margin-top:16px;">
-                <div class="stat-item" style="max-width:200px;margin:0 auto;">
-                    <div class="stat-value" id="anchorAccuracy">--</div>
-                    <div class="stat-label">锚点定位准确率</div>
+                <h4 style="margin-bottom:12px;">定位指标（不要求分类一致）</h4>
+                <div class="stats-row" style="margin-bottom:16px;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="locPrecision">--</div>
+                        <div class="stat-label">定位 Precision</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="locRecall">--</div>
+                        <div class="stat-label">定位 Recall</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="locF1">--</div>
+                        <div class="stat-label">定位 F1</div>
+                    </div>
+                </div>
+                <h4 style="margin-bottom:12px;">分类指标（定位成功后检查分类）</h4>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value" id="clsPrecision">--</div>
+                        <div class="stat-label">分类 Precision</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="clsRecall">--</div>
+                        <div class="stat-label">分类 Recall</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="clsF1">--</div>
+                        <div class="stat-label">分类 F1</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1068,6 +1167,8 @@ async function doBatchSubmit() {
         document.getElementById('batchProgressBar').style.width = '0%';
         document.getElementById('batchProgressText').textContent = '0/' + data.total;
         document.getElementById('batchResults').innerHTML = '';
+        document.getElementById('batchDownloads').classList.remove('active');
+        lastBatchResults = [];
 
         // 开始轮询
         startBatchPolling(data.task_id);
@@ -1146,10 +1247,153 @@ async function pollBatchStatus(taskId) {
             if (data.errors_count > 0) {
                 document.getElementById('batchResumeSection').style.display = 'block';
             }
+            // 存储结果并显示下载按钮
+            lastBatchResults = (data.results || []).map(r => ({
+                request_id: r.request_id,
+                result: r.result
+            }));
+            if (lastBatchResults.length > 0) {
+                document.getElementById('batchDownloads').classList.add('active');
+            }
         }
     } catch(e) {
         // 轮询失败不中断
     }
+}
+
+// ==================== CSV 导入 & 批量下载 ====================
+let lastBatchResults = []; // 存储批量评估结果供下载
+
+// CSV 解析（支持引号包裹、逗号分隔）
+function parseCSV(text) {
+    const rows = [];
+    let cur = '', inQuote = false, row = [];
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuote) {
+            if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+            else if (ch === '"') { inQuote = false; }
+            else { cur += ch; }
+        } else {
+            if (ch === '"') { inQuote = true; }
+            else if (ch === ',') { row.push(cur); cur = ''; }
+            else if (ch === '\n' || ch === '\r') {
+                if (ch === '\r' && text[i + 1] === '\n') i++;
+                row.push(cur); cur = '';
+                if (row.some(c => c.trim())) rows.push(row);
+                row = [];
+            } else { cur += ch; }
+        }
+    }
+    if (cur || row.length) { row.push(cur); if (row.some(c => c.trim())) rows.push(row); }
+    return rows;
+}
+
+function handleCsvUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = parseCSV(text);
+        if (rows.length < 2) { showError('batchError', 'CSV 文件为空或只有表头'); return; }
+
+        // 解析表头（小写化、去空格）
+        const headers = rows[0].map(h => h.toLowerCase().trim());
+        const beforeCol = headers.indexOf('before_text') !== -1 ? headers.indexOf('before_text') : headers.indexOf('before');
+        const afterCol = headers.indexOf('after_text') !== -1 ? headers.indexOf('after_text') : headers.indexOf('after');
+        const idCol = headers.indexOf('id');
+
+        if (beforeCol === -1 || afterCol === -1) {
+            showError('batchError', '未找到 before/before_text 或 after/after_text 列，当前列名：' + headers.join(', '));
+            return;
+        }
+
+        const items = [];
+        for (let i = 1; i < rows.length && items.length < 50; i++) {
+            const r = rows[i];
+            if (!r[beforeCol] && !r[afterCol]) continue;
+            items.push({
+                request_id: idCol !== -1 && r[idCol] ? r[idCol].trim() : 'csv_' + String(i).padStart(3, '0'),
+                before_text: (r[beforeCol] || '').trim(),
+                after_text: (r[afterCol] || '').trim()
+            });
+        }
+
+        // 填入 JSON 输入框
+        document.getElementById('batchData').value = JSON.stringify(items, null, 2);
+
+        // 显示成功提示
+        document.getElementById('csvInfoText').textContent = '已导入 ' + items.length + ' 条记录（来自 ' + file.name + '）';
+        document.getElementById('csvInfo').classList.add('active');
+        document.getElementById('csvDropZone').style.display = 'none';
+    };
+    reader.readAsText(file, 'UTF-8');
+    // 重置 input 以便重复上传同名文件
+    input.value = '';
+}
+
+function clearCsvImport() {
+    document.getElementById('csvInfo').classList.remove('active');
+    document.getElementById('csvDropZone').style.display = '';
+    document.getElementById('batchData').value = '';
+}
+
+// 拖拽支持
+(function() {
+    const zone = document.getElementById('csvDropZone');
+    if (!zone) return;
+    ['dragenter', 'dragover'].forEach(evt => {
+        zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('dragover'); });
+    });
+    zone.addEventListener('drop', e => {
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.csv')) {
+            const input = document.getElementById('csvFileInput');
+            // 构造 DataTransfer 来设置 file input
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            handleCsvUpload(input);
+        }
+    });
+})();
+
+function downloadBatchJson() {
+    if (!lastBatchResults.length) return;
+    const blob = new Blob([JSON.stringify(lastBatchResults, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'batch_eval_report.json'; a.click();
+    URL.revokeObjectURL(url);
+}
+
+function downloadBatchCsv() {
+    if (!lastBatchResults.length) return;
+    const header = 'request_id,overall_score,verdict,flaw_count,semantic,factual,structure,readability\n';
+    const lines = lastBatchResults.map(r => {
+        const res = r.result || {};
+        const dims = {};
+        (res.dimensions || []).forEach(d => { dims[d.dimension] = d.score; });
+        return [
+            r.request_id || '',
+            (res.overall_score || 0).toFixed(4),
+            res.verdict || '',
+            (res.flaws || []).length,
+            (dims['semantic'] || dims['语义一致性'] || '').toString(),
+            (dims['factual'] || dims['事实准确性'] || '').toString(),
+            (dims['structure'] || dims['结构质量'] || '').toString(),
+            (dims['readability'] || dims['可读性'] || '').toString()
+        ].join(',');
+    }).join('\n');
+    const blob = new Blob(['\uFEFF' + header + lines], {type: 'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'batch_eval_result.csv'; a.click();
+    URL.revokeObjectURL(url);
 }
 
 // ==================== 权重显示更新 ====================
@@ -1644,7 +1888,12 @@ async function doAnchorMetrics() {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         document.getElementById('anchorResult').classList.add('active');
-        document.getElementById('anchorAccuracy').textContent = ((data.accuracy||0)*100).toFixed(1) + '%';
+        document.getElementById('locPrecision').textContent = (data.location_precision||0).toFixed(4);
+        document.getElementById('locRecall').textContent = (data.location_recall||0).toFixed(4);
+        document.getElementById('locF1').textContent = (data.location_f1||0).toFixed(4);
+        document.getElementById('clsPrecision').textContent = (data.classification_precision||0).toFixed(4);
+        document.getElementById('clsRecall').textContent = (data.classification_recall||0).toFixed(4);
+        document.getElementById('clsF1').textContent = (data.classification_f1||0).toFixed(4);
     } catch(e) {
         showError('anchorError', '请求失败：' + e.message);
     } finally {

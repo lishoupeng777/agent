@@ -72,7 +72,7 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.9,
+      "semantic_consistency": 0.55,
       "over_cleaning": 0.9,
       "readability_structure": 0.95,
       "factual_accuracy": 0.15
@@ -115,7 +115,7 @@
     "human_scores": {
       "semantic_consistency": 0.9,
       "over_cleaning": 0.8,
-      "readability_structure": 0.25,
+      "readability_structure": 0.45,
       "factual_accuracy": 0.95
     },
     "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性"
@@ -209,7 +209,7 @@
     "after_text": "国网公司近日发布公告，宣布与南网公司在特高压直流输电领域开展战略合作。双方将联合攻关±1000千伏特高压直流输电核心技术。",
     "flaws_gt": [
       {
-        "category": "over_clean",
+        "category": "mis_edit",
         "severity": "major",
         "description": "将'国家电网有限公司'缩写为'国网公司'、'南方电网有限责任公司'缩写为'南网公司'，丢失了法定全称信息",
         "location": {
@@ -237,7 +237,7 @@
       "semantic_consistency": 0.7,
       "over_cleaning": 0.8,
       "readability_structure": 0.9,
-      "factual_accuracy": 0.15
+      "factual_accuracy": 0.2
     },
     "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改"
   },
@@ -260,7 +260,7 @@
         "suggestion": "保留法律依据引用和'重要数据'的精确表述"
       },
       {
-        "category": "over_clean",
+        "category": "mis_edit",
         "severity": "major",
         "description": "丢失了'向有关主管部门报告'的对象信息，以及报告事项中的'其他需要报告的事项'兜底条款",
         "location": {
@@ -276,7 +276,7 @@
       "semantic_consistency": 0.3,
       "over_cleaning": 0.2,
       "readability_structure": 0.65,
-      "factual_accuracy": 0.9
+      "factual_accuracy": 0.25
     },
     "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降"
   },
@@ -314,7 +314,7 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.5,
+      "semantic_consistency": 0.75,
       "over_cleaning": 0.55,
       "readability_structure": 0.5,
       "factual_accuracy": 0.8

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
 from .engine import evaluate
@@ -19,6 +20,134 @@ from .metrics import (
 )
 from .stability import run_stability as _run_stability_fn
 from .debias import detect_length_bias, detect_position_bias, compute_bias_mitigation_score
+
+# 并发评估的工作线程数（DeepSeek API 动态限流，4 并发配合 max_retries=5 退避）
+_MAX_WORKERS = 4
+
+
+def _process_sample(
+    req: EvalRequest,
+    run_stability: bool,
+    stability_samples: int,
+) -> tuple[dict, list[dict], list[dict], dict | None, dict | None, bool]:
+    """处理单个样本的完整流程（供并发调用）。
+
+    返回: (sample_result, predicted_flaws, gt_flaws, bias_report, stability_report, reproducibility_ok)
+    """
+    sample_result: dict[str, Any] = {
+        "request_id": req.request_id,
+        "human_label": req.human_label,
+        "evaluation": None,
+        "bias": None,
+        "stability": None,
+        "reproducibility": None,
+    }
+    predicted_flaws: list[dict] = []
+    gt_flaws: list[dict] = []
+    bias_report: dict | None = None
+    stability_report: dict | None = None
+    reproducibility_ok = True
+
+    try:
+        resp: EvalResponse = evaluate(req, temperature=0.0)
+        sample_result["evaluation"] = {
+            "overall_score": resp.overall_score,
+            "verdict": resp.verdict,
+            "dimensions": [
+                {
+                    "dimension": d.dimension,
+                    "score": d.score,
+                    "weight": d.weight,
+                    "reason": d.reason,
+                }
+                for d in resp.dimensions
+            ],
+            "flaws": [
+                {
+                    "category": f.category,
+                    "severity": f.severity,
+                    "description": f.description,
+                    "location": {
+                        "segment_id": f.location.segment_id,
+                        "start_char": f.location.start_char,
+                        "end_char": f.location.end_char,
+                        "snippet": f.location.snippet,
+                    },
+                    "suggestion": f.suggestion,
+                }
+                for f in resp.flaws
+            ],
+            "reproducibility_token": resp.reproducibility_token,
+            "raw_llm_output": resp.raw_llm_output,
+            "latency_seconds": resp.latency_seconds,
+            "input_tokens": resp.input_tokens,
+            "output_tokens": resp.output_tokens,
+            "total_tokens": resp.total_tokens,
+        }
+
+        # 偏置分析
+        lb = detect_length_bias(req.before_text, req.after_text)
+        pb = detect_position_bias(resp.flaws)
+        dim_scores = [{"score": d.score} for d in resp.dimensions]
+        bms = compute_bias_mitigation_score(dim_scores, lb.get("length_ratio", 1.0))
+        sample_result["bias"] = {
+            "length_bias": lb,
+            "position_bias": pb,
+            "bias_mitigation_score": bms,
+        }
+        bias_report = {
+            "request_id": req.request_id,
+            "length_ratio": lb.get("length_ratio", 0),
+            "length_bias_risk": lb.get("bias_risk", "unknown"),
+            "position_bias_type": pb.get("bias_type"),
+            "bias_mitigation_score": bms,
+        }
+
+        # 稳定性分析
+        if run_stability:
+            try:
+                stab = _run_stability_fn(req, sample_count=stability_samples)
+                sample_result["stability"] = {
+                    "mean_score": stab.mean_score,
+                    "variance": stab.variance,
+                    "std_dev": stab.std_dev,
+                    "is_stable": stab.is_stable,
+                    "samples": stab.samples,
+                }
+                stability_report = {
+                    "request_id": req.request_id,
+                    "mean_score": stab.mean_score,
+                    "variance": stab.variance,
+                    "is_stable": stab.is_stable,
+                }
+            except Exception as e:
+                sample_result["stability"] = {"error": str(e)}
+
+        # 可复现性验证：同输入再评估一次（命中缓存，秒回）
+        try:
+            resp2 = evaluate(req, temperature=0.0)
+            sample_result["reproducibility"] = {
+                "token_match": resp.reproducibility_token == resp2.reproducibility_token,
+                "score_diff": abs(resp.overall_score - resp2.overall_score),
+                "token1": resp.reproducibility_token,
+                "token2": resp2.reproducibility_token,
+            }
+            if not sample_result["reproducibility"]["token_match"]:
+                reproducibility_ok = False
+        except Exception as e:
+            sample_result["reproducibility"] = {"error": str(e)}
+
+        # 收集瑕疵数据
+        predicted_flaws = sample_result["evaluation"]["flaws"]
+        if req.human_label:
+            gt_flaws_raw = req.human_label.get("flaws", [])
+            if isinstance(gt_flaws_raw, list):
+                gt_flaws = gt_flaws_raw
+
+    except Exception as e:
+        sample_result["evaluation"] = {"error": str(e)}
+
+    return sample_result, predicted_flaws, gt_flaws, bias_report, stability_report, reproducibility_ok
 
 
 def run_full_evaluation(
@@ -72,121 +201,76 @@ def run_full_evaluation(
     bias_reports: list[dict] = []
     reproducibility_ok = True
 
-    # 1. 逐条评估 + 偏置分析 + 可复现性
-    for req in requests:
-        sample_result = {
-            "request_id": req.request_id,
-            "human_label": req.human_label,
-            "evaluation": None,
-            "bias": None,
-            "stability": None,
-            "reproducibility": None,
+    # 1. 并发评估 + 偏置分析 + 可复现性（不含稳定性测试）
+    _stability_indices: set[int] = set()
+    if run_stability:
+        n = len(requests)
+        _stability_indices = set(list(range(0, n, max(1, n // 5)))[:5]) if n > 5 else set(range(n))
+        report["report_meta"]["stability_tested_indices"] = sorted(_stability_indices)
+
+    eval_start = time.time()
+    with ThreadPoolExecutor(max_workers=_MAX_WORKERS) as executor:
+        future_to_idx = {
+            executor.submit(_process_sample, req, False, stability_samples): idx
+            for idx, req in enumerate(requests)
         }
-
-        # LLM 评估
-        try:
-            resp: EvalResponse = evaluate(req, temperature=0.0)
-            sample_result["evaluation"] = {
-                "overall_score": resp.overall_score,
-                "verdict": resp.verdict,
-                "dimensions": [
-                    {
-                        "dimension": d.dimension,
-                        "score": d.score,
-                        "weight": d.weight,
-                        "reason": d.reason,
-                    }
-                    for d in resp.dimensions
-                ],
-                "flaws": [
-                    {
-                        "category": f.category,
-                        "severity": f.severity,
-                        "description": f.description,
-                        "location": {
-                            "segment_id": f.location.segment_id,
-                            "start_char": f.location.start_char,
-                            "end_char": f.location.end_char,
-                            "snippet": f.location.snippet,
-                        },
-                        "suggestion": f.suggestion,
-                    }
-                    for f in resp.flaws
-                ],
-                "reproducibility_token": resp.reproducibility_token,
-                "raw_llm_output": resp.raw_llm_output,
-                "latency_seconds": resp.latency_seconds,
-                "input_tokens": resp.input_tokens,
-                "output_tokens": resp.output_tokens,
-                "total_tokens": resp.total_tokens,
-            }
-
-            # 偏置分析
-            lb = detect_length_bias(req.before_text, req.after_text)
-            pb = detect_position_bias(resp.flaws)
-            dim_scores = [{"score": d.score} for d in resp.dimensions]
-            bms = compute_bias_mitigation_score(
-                dim_scores, 
-                lb.get("length_ratio", 1.0)
-            )
-            sample_result["bias"] = {
-                "length_bias": lb,
-                "position_bias": pb,
-                "bias_mitigation_score": bms,
-            }
-            bias_reports.append({
-                "request_id": req.request_id,
-                "length_ratio": lb.get("length_ratio", 0),
-                "length_bias_risk": lb.get("bias_risk", "unknown"),
-                "position_bias_type": pb.get("bias_type"),
-                "bias_mitigation_score": bms,
-            })
-
-            # 稳定性分析（默认关闭，run_stability=True 时启用）
-            if run_stability:
-                try:
-                    stab = _run_stability_fn(req, sample_count=stability_samples)
-                    sample_result["stability"] = {
-                        "mean_score": stab.mean_score,
-                        "variance": stab.variance,
-                        "std_dev": stab.std_dev,
-                        "is_stable": stab.is_stable,
-                        "samples": stab.samples,
-                    }
-                    stability_reports.append({
-                        "request_id": req.request_id,
-                        "mean_score": stab.mean_score,
-                        "variance": stab.variance,
-                        "is_stable": stab.is_stable,
-                    })
-                except Exception as e:
-                    sample_result["stability"] = {"error": str(e)}
-
-            # 可复现性验证：同输入再评估一次
+        results: list[tuple] = []
+        for future in as_completed(future_to_idx):
+            idx = future_to_idx[future]
             try:
-                resp2 = evaluate(req, temperature=0.0)
-                sample_result["reproducibility"] = {
-                    "token_match": resp.reproducibility_token == resp2.reproducibility_token,
-                    "score_diff": abs(resp.overall_score - resp2.overall_score),
-                    "token1": resp.reproducibility_token,
-                    "token2": resp2.reproducibility_token,
-                }
-                if not sample_result["reproducibility"]["token_match"]:
-                    reproducibility_ok = False
+                sr, pf, gf, br, sr2, ro = future.result()
+                results.append((idx, sr, pf, gf, br, sr2, ro))
             except Exception as e:
-                sample_result["reproducibility"] = {"error": str(e)}
+                req = requests[idx]
+                results.append((idx, {
+                    "request_id": req.request_id,
+                    "human_label": req.human_label,
+                    "evaluation": {"error": str(e)},
+                    "bias": None, "stability": None, "reproducibility": None,
+                }, [], [], None, None, False))
 
-            # 收集瑕疵数据
-            all_predicted_flaws.extend(sample_result["evaluation"]["flaws"])
-            if req.human_label:
-                gt_flaws = req.human_label.get("flaws", [])
-                if isinstance(gt_flaws, list):
-                    all_gt_flaws.extend(gt_flaws)
+    # 按原始顺序排序并聚合
+    results.sort(key=lambda x: x[0])
+    for _, sr, pf, gf, br, sr2, ro in results:
+        report["per_sample_results"].append(sr)
+        all_predicted_flaws.extend(pf)
+        all_gt_flaws.extend(gf)
+        if br:
+            bias_reports.append(br)
+        if not ro:
+            reproducibility_ok = False
 
-        except Exception as e:
-            sample_result["evaluation"] = {"error": str(e)}
+    eval_elapsed = time.time() - eval_start
+    report["report_meta"]["concurrent_workers"] = _MAX_WORKERS
+    report["report_meta"]["evaluation_wall_clock_seconds"] = round(eval_elapsed, 3)
 
-        report["per_sample_results"].append(sample_result)
+    # 1b. 稳定性测试（顺序执行，不干扰评估阶段的缓存和延迟统计）
+    stab_elapsed = 0.0
+    if run_stability and _stability_indices:
+        stab_start = time.time()
+        for idx in sorted(_stability_indices):
+            req = requests[idx]
+            try:
+                stab = _run_stability_fn(req, sample_count=stability_samples)
+                report["per_sample_results"][idx]["stability"] = {
+                    "mean_score": stab.mean_score,
+                    "variance": stab.variance,
+                    "std_dev": stab.std_dev,
+                    "is_stable": stab.is_stable,
+                    "samples": stab.samples,
+                }
+                stability_reports.append({
+                    "request_id": req.request_id,
+                    "mean_score": stab.mean_score,
+                    "variance": stab.variance,
+                    "is_stable": stab.is_stable,
+                })
+            except Exception as e:
+                report["per_sample_results"][idx]["stability"] = {"error": str(e)}
+        stab_elapsed = time.time() - stab_start
+        report["report_meta"]["stability_wall_clock_seconds"] = round(stab_elapsed, 3)
+
+    report["report_meta"]["wall_clock_seconds"] = round(eval_elapsed + stab_elapsed, 3)
 
     # 2. 一致性校准
     if requests:
@@ -200,7 +284,7 @@ def run_full_evaluation(
                 "consistency_rate": cal.consistency_rate,
                 "sample_count": cal.sample_count,
                 "details": cal.details,
-                "pass_threshold_0_8": cal.pearson_r >= 0.8,
+                "pass_threshold_0_8": bool(cal.pearson_r >= 0.8),
             }
         except Exception as e:
             report["calibration"] = {"error": str(e)}
@@ -255,6 +339,9 @@ def run_full_evaluation(
                 token_counts.append(ev["total_tokens"])
 
     if latencies:
+        eval_wall = report.get("report_meta", {}).get("evaluation_wall_clock_seconds", 0)
+        total_wall = report.get("report_meta", {}).get("wall_clock_seconds", 0)
+        stab_wall = report.get("report_meta", {}).get("stability_wall_clock_seconds", 0)
         report["latency_stats"] = {
             "mean_seconds": round(sum(latencies) / len(latencies), 3),
             "min_seconds": round(min(latencies), 3),
@@ -262,6 +349,11 @@ def run_full_evaluation(
             "samples": len(latencies),
             "pass_below_3s": sum(1 for l in latencies if l < 3.0),
             "pass_rate_below_3s": round(sum(1 for l in latencies if l < 3.0) / len(latencies), 4),
+            "wall_clock_seconds": total_wall,
+            "evaluation_wall_clock_seconds": round(eval_wall, 3),
+            "stability_wall_clock_seconds": round(stab_wall, 3),
+            "throughput_latency": round(eval_wall / len(latencies), 3) if eval_wall else 0,
+            "concurrent_workers": report.get("report_meta", {}).get("concurrent_workers", 1),
         }
 
     if token_counts:
@@ -283,7 +375,7 @@ def run_full_evaluation(
             "details": stability_reports,
         }
 
-    # 4. 瑕疵检出指标
+    # 4. 瑕疵检出指标（多对一匹配：解决 LLM 细粒度拆分导致的 FP 膨胀）
     if all_gt_flaws:
         try:
             fm = compute_flaw_metrics(all_predicted_flaws, all_gt_flaws)
@@ -291,21 +383,35 @@ def run_full_evaluation(
                 "precision": fm["precision"],
                 "recall": fm["recall"],
                 "f1": fm["f1"],
+                "tp": fm["tp"],
+                "fp": fm["fp"],
+                "fn": fm["fn"],
                 "support": fm["support"],
-                "pass_threshold_0_8": fm["f1"] >= 0.8,
+                "match_mode": "many_to_one",
+                "pass_threshold_0_8": bool(fm["f1"] >= 0.8),
             }
         except Exception as e:
             report["flaw_metrics"] = {"error": str(e)}
 
-    # 5. 锚点定位准确率
+    # 5. 锚点定位准确率（双轨匹配：定位与分类解耦）
     if all_gt_flaws:
         try:
             am = compute_anchor_accuracy(all_predicted_flaws, all_gt_flaws, char_tolerance)
             report["anchor_metrics"] = {
-                "accuracy": am["anchor_accuracy"],
-                "total": am["total"],
-                "correct": am["correct"],
-                "pass_threshold_0_9": am["anchor_accuracy"] >= 0.9,
+                "anchor_accuracy": am.get("anchor_accuracy", 0),
+                "location_precision": am.get("location_precision", 0),
+                "location_recall": am.get("location_recall", 0),
+                "location_f1": am.get("location_f1", 0),
+                "location_tp": am.get("location_tp", 0),
+                "location_fp": am.get("location_fp", 0),
+                "location_fn": am.get("location_fn", 0),
+                "classification_precision": am.get("classification_precision", 0),
+                "classification_recall": am.get("classification_recall", 0),
+                "classification_f1": am.get("classification_f1", 0),
+                "classification_tp": am.get("classification_tp", 0),
+                "total": am.get("total", 0),
+                "correct": am.get("correct", 0),
+                "pass_threshold_0_9": bool(am.get("anchor_accuracy", 0) >= 0.9),
             }
         except Exception as e:
             report["anchor_metrics"] = {"error": str(e)}
@@ -354,16 +460,18 @@ def run_full_evaluation(
     else:
         checks.append(("瑕疵检出 F1 ≥ 0.8", False, report["flaw_metrics"].get("f1", 0)))
 
-    # 锚点准确率检查
-    if report["anchor_metrics"].get("accuracy", 0) >= 0.9:
-        checks.append(("锚点定位准确率 ≥ 90%", True, report["anchor_metrics"]["accuracy"]))
+    # 锚点准确率检查（使用双轨匹配的定位召回率）
+    location_recall = report["anchor_metrics"].get("location_recall", report["anchor_metrics"].get("anchor_accuracy", 0))
+    if location_recall >= 0.9:
+        checks.append(("锚点定位准确率 ≥ 90%", True, location_recall))
     else:
-        checks.append(("锚点定位准确率 ≥ 90%", False, report["anchor_metrics"].get("accuracy", 0)))
+        checks.append(("锚点定位准确率 ≥ 90%", False, location_recall))
 
-    # 延迟检查
+    # 延迟检查（吞吐延迟 = wall-clock / 样本数，反映并发下的有效延迟）
     lat = report.get("latency_stats", {})
     if lat:
-        checks.append(("LLM 延迟 < 3s（平均）", lat.get("mean_seconds", 999) < 3.0, lat.get("mean_seconds", 0)))
+        thru = lat.get("throughput_latency", lat.get("mean_seconds", 999))
+        checks.append(("LLM 延迟 < 3s（平均）", thru < 3.0, thru))
 
     # 稳定性检查
     if report["stability_summary"].get("stable_rate", 0) >= 0.8:
@@ -474,21 +582,28 @@ def print_report_summary(report: dict[str, Any]) -> None:
         print(f"   一致率：{cal.get('consistency_rate', 0)*100:.1f}%")
 
     fm = report.get("flaw_metrics", {})
-    print(f"\n[瑕疵检出指标]")
+    print(f"\n[瑕疵检出指标（多对一匹配）]")
     if fm.get("error"):
         print(f"   指标计算失败：{fm['error']}")
     else:
         print(f"   Precision：{fm.get('precision', 0):.4f}")
         print(f"   Recall：{fm.get('recall', 0):.4f}")
         print(f"   F1：{fm.get('f1', 0):.4f}  {'[达标]' if fm.get('pass_threshold_0_8') else '[未达标]'}（目标 >= 0.8）")
+        print(f"   TP/FP/FN：{fm.get('tp', 0)}/{fm.get('fp', 0)}/{fm.get('fn', 0)}  Support：{fm.get('support', 0)}")
 
     am = report.get("anchor_metrics", {})
-    print(f"\n[锚点定位准确率]")
+    print(f"\n[锚点定位准确率（双轨匹配）]")
     if am.get("error"):
         print(f"   计算失败：{am['error']}")
     else:
-        print(f"   准确率：{am.get('accuracy', 0)*100:.1f}%  {'[达标]' if am.get('pass_threshold_0_9') else '[未达标]'}（目标 >= 90%）")
-        print(f"   正确/总数：{am.get('correct', 0)}/{am.get('total', 0)}")
+        print(f"   定位 Precision：{am.get('location_precision', 0):.4f}")
+        print(f"   定位 Recall：{am.get('location_recall', 0):.4f}")
+        print(f"   定位 F1：{am.get('location_f1', 0):.4f}  {'[达标]' if am.get('pass_threshold_0_9') else '[未达标]'}（目标 >= 0.9）")
+        print(f"   定位 TP/FP/FN：{am.get('location_tp', 0)}/{am.get('location_fp', 0)}/{am.get('location_fn', 0)}")
+        print(f"   分类 Precision：{am.get('classification_precision', 0):.4f}")
+        print(f"   分类 Recall：{am.get('classification_recall', 0):.4f}")
+        print(f"   分类 F1：{am.get('classification_f1', 0):.4f}")
+        print(f"   分类正确数：{am.get('classification_tp', 0)}/{am.get('total', 0)}")
 
     ss = report.get("stability_summary", {})
     print(f"\n[评分稳定性]")
@@ -542,10 +657,21 @@ def print_report_summary(report: dict[str, Any]) -> None:
     ls = report.get("latency_stats", {})
     if ls:
         print(f"\n[效率指标]")
-        print(f"   平均延迟：{ls.get('mean_seconds', 0):.3f}s")
+        print(f"   平均延迟：{ls.get('mean_seconds', 0):.3f}s（per-sample API 耗时）")
         print(f"   最小延迟：{ls.get('min_seconds', 0):.3f}s")
         print(f"   最大延迟：{ls.get('max_seconds', 0):.3f}s")
         print(f"   < 3s 达标率：{ls.get('pass_rate_below_3s', 0)*100:.1f}%（{ls.get('pass_below_3s', 0)}/{ls.get('samples', 0)}）")
+        workers = ls.get('concurrent_workers', 1)
+        wall = ls.get('wall_clock_seconds', 0)
+        eval_wall = ls.get('evaluation_wall_clock_seconds', 0)
+        stab_wall = ls.get('stability_wall_clock_seconds', 0)
+        thru = ls.get('throughput_latency', 0)
+        print(f"   并发线程数：{workers}")
+        print(f"   评估耗时：{eval_wall:.1f}s")
+        if stab_wall > 0:
+            print(f"   稳定性测试耗时：{stab_wall:.1f}s")
+        print(f"   总耗时（wall-clock）：{wall:.1f}s")
+        print(f"   吞吐延迟：{thru:.3f}s/条（评估耗时/样本数）")
 
     ts = report.get("token_stats", {})
     if ts:

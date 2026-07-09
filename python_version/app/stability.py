@@ -15,8 +15,8 @@ def run_stability(
     推理层面的不确定性（如浮点精度、批处理顺序等）。通过多次采样
     可以量化这种服务端波动，确保评分结果的可靠性。
 
-    执行期间会临时关闭 LLM 响应缓存，确保每次都是真实调用 API。
-    测试完成后自动恢复原有缓存配置。
+    使用 use_cache=False 创建独立 LLM 实例绕过全局缓存，确保每次
+    都是真实调用 API。不再操作全局缓存，避免影响并发 worker。
 
     Args:
         request: 评估请求（sample_count 控制采样次数）
@@ -25,23 +25,16 @@ def run_stability(
     Returns:
         StabilityReport: 包含各次采样得分、均值、方差、标准差
     """
-    from .chain import disable_cache, enable_cache
+    samples: list[dict[str, float]] = []
+    scores: list[float] = []
 
-    # 临时关闭 LLM 响应缓存，确保每次真实调用 API
-    disable_cache()
-    try:
-        samples: list[dict[str, float]] = []
-        scores: list[float] = []
-
-        for i in range(sample_count):
-            resp = evaluate(request, temperature=0.0)  # 固定低温度保证可复现
-            sample = {d.dimension: d.score for d in resp.dimensions}
-            sample["overall"] = resp.overall_score
-            samples.append(sample)
-            scores.append(resp.overall_score)
-    finally:
-        # 无论成功失败，恢复内存缓存
-        enable_cache("memory")
+    for i in range(sample_count):
+        # use_cache=False: 创建独立 LLM 实例绕过缓存，不影响全局
+        resp = evaluate(request, temperature=0.0, use_cache=False)
+        sample = {d.dimension: d.score for d in resp.dimensions}
+        sample["overall"] = resp.overall_score
+        samples.append(sample)
+        scores.append(resp.overall_score)
 
     n = len(scores)
     mean_score = sum(scores) / n if n > 0 else 0.0

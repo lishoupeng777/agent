@@ -97,7 +97,7 @@ def main():
         print("运行综合评估报告（课题12验收标准）...")
         print("=" * 60)
         
-        report = run_full_evaluation(requests)
+        report = run_full_evaluation(requests, run_stability=True, stability_samples=3)
         print_report_summary(report)
         
         # 导出 JSON 报告

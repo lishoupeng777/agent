@@ -131,14 +131,35 @@ enable_cache("memory")
 _llm_instance: Optional[ChatOpenAI] = None
 
 
-def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
+def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: bool = True) -> ChatOpenAI:
     """创建 LLM 实例（延迟读取环境变量，支持限流）
 
     Args:
         temperature: 温度参数
         json_mode: 是否启用 JSON mode（强制输出合法 JSON）
+        use_cache: 是否使用全局缓存（False 时创建独立实例绕过缓存，不影响其他 worker）
     """
     global _llm_instance
+    # 不走缓存的请求创建独立实例，不污染全局单例
+    if not use_cache:
+        kwargs: dict[str, Any] = {}
+        if json_mode:
+            kwargs["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        if _rate_limiter is not None:
+            kwargs["rate_limiter"] = _rate_limiter
+        nocache_llm = ChatOpenAI(
+            model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
+            temperature=temperature,
+            top_p=1.0,
+            max_tokens=2048,
+            max_retries=5,
+            base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
+            api_key=os.getenv("DEEPSEEK_API_KEY", ""),
+            **kwargs,
+        )
+        nocache_llm.cache = False  # per-instance 禁用缓存，不影响全局
+        return nocache_llm
+
     if _llm_instance is not None and _llm_instance.temperature == temperature:
         return _llm_instance
     kwargs: dict[str, Any] = {}
@@ -151,6 +172,7 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False) -> ChatOpenAI:
         temperature=temperature,
         top_p=1.0,           # 固定 top_p，确保确定性输出
         max_tokens=2048,
+        max_retries=5,       # 429/503 自动指数退避重试
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         **kwargs,
@@ -207,6 +229,8 @@ class LLMAnchorSpan(BaseModel):
     """LLM 输出的锚点信息"""
     model_config = {"coerce_numbers_to_str": True}  # LLM 返回 segment_id=1 (int) 时自动转为 "1"
     segment_id: str = ""
+    before_anchor: str | None = ""   # Prompt 要求 LLM 输出 [Before N] 格式
+    after_anchor: str | None = ""    # Prompt 要求 LLM 输出 [After N] 格式
     start_char: int = 0
     end_char: int = 0
     snippet: str = ""
@@ -1235,7 +1259,7 @@ def compute_risk_level(overall_score: float, confidence: float) -> str:
 # 7. 主评估函数（LCEL Chain 流程）
 # ============================================================
 
-def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
+def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bool = True) -> EvalResponse:
     """单次评估（不含临界区多次采样），供内部调用。"""
     callback = EvalCallbackHandler()
 
@@ -1270,7 +1294,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
     )
 
     # Step 2: 调用 LLM（带 callback，启用 JSON mode，空返回自动重试 1 次）
-    llm = create_llm(temperature=temperature, json_mode=True)
+    llm = create_llm(temperature=temperature, json_mode=True, use_cache=use_cache)
     response = llm.invoke(messages, config={"callbacks": [callback]})
     raw_output = str(response.content) if hasattr(response, "content") else str(response)
 
@@ -1443,15 +1467,16 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0) -> EvalRespon
     )
 
 
-def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
+def evaluate(request: EvalRequest, temperature: float = 0.0, use_cache: bool = True) -> EvalResponse:
     """
     LCEL 风格的评估流程（含临界区多次采样）：
       单次评估 → 判定 → 临界区自动多次采样 → 最终结果
 
-    保留与原 evaluate() 相同的接口签名，确保向后兼容。
+    Args:
+        use_cache: False 时绕过全局缓存（用于稳定性测试），不影响其他并发 worker。
     """
     # 单次评估
-    resp = _evaluate_once(request, temperature)
+    resp = _evaluate_once(request, temperature, use_cache=use_cache)
 
     # 临界区自动多次采样（分数在 0.75~0.85 时，再跑 2 次取均值）
     # 防止边界值波动导致 pass/review 跳变
@@ -1459,7 +1484,7 @@ def evaluate(request: EvalRequest, temperature: float = 0.0) -> EvalResponse:
         extra_scores = [resp.overall_score]
         for _ in range(2):
             try:
-                resp2 = _evaluate_once(request, temperature)
+                resp2 = _evaluate_once(request, temperature, use_cache=use_cache)
                 extra_scores.append(resp2.overall_score)
             except Exception:
                 pass

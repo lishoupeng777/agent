@@ -1,10 +1,21 @@
 {
   "report_meta": {
-    "generated_at": "2026-07-03 10:08:20",
+    "generated_at": "2026-07-09 16:11:42",
     "total_samples": 25,
-    "stability_samples": 0,
+    "stability_samples": 3,
     "char_tolerance": 10,
-    "run_stability": false
+    "run_stability": true,
+    "stability_tested_indices": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ],
+    "concurrent_workers": 4,
+    "evaluation_wall_clock_seconds": 77.821,
+    "stability_wall_clock_seconds": 84.513,
+    "wall_clock_seconds": 162.334
   },
   "per_sample_results": [
     {
@@ -29,34 +40,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本与原文语义完全一致，核心信息完整，无扭曲或泛化。"
+            "reason": "治理后文本完整保留了原文的全部信息，无任何信息删除、泛化或遗漏。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数字、日期、人名、机构名等关键事实均未变更。"
+            "reason": "治理后文本未篡改任何事实，所有数值、日期、名称均与原文一致。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑关系、段落结构完全保持。"
+            "reason": "治理后文本与原文结构完全相同，段落、列表及逻辑关系均未改变。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，仅修正了多余空格，可读性更佳。"
+            "reason": "治理后文本通顺流畅，标点规范，且去除了原文中的多余空格，可读性略有提升。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "f69b2dbfb5bfa2e3",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本与原文语义完全一致，核心信息完整，无扭曲或泛化。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数字、日期、人名、机构名等关键事实均未变更。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系、段落结构完全保持。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，仅修正了多余空格，可读性更佳。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 4.789,
-        "input_tokens": 2149,
-        "output_tokens": 432,
-        "total_tokens": 2581
+        "reproducibility_token": "b0ce6e337f26fb8d",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的全部信息，无任何信息删除、泛化或遗漏。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有数值、日期、名称均与原文一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本与原文结构完全相同，段落、列表及逻辑关系均未改变。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本通顺流畅，标点规范，且去除了原文中的多余空格，可读性略有提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 4.3,
+        "input_tokens": 2551,
+        "output_tokens": 451,
+        "total_tokens": 3002
       },
       "bias": {
         "length_bias": {
@@ -77,12 +88,40 @@
         },
         "bias_mitigation_score": 0.8
       },
-      "stability": null,
+      "stability": {
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "std_dev": 0.0,
+        "is_stable": true,
+        "samples": [
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          }
+        ]
+      },
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "f69b2dbfb5bfa2e3",
-        "token2": "f69b2dbfb5bfa2e3"
+        "token1": "b0ce6e337f26fb8d",
+        "token2": "b0ce6e337f26fb8d"
       }
     },
     {
@@ -113,54 +152,54 @@
         "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺"
       },
       "evaluation": {
-        "overall_score": 0.1527,
+        "overall_score": 0.325,
         "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.1,
+            "score": 0.0,
             "weight": 0.35,
-            "reason": "治理后仅保留模糊表述'本次产品进行了升级'，完全丢失了原文的三个核心方面（界面改版、智能推荐、性能优化），核心信息严重缺失。"
+            "reason": "治理后完全删除了原文的三个具体升级方面（界面改版、智能推荐、性能提升50%），仅保留概括性描述，信息严重丢失。"
           },
           {
             "dimension": "factual",
-            "score": 0.1,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "原文中的具体事实（卡片式布局、50%速度提升等）被全部删除，虽然未篡改，但关键事实的完整丢失导致事实准确性极低。"
+            "reason": "治理后文本没有篡改任何事实，未引入错误信息，仅删除内容。"
           },
           {
             "dimension": "structure",
-            "score": 0.1,
+            "score": 0.0,
             "weight": 0.15,
-            "reason": "原文为清晰的总分结构（三方面并列），治理后压缩为单一无结构句子，逻辑关系完全丧失。"
+            "reason": "原文采用总分结构列出三个方面，治理后变为单句，结构完全丧失。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后句子通顺，语法正确，无标点或排版问题。"
+            "reason": "治理后语句通顺，标点正确，可读性良好。"
           }
         ],
         "flaws": [
           {
             "category": "over_clean",
             "severity": "critical",
-            "description": "治理后删除了所有具体升级内容（界面改版、智能推荐、性能优化），仅保留模糊表述'本次产品进行了升级'",
+            "description": "原文三个方面的具体内容（界面改版、智能推荐、性能提升50%）被全部删除，仅保留模糊概括，属于严重信息丢失。",
             "location": {
-              "segment_id": "2",
+              "segment_id": "[After 2]",
               "start_char": 0,
-              "end_char": 9,
-              "snippet": "本次产品进行了升级"
+              "end_char": 0,
+              "snippet": "本次产品升级主要包括三个方面"
             },
-            "suggestion": "保留原文的核心三个方面或至少概括性保留具体升级内容，避免过度压缩。"
+            "suggestion": "保留或概括三个方面的核心信息，避免关键内容完全丢失。"
           }
         ],
-        "reproducibility_token": "88e96fc1bba8e8de",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.1,\n      \"weight\": 0.35,\n      \"reason\": \"治理后仅保留模糊表述'本次产品进行了升级'，完全丢失了原文的三个核心方面（界面改版、智能推荐、性能优化），核心信息严重缺失。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.1,\n      \"weight\": 0.35,\n      \"reason\": \"原文中的具体事实（卡片式布局、50%速度提升等）被全部删除，虽然未篡改，但关键事实的完整丢失导致事实准确性极低。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.1,\n      \"weight\": 0.15,\n      \"reason\": \"原文为清晰的总分结构（三方面并列），治理后压缩为单一无结构句子，逻辑关系完全丧失。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子通顺，语法正确，无标点或排版问题。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后删除了所有具体升级内容（界面改版、智能推荐、性能优化），仅保留模糊表述'本次产品进行了升级'\",\n      \"location\": {\n        \"segment_id\": \"2\",\n        \"start_char\": 0,\n        \"end_char\": 9,\n        \"snippet\": \"本次产品进行了升级\"\n      },\n      \"suggestion\": \"保留原文的核心三个方面或至少概括性保留具体升级内容，避免过度压缩。\"\n    }\n  ]\n}",
-        "latency_seconds": 11.861,
-        "input_tokens": 2079,
-        "output_tokens": 979,
-        "total_tokens": 3058
+        "reproducibility_token": "997d0ee9a6d19bce",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后完全删除了原文的三个具体升级方面（界面改版、智能推荐、性能提升50%），仅保留概括性描述，信息严重丢失。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本没有篡改任何事实，未引入错误信息，仅删除内容。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.0,\n      \"weight\": 0.15,\n      \"reason\": \"原文采用总分结构列出三个方面，治理后变为单句，结构完全丧失。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后语句通顺，标点正确，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"原文三个方面的具体内容（界面改版、智能推荐、性能提升50%）被全部删除，仅保留模糊概括，属于严重信息丢失。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 2]\",\n        \"snippet\": \"本次产品升级主要包括三个方面\"\n      },\n      \"suggestion\": \"保留或概括三个方面的核心信息，避免关键内容完全丢失。\"\n    }\n  ]\n}",
+        "latency_seconds": 9.404,
+        "input_tokens": 2481,
+        "output_tokens": 969,
+        "total_tokens": 3450
       },
       "bias": {
         "length_bias": {
@@ -180,20 +219,20 @@
           "back_count": 1,
           "total": 1
         },
-        "bias_mitigation_score": 0.75
+        "bias_mitigation_score": 0.5
       },
       "stability": null,
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "88e96fc1bba8e8de",
-        "token2": "88e96fc1bba8e8de"
+        "token1": "997d0ee9a6d19bce",
+        "token2": "997d0ee9a6d19bce"
       }
     },
     {
       "request_id": "sample_003",
       "human_label": {
-        "overall_score": 0.655,
+        "overall_score": 0.795,
         "label": "数值误改",
         "flaws": [
           {
@@ -222,7 +261,7 @@
           }
         ],
         "dimension_scores": {
-          "semantic_consistency": 0.55,
+          "semantic_consistency": 0.9,
           "over_cleaning": 0.9,
           "readability_structure": 0.95,
           "factual_accuracy": 0.15
@@ -230,78 +269,90 @@
         "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低"
       },
       "evaluation": {
-        "overall_score": 0.369,
-        "verdict": "fail",
+        "overall_score": 0.612,
+        "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.6,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本在整体语义上保留了原意，核心信息（营收、净利润、研发投入）及增长趋势未变，但具体数值发生了变化（营收125.8→128.5，增速23.5%→23.6%，研发占比8.7%→8.8%），导致语义不完全一致，属于中度保留。"
+            "reason": "治理后文本完整保留了原文的所有信息项，没有删除、泛化或遗漏任何信息。数值变更属于事实篡改，不影响语义保真度。"
           },
           {
             "dimension": "factual",
-            "score": 0.3,
+            "score": 0.2,
             "weight": 0.35,
-            "reason": "关键财务数据被篡改：营业收入从125.8亿元变为128.5亿元（偏差2.7亿元），同比增长率从23.5%变为23.6%，研发投入占比从8.7%变为8.8%。这些数值变化涉及核心财务指标，属于严重事实错误，即使幅度较小也是不可接受的。净利润及增长率未变。"
+            "reason": "治理后文本对原文多个数据进行了篡改：营业收入由125.8亿元改为128.5亿元，营业收入同比增长由23.5%改为23.6%，净利润同比增长由31.2%改为31.3%，研发投入占比由8.7%改为8.8%。这些改动全部属于事实错误，造成较大范围的信息失真，故得分极低。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理前后文本结构完全相同，均为单一叙述段落，信息顺序、句式结构一致，逻辑关系未受任何影响。"
+            "reason": "治理前后文本的段落结构、句子顺序、标点符号完全一致，逻辑关系未受任何影响。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后文本通顺流畅，标点符号使用正确，排版规范，与治理前无异。"
+            "reason": "治理后文本语句通顺，排版规范，标点正确，可读性与原文无异。"
           }
         ],
         "flaws": [
           {
             "category": "mis_edit",
-            "severity": "critical",
-            "description": "营业收入数值从125.8亿元篡改为128.5亿元，造成核心财务数据错误。",
+            "severity": "major",
+            "description": "营业收入数值被篡改：125.8亿元改为128.5亿元",
             "location": {
-              "segment_id": "1",
-              "start_char": 20,
-              "end_char": 24,
-              "snippet": "实现营业收入128.5亿元"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 74,
+              "snippet": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。"
             },
-            "suggestion": "恢复为125.8亿元"
+            "suggestion": "恢复为原文的125.8亿元"
           },
           {
             "category": "mis_edit",
             "severity": "minor",
-            "description": "同比增长率从23.5%篡改为23.6%，偏差0.1个百分点。",
+            "description": "营业收入同比增长率被篡改：23.5%改为23.6%",
             "location": {
-              "segment_id": "1",
-              "start_char": 32,
-              "end_char": 36,
-              "snippet": "同比增长23.6%"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 74,
+              "snippet": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。"
             },
-            "suggestion": "恢复为23.5%"
+            "suggestion": "恢复为原文的23.5%"
           },
           {
             "category": "mis_edit",
             "severity": "minor",
-            "description": "研发投入占营收比例从8.7%篡改为8.8%，偏差0.1个百分点。",
+            "description": "净利润同比增长率被篡改：31.2%改为31.3%",
             "location": {
-              "segment_id": "1",
-              "start_char": 69,
-              "end_char": 72,
-              "snippet": "比例达到8.8%"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 74,
+              "snippet": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。"
             },
-            "suggestion": "恢复为8.7%"
+            "suggestion": "恢复为原文的31.2%"
+          },
+          {
+            "category": "mis_edit",
+            "severity": "minor",
+            "description": "研发投入占营收比例被篡改：8.7%改为8.8%",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 74,
+              "snippet": "截至2023年第三季度，公司实现营业收入128.5亿元，同比增长23.6%；净利润18.6亿元，同比增长31.3%。研发投入占营收比例达到8.8%。"
+            },
+            "suggestion": "恢复为原文的8.7%"
           }
         ],
-        "reproducibility_token": "09d989c10ad0858c",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.6,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本在整体语义上保留了原意，核心信息（营收、净利润、研发投入）及增长趋势未变，但具体数值发生了变化（营收125.8→128.5，增速23.5%→23.6%，研发占比8.7%→8.8%），导致语义不完全一致，属于中度保留。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"关键财务数据被篡改：营业收入从125.8亿元变为128.5亿元（偏差2.7亿元），同比增长率从23.5%变为23.6%，研发投入占比从8.7%变为8.8%。这些数值变化涉及核心财务指标，属于严重事实错误，即使幅度较小也是不可接受的。净利润及增长率未变。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构完全相同，均为单一叙述段落，信息顺序、句式结构一致，逻辑关系未受任何影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本通顺流畅，标点符号使用正确，排版规范，与治理前无异。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"营业收入数值从125.8亿元篡改为128.5亿元，造成核心财务数据错误。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 20,\n        \"end_char\": 24,\n        \"snippet\": \"实现营业收入128.5亿元\"\n      },\n      \"suggestion\": \"恢复为125.8亿元\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"同比增长率从23.5%篡改为23.6%，偏差0.1个百分点。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 32,\n        \"end_char\": 36,\n        \"snippet\": \"同比增长23.6%\"\n      },\n      \"suggestion\": \"恢复为23.5%\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"研发投入占营收比例从8.7%篡改为8.8%，偏差0.1个百分点。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 69,\n        \"end_char\": 72,\n        \"snippet\": \"比例达到8.8%\"\n      },\n      \"suggestion\": \"恢复为8.7%\"\n    }\n  ]\n}",
-        "latency_seconds": 27.644,
-        "input_tokens": 2070,
-        "output_tokens": 2644,
-        "total_tokens": 4714
+        "reproducibility_token": "f26aedf4963a441a",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息项，没有删除、泛化或遗漏任何信息。数值变更属于事实篡改，不影响语义保真度。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 0.2,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本对原文多个数据进行了篡改：营业收入由125.8亿元改为128.5亿元，营业收入同比增长由23.5%改为23.6%，净利润同比增长由31.2%改为31.3%，研发投入占比由8.7%改为8.8%。这些改动全部属于事实错误，造成较大范围的信息失真，故得分极低。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本的段落结构、句子顺序、标点符号完全一致，逻辑关系未受任何影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本语句通顺，排版规范，标点正确，可读性与原文无异。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"营业收入数值被篡改：125.8亿元改为128.5亿元\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"营业收入125.8亿元\"\n      },\n      \"suggestion\": \"恢复为原文的125.8亿元\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"营业收入同比增长率被篡改：23.5%改为23.6%\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"同比增长23.5%\"\n      },\n      \"suggestion\": \"恢复为原文的23.5%\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"净利润同比增长率被篡改：31.2%改为31.3%\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"净利润同比增长31.2%\"\n      },\n      \"suggestion\": \"恢复为原文的31.2%\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"研发投入占营收比例被篡改：8.7%改为8.8%\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"研发投入占营收比例8.7%\"\n      },\n      \"suggestion\": \"恢复为原文的8.7%\"\n    }\n  ]\n}",
+        "latency_seconds": 26.597,
+        "input_tokens": 2472,
+        "output_tokens": 3064,
+        "total_tokens": 5536
       },
       "bias": {
         "length_bias": {
@@ -314,12 +365,12 @@
           "mitigation": null
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前2/后1），位置偏置风险低",
-          "front_count": 2,
-          "back_count": 1,
-          "total": 3
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（4/4），可能存在\"后严先松\"偏置",
+          "front_count": 0,
+          "back_count": 4,
+          "total": 4
         },
         "bias_mitigation_score": 1.0
       },
@@ -327,8 +378,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "09d989c10ad0858c",
-        "token2": "09d989c10ad0858c"
+        "token1": "f26aedf4963a441a",
+        "token2": "f26aedf4963a441a"
       }
     },
     {
@@ -353,34 +404,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本完全保留了原意，核心信息（订单号、发货状态、送达时间、客服电话）无任何丢失或扭曲。"
+            "reason": "治理后文本完整保留了原文的所有信息，没有删除、泛化或遗漏任何内容。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有关键事实（订单号、日期、时间点、电话号码）均准确无误，未发生任何数值、日期或技术参数的更改。"
+            "reason": "治理后文本未篡改原文的任何事实，包括订单号、日期、电话号码等均保持不变。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理前后均为单句段落，信息顺序完全一致，逻辑关系（先问候、再通知、后联系）保持不变。"
+            "reason": "治理后文本保持了原文的段落结构、句子顺序和逻辑关系，仅调整了空格。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "去除了多余空格，使语句更紧凑、标点符号使用正确，整体可读性略有提升。"
+            "reason": "治理后文本去掉了多余的空格，语句通顺，排版更规范，可读性略有提升。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "54f3290d4f83d0a3",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完全保留了原意，核心信息（订单号、发货状态、送达时间、客服电话）无任何丢失或扭曲。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有关键事实（订单号、日期、时间点、电话号码）均准确无误，未发生任何数值、日期或技术参数的更改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后均为单句段落，信息顺序完全一致，逻辑关系（先问候、再通知、后联系）保持不变。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"去除了多余空格，使语句更紧凑、标点符号使用正确，整体可读性略有提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 5.083,
-        "input_tokens": 2059,
-        "output_tokens": 471,
-        "total_tokens": 2530
+        "reproducibility_token": "194ada725184e82f",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息，没有删除、泛化或遗漏任何内容。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改原文的任何事实，包括订单号、日期、电话号码等均保持不变。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本保持了原文的段落结构、句子顺序和逻辑关系，仅调整了空格。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本去掉了多余的空格，语句通顺，排版更规范，可读性略有提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 5.087,
+        "input_tokens": 2461,
+        "output_tokens": 567,
+        "total_tokens": 3028
       },
       "bias": {
         "length_bias": {
@@ -405,14 +456,14 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "54f3290d4f83d0a3",
-        "token2": "54f3290d4f83d0a3"
+        "token1": "194ada725184e82f",
+        "token2": "194ada725184e82f"
       }
     },
     {
       "request_id": "sample_005",
       "human_label": {
-        "overall_score": 0.81,
+        "overall_score": 0.78,
         "label": "表格结构破坏",
         "flaws": [
           {
@@ -431,60 +482,60 @@
         "dimension_scores": {
           "semantic_consistency": 0.9,
           "over_cleaning": 0.8,
-          "readability_structure": 0.45,
+          "readability_structure": 0.25,
           "factual_accuracy": 0.95
         },
         "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性"
       },
       "evaluation": {
-        "overall_score": 0.6712,
+        "overall_score": 0.6581,
         "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 1.0,
+            "score": 0.95,
             "weight": 0.35,
-            "reason": "治理后保留了所有产品、价格、销量及总销售额信息，核心意思完整，表达一致。"
+            "reason": "治理后文本完整保留了所有产品数据（价格、销量）和总计销售额，仅省略了表格表头（产品、价格、销量列名），但核心信息未丢失，语义保真度高。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数值（99元、1200件、199元、850件、299元、620件、47.5万元）完全准确，无篡改。"
+            "reason": "所有事实数据（产品名、价格、销量、总计销售额）均与原文一致，无篡改。"
           },
           {
             "dimension": "structure",
             "score": 0.3,
             "weight": 0.15,
-            "reason": "原文为表格结构，治理后转为纯文本，失去了表格的对比性和结构化信息，根据标准结构评分≤0.3。"
+            "reason": "原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式丧失，根据规则，得分不超过0.3。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后句子通顺，标点正确，排版规范，易于阅读。"
+            "reason": "治理后文本为自然流畅的句子，标点正确，排版规范，可读性良好。"
           }
         ],
         "flaws": [
           {
             "category": "structure",
             "severity": "critical",
-            "description": "表格结构被转为纯文本，失去了表格的对比性和结构化信息。",
+            "description": "Markdown表格被转为纯文本，表格结构丢失，影响信息的对比性和结构化呈现。",
             "location": {
-              "segment_id": "After_7",
+              "segment_id": "[After 7]",
               "start_char": 0,
-              "end_char": 49,
-              "snippet": "| A产品 | 99元 | 1200 |"
+              "end_char": 0,
+              "snippet": "| 产品 | 价格 | 销量 |"
             },
-            "suggestion": "建议保留表格结构或使用清晰的列表/对比格式。"
+            "suggestion": "可保留表格形式或至少用结构化列表维持信息的对比性。"
           }
         ],
-        "reproducibility_token": "a1dc556220b49d0f",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后保留了所有产品、价格、销量及总销售额信息，核心意思完整，表达一致。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数值（99元、1200件、199元、850件、299元、620件、47.5万元）完全准确，无篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文为表格结构，治理后转为纯文本，失去了表格的对比性和结构化信息，根据标准结构评分≤0.3。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子通顺，标点正确，排版规范，易于阅读。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"表格结构被转为纯文本，失去了表格的对比性和结构化信息。\",\n      \"location\": {\n        \"segment_id\": \"After_7\",\n        \"start_char\": 0,\n        \"end_char\": 49,\n        \"snippet\": \"| A产品 | 99元 | 1200 |\"\n      },\n      \"suggestion\": \"建议保留表格结构或使用清晰的列表/对比格式。\"\n    }\n  ]\n}",
-        "latency_seconds": 14.79,
-        "input_tokens": 2310,
-        "output_tokens": 1259,
-        "total_tokens": 3569
+        "reproducibility_token": "0457d79162df07d3",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.95,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了所有产品数据（价格、销量）和总计销售额，仅省略了表格表头（产品、价格、销量列名），但核心信息未丢失，语义保真度高。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有事实数据（产品名、价格、销量、总计销售额）均与原文一致，无篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式丧失，根据规则，得分不超过0.3。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本为自然流畅的句子，标点正确，排版规范，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"Markdown表格被转为纯文本，表格结构丢失，影响信息的对比性和结构化呈现。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]-[Before 5]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"| 产品 | 价格 | 销量 |\"\n      },\n      \"suggestion\": \"可保留表格形式或至少用结构化列表维持信息的对比性。\"\n    }\n  ]\n}",
+        "latency_seconds": 21.961,
+        "input_tokens": 2712,
+        "output_tokens": 2017,
+        "total_tokens": 4729
       },
       "bias": {
         "length_bias": {
@@ -510,8 +561,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "a1dc556220b49d0f",
-        "token2": "a1dc556220b49d0f"
+        "token1": "0457d79162df07d3",
+        "token2": "0457d79162df07d3"
       }
     },
     {
@@ -536,34 +587,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理前后文本完全一致，语义完全保留。"
+            "reason": "治理前后文本完全相同，信息完整保留，无遗漏或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "无任何事实变更，所有数字、术语、定义均准确。"
+            "reason": "治理前后文本一致，无事实篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "文本结构完全一致，逻辑关系、段落划分均未改变。"
+            "reason": "治理前后结构一致，逻辑关系、段落划分均未改变。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，标点符号、排版均无误。"
+            "reason": "文本通顺，排版规范，无格式问题。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "c5c7cc10a6549430",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理前后文本完全一致，语义完全保留。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"无任何事实变更，所有数字、术语、定义均准确。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"文本结构完全一致，逻辑关系、段落划分均未改变。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，标点符号、排版均无误。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 2.524,
-        "input_tokens": 2055,
-        "output_tokens": 260,
-        "total_tokens": 2315
+        "reproducibility_token": "c36cd8802f6f520f",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理前后文本完全相同，信息完整保留，无遗漏或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理前后文本一致，无事实篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后结构一致，逻辑关系、段落划分均未改变。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"文本通顺，排版规范，无格式问题。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 2.755,
+        "input_tokens": 2457,
+        "output_tokens": 303,
+        "total_tokens": 2760
       },
       "bias": {
         "length_bias": {
@@ -584,12 +635,40 @@
         },
         "bias_mitigation_score": 0.8
       },
-      "stability": null,
+      "stability": {
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "std_dev": 0.0,
+        "is_stable": true,
+        "samples": [
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          }
+        ]
+      },
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "c5c7cc10a6549430",
-        "token2": "c5c7cc10a6549430"
+        "token1": "c36cd8802f6f520f",
+        "token2": "c36cd8802f6f520f"
       }
     },
     {
@@ -620,66 +699,78 @@
         "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解"
       },
       "evaluation": {
-        "overall_score": 0.555,
-        "verdict": "review",
+        "overall_score": 0.48,
+        "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.9,
+            "score": 0.7,
             "weight": 0.35,
-            "reason": "核心信息（定期改密、禁止公共设备保存、异常联系）完整保留，仅省略非核心修饰语，意思未扭曲。"
+            "reason": "核心信息基本保留，但部分词汇被过度简化（如'保存登录信息'变为'保存登录信'，'立即联系'变为'立联'），导致信息轻微丢失，但不影响整体含义理解。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "数字（90天）正确，未篡改任何事实；约束词未删除。"
+            "reason": "所有事实（如每90天、公共设备、异常登录联系技术支持）均未篡改，数值和关系完全一致。"
           },
           {
             "dimension": "structure",
-            "score": 0.3,
+            "score": 0.2,
             "weight": 0.15,
-            "reason": "原文有序号列表（1.2.3.），治理后压缩为连续文本，层级关系扁平化，结构丢失严重。"
+            "reason": "原文使用有序列表（1. 2. 3.）组织信息，治理后完全丢失列表结构，所有内容被压缩为连续文本，逻辑层次严重受损。"
           },
           {
             "dimension": "readability",
-            "score": 0.2,
+            "score": 0.1,
             "weight": 0.15,
-            "reason": "完全缺失标点和空格，句子连写，严重影响阅读流畅性。"
+            "reason": "治理后文本无任何标点符号和空格，词语被过度缩略（如'改密'、'立联'），阅读极为困难，流畅性极差。"
           }
         ],
         "flaws": [
           {
             "category": "structure",
             "severity": "critical",
-            "description": "原文有序号列表（1.2.3.），治理后压缩为连续文本，层级关系丢失。",
+            "description": "原文的有序列表结构（1. 2. 3.）被完全清除，内容连续排列导致逻辑关系不清晰。",
             "location": {
-              "segment_id": "1",
-              "start_char": 10,
-              "end_char": 22,
-              "snippet": "请各用户注意下事定期改密"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 55,
+              "snippet": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。"
             },
-            "suggestion": "保留序号或使用换行/项目符号分隔三点内容。"
+            "suggestion": "恢复列表结构或使用段落分隔，保留序号或项目符号。"
           },
           {
             "category": "readability",
             "severity": "major",
-            "description": "治理后文本完全缺失标点和空格，导致可读性极差。",
+            "description": "全篇缺少标点符号和空格，大量词汇被简写（如'改密'、'立联'），导致语句断裂，难以流畅阅读。",
             "location": {
-              "segment_id": "1",
+              "segment_id": "[After 1]",
               "start_char": 0,
-              "end_char": 18,
-              "snippet": "为保系统安全稳定运行请各用户注意下事"
+              "end_char": 55,
+              "snippet": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。"
             },
-            "suggestion": "在句子间添加逗号、句号等标点，并适当空格。"
+            "suggestion": "恢复标点、空格，使用完整词汇（如'修改密码'、'立即联系'）。"
+          },
+          {
+            "category": "over_clean",
+            "severity": "minor",
+            "description": "治理后文本将'保存登录信息'简化为'保存登录信'，省略'信息'二字；将'立即联系'简化为'立联'，省略'即'和'系'，导致信息表达略有缺失。",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 55,
+              "snippet": "为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次别在公共设备保存登录信如现异常登录立联技术支持。"
+            },
+            "suggestion": "保持原文完整词汇，避免无意义缩写。"
           }
         ],
-        "reproducibility_token": "2993fcfbb562727d",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.9,\n      \"weight\": 0.35,\n      \"reason\": \"核心信息（定期改密、禁止公共设备保存、异常联系）完整保留，仅省略非核心修饰语，意思未扭曲。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"数字（90天）正确，未篡改任何事实；约束词未删除。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文有序号列表（1.2.3.），治理后压缩为连续文本，层级关系扁平化，结构丢失严重。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.2,\n      \"weight\": 0.15,\n      \"reason\": \"完全缺失标点和空格，句子连写，严重影响阅读流畅性。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"原文有序号列表（1.2.3.），治理后压缩为连续文本，层级关系丢失。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 10,\n        \"end_char\": 22,\n        \"snippet\": \"请各用户注意下事定期改密\"\n      },\n      \"suggestion\": \"保留序号或使用换行/项目符号分隔三点内容。\"\n    },\n    {\n      \"category\": \"readability\",\n      \"severity\": \"major\",\n      \"description\": \"治理后文本完全缺失标点和空格，导致可读性极差。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 0,\n        \"end_char\": 18,\n        \"snippet\": \"为保系统安全稳定运行请各用户注意下事\"\n      },\n      \"suggestion\": \"在句子间添加逗号、句号等标点，并适当空格。\"\n    }\n  ]\n}",
-        "latency_seconds": 32.016,
-        "input_tokens": 2145,
-        "output_tokens": 2759,
-        "total_tokens": 4904
+        "reproducibility_token": "c948e75729686d9e",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.7,\n      \"weight\": 0.35,\n      \"reason\": \"核心信息基本保留，但部分词汇被过度简化（如'保存登录信息'变为'保存登录信'，'立即联系'变为'立联'），导致信息轻微丢失，但不影响整体含义理解。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有事实（如每90天、公共设备、异常登录联系技术支持）均未篡改，数值和关系完全一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.2,\n      \"weight\": 0.15,\n      \"reason\": \"原文使用有序列表（1. 2. 3.）组织信息，治理后完全丢失列表结构，所有内容被压缩为连续文本，逻辑层次严重受损。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.1,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本无任何标点符号和空格，词语被过度缩略（如'改密'、'立联'），阅读极为困难，流畅性极差。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"原文的有序列表结构（1. 2. 3.）被完全清除，内容连续排列导致逻辑关系不清晰。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"1. 定期修改密码；2. 不要在公共设备上保存登录信息；3. 如发现异常登录\"\n      },\n      \"suggestion\": \"恢复列表结构或使用段落分隔，保留序号或项目符号。\"\n    },\n    {\n      \"category\": \"readability\",\n      \"severity\": \"major\",\n      \"description\": \"全篇缺少标点符号和空格，大量词汇被简写（如'改密'、'立联'），导致语句断裂，难以流畅阅读。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"为保系统安全稳定运行请各用户注意下事定期改密建议每90天换一次\"\n      },\n      \"suggestion\": \"恢复标点、空格，使用完整词汇（如'修改密码'、'立即联系'）。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"minor\",\n      \"description\": \"治理后文本将'保存登录信息'简化为'保存登录信'，省略'信息'二字；将'立即联系'简化为'立联'，省略'即'和'系'，导致信息表达略有缺失。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"保存登录信息、立即联系\"\n      },\n      \"suggestion\": \"保持原文完整词汇，避免无意义缩写。\"\n    }\n  ]\n}",
+        "latency_seconds": 21.69,
+        "input_tokens": 2547,
+        "output_tokens": 2084,
+        "total_tokens": 4631
       },
       "bias": {
         "length_bias": {
@@ -692,12 +783,12 @@
           "mitigation": null
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前1/后1），位置偏置风险低",
-          "front_count": 1,
-          "back_count": 1,
-          "total": 2
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（3/3），可能存在\"后严先松\"偏置",
+          "front_count": 0,
+          "back_count": 3,
+          "total": 3
         },
         "bias_mitigation_score": 1.0
       },
@@ -705,8 +796,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "2993fcfbb562727d",
-        "token2": "2993fcfbb562727d"
+        "token1": "c948e75729686d9e",
+        "token2": "c948e75729686d9e"
       }
     },
     {
@@ -731,34 +822,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本完整保留了原意，核心信息未丢失或扭曲。"
+            "reason": "治理后文本完整保留了原文的所有信息，没有遗漏、删除或泛化。仅是标点符号和空格规范化处理，不影响信息完整性。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "数字、人名等关键事实均未改变。"
+            "reason": "治理后文本未篡改任何事实，所有数值、人名、项目内容均与原文一致。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑关系完全一致，并列结构清晰。"
+            "reason": "原文的逻辑结构（会议纪要列表）完全保持，列表项顺序、层级关系未发生变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后标点符号规范，排版更加整洁，可读性提升。"
+            "reason": "治理后文本标点符号使用规范，空格处理得当，语句通顺，排版更规整，可读性优于原文。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "155dcc5aee2747d2",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原意，核心信息未丢失或扭曲。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"数字、人名等关键事实均未改变。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系完全一致，并列结构清晰。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后标点符号规范，排版更加整洁，可读性提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 3.68,
-        "input_tokens": 2025,
-        "output_tokens": 321,
-        "total_tokens": 2346
+        "reproducibility_token": "509a8d1579b1a94a",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息，没有遗漏、删除或泛化。仅是标点符号和空格规范化处理，不影响信息完整性。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有数值、人名、项目内容均与原文一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"原文的逻辑结构（会议纪要列表）完全保持，列表项顺序、层级关系未发生变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本标点符号使用规范，空格处理得当，语句通顺，排版更规整，可读性优于原文。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 4.175,
+        "input_tokens": 2427,
+        "output_tokens": 420,
+        "total_tokens": 2847
       },
       "bias": {
         "length_bias": {
@@ -783,8 +874,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "155dcc5aee2747d2",
-        "token2": "155dcc5aee2747d2"
+        "token1": "509a8d1579b1a94a",
+        "token2": "509a8d1579b1a94a"
       }
     },
     {
@@ -815,90 +906,54 @@
         "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界"
       },
       "evaluation": {
-        "overall_score": 0.255,
-        "verdict": "fail",
+        "overall_score": 0.5865,
+        "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.4,
+            "score": 0.2,
             "weight": 0.35,
-            "reason": "治理后保留了四大战略方向的大意，但删除了具体措施、时间目标和营收数据，核心信息大量丢失，原意被过度简化，因此评分较低。"
+            "reason": "治理后文本删除了大量具体信息：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元等，导致核心战略细节丢失，仅保留泛化表述，语义保真度严重下降。"
           },
           {
             "dimension": "factual",
-            "score": 0.3,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "删除了关键事实：碳中和目标时间（2030年）和预计新增营收（15亿元），这些属于核心事实损失，但未篡改其他数值，因此评分较低。"
+            "reason": "治理后文本未篡改任何事实，所有保留的信息均与原文一致，无无中生有或歪曲。"
           },
           {
             "dimension": "structure",
-            "score": 0.3,
+            "score": 0.8,
             "weight": 0.15,
-            "reason": "原文为并列战略要点，每个要点包含具体措施或目标，治理后仅保留要点标题，内部层级关系被扁平化，逻辑结构受损。"
+            "reason": "治理后文本保持了原文的并列列表结构，但内部修饰性内容被删除，结构完整性略有下降，但基本逻辑关系未破坏。"
           },
           {
             "dimension": "readability",
-            "score": 0.9,
+            "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后文本句子通顺，分号使用正确，排版规范，无明显语法或标点错误。"
+            "reason": "治理后文本句子通顺，排版规范，标点正确，简洁易读。"
           }
         ],
         "flaws": [
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "major",
-            "description": "删除了'构建智能制造体系'，导致数字化转型的具体措施丢失。",
+            "description": "治理后删除了原文中多项关键战略细节：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元。这些信息对理解战略重点至关重要，过度简化导致信息丢失。",
             "location": {
-              "segment_id": "1",
-              "start_char": 21,
-              "end_char": 22,
-              "snippet": "型；（缺失'构建智能制造体系'）"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 50,
+              "snippet": "公司2024年度战略重点包括：深化数字化转型；加强供应链建设；持续推进绿色发展；积极拓展东南亚市场。"
             },
-            "suggestion": "恢复'构建智能制造体系'以保持语义完整性。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "major",
-            "description": "删除了'韧性建设，优化全球采购网络'，使供应链建设的具体方向缺失。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 29,
-              "end_char": 30,
-              "snippet": "设；（缺失'韧性建设，优化全球采购网络'）"
-            },
-            "suggestion": "恢复'韧性建设，优化全球采购网络'以明确供应链重点。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "critical",
-            "description": "删除了'争取2030年实现碳中和目标'，去除了关键的时间约束和具体目标，属于核心事实变更。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 38,
-              "end_char": 39,
-              "snippet": "展；（缺失'争取2030年实现碳中和目标'）"
-            },
-            "suggestion": "恢复'争取2030年实现碳中和目标'以保留关键事实。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "critical",
-            "description": "删除了'预计新增营收15亿元'，去除了关键的经济指标数据，属于核心事实变更。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 48,
-              "end_char": 49,
-              "snippet": "场。（缺失'预计新增营收15亿元'）"
-            },
-            "suggestion": "恢复'预计新增营收15亿元'以保留关键数据。"
+            "suggestion": "建议保留核心数字和具体目标，避免过度简化战略细节。"
           }
         ],
-        "reproducibility_token": "cfb4415a8e303266",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"治理后保留了四大战略方向的大意，但删除了具体措施、时间目标和营收数据，核心信息大量丢失，原意被过度简化，因此评分较低。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"删除了关键事实：碳中和目标时间（2030年）和预计新增营收（15亿元），这些属于核心事实损失，但未篡改其他数值，因此评分较低。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文为并列战略要点，每个要点包含具体措施或目标，治理后仅保留要点标题，内部层级关系被扁平化，逻辑结构受损。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本句子通顺，分号使用正确，排版规范，无明显语法或标点错误。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"删除了'构建智能制造体系'，导致数字化转型的具体措施丢失。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 21,\n        \"end_char\": 22,\n        \"snippet\": \"型；（缺失'构建智能制造体系'）\"\n      },\n      \"suggestion\": \"恢复'构建智能制造体系'以保持语义完整性。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"删除了'韧性建设，优化全球采购网络'，使供应链建设的具体方向缺失。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 29,\n        \"end_char\": 30,\n        \"snippet\": \"设；（缺失'韧性建设，优化全球采购网络'）\"\n      },\n      \"suggestion\": \"恢复'韧性建设，优化全球采购网络'以明确供应链重点。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"删除了'争取2030年实现碳中和目标'，去除了关键的时间约束和具体目标，属于核心事实变更。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 38,\n        \"end_char\": 39,\n        \"snippet\": \"展；（缺失'争取2030年实现碳中和目标'）\"\n      },\n      \"suggestion\": \"恢复'争取2030年实现碳中和目标'以保留关键事实。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"删除了'预计新增营收15亿元'，去除了关键的经济指标数据，属于核心事实变更。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 48,\n        \"end_char\": 49,\n        \"snippet\": \"场。（缺失'预计新增营收15亿元'）\"\n      },\n      \"suggestion\": \"恢复'预计新增营收15亿元'以保留关键数据。\"\n    }\n  ]\n}",
-        "latency_seconds": 27.95,
-        "input_tokens": 2023,
-        "output_tokens": 2585,
-        "total_tokens": 4608
+        "reproducibility_token": "c25142ce3168cb5c",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.2,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本删除了大量具体信息：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元等，导致核心战略细节丢失，仅保留泛化表述，语义保真度严重下降。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有保留的信息均与原文一致，无无中生有或歪曲。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.8,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本保持了原文的并列列表结构，但内部修饰性内容被删除，结构完整性略有下降，但基本逻辑关系未破坏。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本句子通顺，排版规范，标点正确，简洁易读。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"治理后删除了原文中多项关键战略细节：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元。这些信息对理解战略重点至关重要，过度简化导致信息丢失。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"构建智能制造体系；加强供应链韧性建设\"\n      },\n      \"suggestion\": \"建议保留核心数字和具体目标，避免过度简化战略细节。\"\n    }\n  ]\n}",
+        "latency_seconds": 7.521,
+        "input_tokens": 2425,
+        "output_tokens": 805,
+        "total_tokens": 3230
       },
       "bias": {
         "length_bias": {
@@ -911,12 +966,12 @@
           "mitigation": "建议在评估时区分结构优化导致的长度变化与语义丢失"
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前1/后3），位置偏置风险低",
-          "front_count": 1,
-          "back_count": 3,
-          "total": 4
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（1/1），可能存在\"后严先松\"偏置",
+          "front_count": 0,
+          "back_count": 1,
+          "total": 1
         },
         "bias_mitigation_score": 1.0
       },
@@ -924,18 +979,18 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "cfb4415a8e303266",
-        "token2": "cfb4415a8e303266"
+        "token1": "c25142ce3168cb5c",
+        "token2": "c25142ce3168cb5c"
       }
     },
     {
       "request_id": "sample_010",
       "human_label": {
-        "overall_score": 0.685,
+        "overall_score": 0.6775,
         "label": "机构名误改",
         "flaws": [
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "major",
             "description": "将'国家电网有限公司'缩写为'国网公司'、'南方电网有限责任公司'缩写为'南网公司'，丢失了法定全称信息",
             "location": {
@@ -963,59 +1018,59 @@
           "semantic_consistency": 0.7,
           "over_cleaning": 0.8,
           "readability_structure": 0.9,
-          "factual_accuracy": 0.2
+          "factual_accuracy": 0.15
         },
         "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改"
       },
       "evaluation": {
-        "overall_score": 0.285,
+        "overall_score": 0.3795,
         "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.4,
+            "score": 0.95,
             "weight": 0.35,
-            "reason": "核心语义保留，但关键技术参数（±1100千伏→±1000千伏）被修改，导致语义不准确，整体意思仍有偏差。"
+            "reason": "治理后文本将全称缩略为常用简称，但核心信息（合作主体、领域、技术方向）完整保留，无重要信息遗漏或删除。"
           },
           {
             "dimension": "factual",
-            "score": 0.1,
+            "score": 0.0,
             "weight": 0.35,
-            "reason": "关键事实错误：±1100千伏被篡改为±1000千伏，属于核心技术参数变更，严重违反事实准确性。"
+            "reason": "治理后文本将±1100千伏错误修改为±1000千伏，关键电压等级数值被篡改，事实严重不一致。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "文本结构和逻辑关系完全保留，无任何结构调整。"
+            "reason": "治理前后均为单一段落结构，信息顺序和逻辑关系完全一致。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，无语法或标点问题。"
+            "reason": "治理后文本句子通顺，标点正确，排版规范，可读性良好。"
           }
         ],
         "flaws": [
           {
             "category": "mis_edit",
             "severity": "critical",
-            "description": "治理后文本将特高压直流输电核心技术电压从±1100千伏错误修改为±1000千伏，属于核心事实篡改。",
+            "description": "将原文'±1100千伏'错误改为'±1000千伏'，电压等级数值被篡改，属于关键事实错误。",
             "location": {
-              "segment_id": "1",
-              "start_char": 43,
-              "end_char": 54,
-              "snippet": "±1000千伏特高压直流输电"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 61,
+              "snippet": "国网公司近日发布公告，宣布与南网公司在特高压直流输电领域开展战略合作。双方将联合攻关±1000千伏特高压直流输电核心技术。"
             },
-            "suggestion": "恢复为±1100千伏，或确认是否为笔误。"
+            "suggestion": "恢复为±1100千伏"
           }
         ],
-        "reproducibility_token": "2cf4a70a17ae7e97",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"核心语义保留，但关键技术参数（±1100千伏→±1000千伏）被修改，导致语义不准确，整体意思仍有偏差。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.1,\n      \"weight\": 0.35,\n      \"reason\": \"关键事实错误：±1100千伏被篡改为±1000千伏，属于核心技术参数变更，严重违反事实准确性。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"文本结构和逻辑关系完全保留，无任何结构调整。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，无语法或标点问题。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后文本将特高压直流输电核心技术电压从±1100千伏错误修改为±1000千伏，属于核心事实篡改。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 43,\n        \"end_char\": 54,\n        \"snippet\": \"±1000千伏特高压直流输电\"\n      },\n      \"suggestion\": \"恢复为±1100千伏，或确认是否为笔误。\"\n    }\n  ]\n}",
-        "latency_seconds": 13.057,
-        "input_tokens": 2062,
-        "output_tokens": 1080,
-        "total_tokens": 3142
+        "reproducibility_token": "ccdc50fbd70e5a74",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.95,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本将全称缩略为常用简称，但核心信息（合作主体、领域、技术方向）完整保留，无重要信息遗漏或删除。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 0.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本将±1100千伏错误修改为±1000千伏，关键电压等级数值被篡改，事实严重不一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后均为单一段落结构，信息顺序和逻辑关系完全一致。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本句子通顺，标点正确，排版规范，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"将原文'±1100千伏'错误改为'±1000千伏'，电压等级数值被篡改，属于关键事实错误。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"±1100千伏\"\n      },\n      \"suggestion\": \"恢复为±1100千伏\"\n    }\n  ]\n}",
+        "latency_seconds": 17.667,
+        "input_tokens": 2464,
+        "output_tokens": 1648,
+        "total_tokens": 4112
       },
       "bias": {
         "length_bias": {
@@ -1035,20 +1090,20 @@
           "back_count": 1,
           "total": 1
         },
-        "bias_mitigation_score": 1.0
+        "bias_mitigation_score": 0.75
       },
       "stability": null,
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "2cf4a70a17ae7e97",
-        "token2": "2cf4a70a17ae7e97"
+        "token1": "ccdc50fbd70e5a74",
+        "token2": "ccdc50fbd70e5a74"
       }
     },
     {
       "request_id": "sample_011",
       "human_label": {
-        "overall_score": 0.315,
+        "overall_score": 0.4125,
         "label": "混合多类瑕疵",
         "flaws": [
           {
@@ -1064,7 +1119,7 @@
             "suggestion": "保留法律依据引用和'重要数据'的精确表述"
           },
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "major",
             "description": "丢失了'向有关主管部门报告'的对象信息，以及报告事项中的'其他需要报告的事项'兜底条款",
             "location": {
@@ -1080,95 +1135,59 @@
           "semantic_consistency": 0.3,
           "over_cleaning": 0.2,
           "readability_structure": 0.65,
-          "factual_accuracy": 0.25
+          "factual_accuracy": 0.9
         },
         "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降"
       },
       "evaluation": {
-        "overall_score": 0.4505,
+        "overall_score": 0.494,
         "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
             "score": 0.4,
             "weight": 0.35,
-            "reason": "治理后文本将‘重要数据的处理者’泛化为‘数据处理者’，扩大了适用范围，改变了原意的法律含义；删除了法律依据和主管部门，核心信息完整性受损。"
+            "reason": "删除了重要信息：法律依据（《中华人民共和国数据安全法》第三十条）、主体限定（重要数据的处理者→数据处理者）、义务要求（按照规定、向有关主管部门报告）、报告内容中的'以及其他需要报告的事项'。核心语义保留但缺失大量关键限定，根据约束词删除规则，评分≤0.4。"
           },
           {
             "dimension": "factual",
-            "score": 0.3,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "关键事实被篡改：主体从‘重要数据的处理者’变为‘数据处理者’，属于定义条款变更；删除了法律引用和主管部门，事实准确性降低。"
+            "reason": "未篡改事实，仅删除信息，无新增或歪曲内容。"
           },
           {
             "dimension": "structure",
-            "score": 0.9,
+            "score": 0.8,
             "weight": 0.15,
-            "reason": "逻辑关系（总-分结构）保持，列举内容被压缩但未改变层级关系，未破坏逻辑结构。"
+            "reason": "原文为两个句子：义务规定+报告内容列举。治理后保持相同结构，但报告内容的并列项被简化（删除最后一项'以及其他需要报告的事项'），整体逻辑关系完整。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，标点正确，可读性佳。"
+            "reason": "治理后句子简短通顺，无语法或标点错误，可读性良好。"
           }
         ],
         "flaws": [
           {
-            "category": "mis_edit",
-            "severity": "major",
-            "description": "将‘重要数据的处理者’泛化为‘数据处理者’，删除了‘重要数据’这一关键主体限定，扩大了适用范围。",
+            "category": "over_clean",
+            "severity": "critical",
+            "description": "治理后文本删除了多项关键信息：法律依据‘《中华人民共和国数据安全法》第三十条规定’、主体限定‘重要数据的’、义务细节‘按照规定’和‘向有关主管部门报告’、报告内容中的‘以及其他需要报告的事项’。这些删除导致法律条款的完整性和约束力严重受损。",
             "location": {
-              "segment_id": "1",
+              "segment_id": "[After 1]",
               "start_char": 0,
-              "end_char": 6,
-              "snippet": "数据处理者应当"
+              "end_char": 48,
+              "snippet": "数据处理者应当定期开展风险评估并报告。报告应包括数据种类和数量、处理活动情况及安全风险应对措施。"
             },
-            "suggestion": "恢复为‘重要数据的处理者’以保持法律含义。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "minor",
-            "description": "删除了法律依据‘《中华人民共和国数据安全法》第三十条规定’。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 0,
-              "end_char": 0,
-              "snippet": "（原文开头缺失）"
-            },
-            "suggestion": "保留法律引用以维持权威性。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "minor",
-            "description": "删除了‘向有关主管部门报告’中的‘有关主管部门’，模糊了报告对象。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 11,
-              "end_char": 12,
-              "snippet": "报告"
-            },
-            "suggestion": "恢复为‘向有关主管部门报告’。"
-          },
-          {
-            "category": "mis_edit",
-            "severity": "minor",
-            "description": "删除了报告内容中的‘以及其他需要报告的事项’兜底条款。",
-            "location": {
-              "segment_id": "1",
-              "start_char": 37,
-              "end_char": 38,
-              "snippet": "安全风险应对措施"
-            },
-            "suggestion": "补充‘以及其他需要报告的事项’。"
+            "suggestion": "建议保留法律依据、主体限定及义务要求，确保表述准确完整。"
           }
         ],
-        "reproducibility_token": "3033e16058ce7a60",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本将‘重要数据的处理者’泛化为‘数据处理者’，扩大了适用范围，改变了原意的法律含义；删除了法律依据和主管部门，核心信息完整性受损。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"关键事实被篡改：主体从‘重要数据的处理者’变为‘数据处理者’，属于定义条款变更；删除了法律引用和主管部门，事实准确性降低。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系（总-分结构）保持，列举内容被压缩但未改变层级关系，未破坏逻辑结构。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，标点正确，可读性佳。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"将‘重要数据的处理者’泛化为‘数据处理者’，删除了‘重要数据’这一关键主体限定，扩大了适用范围。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 0,\n        \"end_char\": 6,\n        \"snippet\": \"数据处理者应当\"\n      },\n      \"suggestion\": \"恢复为‘重要数据的处理者’以保持法律含义。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"删除了法律依据‘《中华人民共和国数据安全法》第三十条规定’。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 0,\n        \"end_char\": 0,\n        \"snippet\": \"（原文开头缺失）\"\n      },\n      \"suggestion\": \"保留法律引用以维持权威性。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"删除了‘向有关主管部门报告’中的‘有关主管部门’，模糊了报告对象。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 11,\n        \"end_char\": 12,\n        \"snippet\": \"报告\"\n      },\n      \"suggestion\": \"恢复为‘向有关主管部门报告’。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"minor\",\n      \"description\": \"删除了报告内容中的‘以及其他需要报告的事项’兜底条款。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 37,\n        \"end_char\": 38,\n        \"snippet\": \"安全风险应对措施\"\n      },\n      \"suggestion\": \"补充‘以及其他需要报告的事项’。\"\n    }\n  ]\n}",
-        "latency_seconds": 20.292,
-        "input_tokens": 2123,
-        "output_tokens": 1751,
-        "total_tokens": 3874
+        "reproducibility_token": "27678b8b99ac9fbe",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"删除了重要信息：法律依据（《中华人民共和国数据安全法》第三十条）、主体限定（重要数据的处理者→数据处理者）、义务要求（按照规定、向有关主管部门报告）、报告内容中的'以及其他需要报告的事项'。核心语义保留但缺失大量关键限定，根据约束词删除规则，评分≤0.4。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"未篡改事实，仅删除信息，无新增或歪曲内容。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.8,\n      \"weight\": 0.15,\n      \"reason\": \"原文为两个句子：义务规定+报告内容列举。治理后保持相同结构，但报告内容的并列项被简化（删除最后一项'以及其他需要报告的事项'），整体逻辑关系完整。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子简短通顺，无语法或标点错误，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后文本删除了多项关键信息：法律依据‘《中华人民共和国数据安全法》第三十条规定’、主体限定‘重要数据的’、义务细节‘按照规定’和‘向有关主管部门报告’、报告内容中的‘以及其他需要报告的事项’。这些删除导致法律条款的完整性和约束力严重受损。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"根据《中华人民共和国数据安全法》第三十条规定\"\n      },\n      \"suggestion\": \"建议保留法律依据、主体限定及义务要求，确保表述准确完整。\"\n    }\n  ]\n}",
+        "latency_seconds": 23.423,
+        "input_tokens": 2525,
+        "output_tokens": 2209,
+        "total_tokens": 4734
       },
       "bias": {
         "length_bias": {
@@ -1181,21 +1200,49 @@
           "mitigation": "建议在评估时区分结构优化导致的长度变化与语义丢失"
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前3/后1），位置偏置风险低",
-          "front_count": 3,
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（1/1），可能存在\"后严先松\"偏置",
+          "front_count": 0,
           "back_count": 1,
-          "total": 4
+          "total": 1
         },
         "bias_mitigation_score": 0.9
       },
-      "stability": null,
+      "stability": {
+        "mean_score": 0.5992,
+        "variance": 0.00047,
+        "std_dev": 0.0217,
+        "is_stable": true,
+        "samples": [
+          {
+            "semantic": 0.3,
+            "factual": 1.0,
+            "structure": 0.7,
+            "readability": 0.9,
+            "overall": 0.5907
+          },
+          {
+            "semantic": 0.3,
+            "factual": 1.0,
+            "structure": 0.9,
+            "readability": 1.0,
+            "overall": 0.629
+          },
+          {
+            "semantic": 0.3,
+            "factual": 1.0,
+            "structure": 0.5,
+            "readability": 1.0,
+            "overall": 0.578
+          }
+        ]
+      },
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "3033e16058ce7a60",
-        "token2": "3033e16058ce7a60"
+        "token1": "27678b8b99ac9fbe",
+        "token2": "27678b8b99ac9fbe"
       }
     },
     {
@@ -1213,41 +1260,41 @@
         "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留"
       },
       "evaluation": {
-        "overall_score": 1.0,
+        "overall_score": 0.895,
         "verdict": "pass",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 1.0,
+            "score": 0.7,
             "weight": 0.35,
-            "reason": "治理后保留了原意，核心信息（投诉记录、时间、电话、产品问题、退款要求、工单编号）完整，仅对姓名和身份证号进行脱敏处理，不影响语义。"
+            "reason": "治理后文本将客户姓名和身份证号替换为星号（张**、***），属于信息泛化/删除，丢失了具体身份信息。但核心业务信息（投诉记录、时间、电话、问题、工单编号）均完整保留，整体语义保真度较高。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有关键事实（日期、电话号码、工单编号、投诉内容）均准确无误，姓名和身份证号的脱敏属于隐私保护操作，不构成事实篡改。"
+            "reason": "治理后文本未篡改任何事实，日期、电话号码、工单编号等均与原文一致。姓名和身份证号的脱敏处理不属于事实篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理前后文本结构完全相同，均为单一陈述句，逻辑关系和信息顺序一致。"
+            "reason": "治理前后文本结构完全相同，均为一个完整句子，无列表、表格或层级关系变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，标点正确，脱敏后的星号不影响阅读流畅性。"
+            "reason": "治理后文本语句通顺，标点符号正确，星号不影响阅读流畅性。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "da408cc6ed2cd4d3",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后保留了原意，核心信息（投诉记录、时间、电话、产品问题、退款要求、工单编号）完整，仅对姓名和身份证号进行脱敏处理，不影响语义。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有关键事实（日期、电话号码、工单编号、投诉内容）均准确无误，姓名和身份证号的脱敏属于隐私保护操作，不构成事实篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构完全相同，均为单一陈述句，逻辑关系和信息顺序一致。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，标点正确，脱敏后的星号不影响阅读流畅性。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 7.584,
-        "input_tokens": 2121,
-        "output_tokens": 626,
-        "total_tokens": 2747
+        "reproducibility_token": "cf9373b6a81a539c",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.7,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本将客户姓名和身份证号替换为星号（张**、***），属于信息泛化/删除，丢失了具体身份信息。但核心业务信息（投诉记录、时间、电话、问题、工单编号）均完整保留，整体语义保真度较高。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，日期、电话号码、工单编号等均与原文一致。姓名和身份证号的脱敏处理不属于事实篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构完全相同，均为一个完整句子，无列表、表格或层级关系变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本语句通顺，标点符号正确，星号不影响阅读流畅性。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 14.345,
+        "input_tokens": 2523,
+        "output_tokens": 1227,
+        "total_tokens": 3750
       },
       "bias": {
         "length_bias": {
@@ -1266,20 +1313,20 @@
           "front_count": 0,
           "back_count": 0
         },
-        "bias_mitigation_score": 0.8
+        "bias_mitigation_score": 1.0
       },
       "stability": null,
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "da408cc6ed2cd4d3",
-        "token2": "da408cc6ed2cd4d3"
+        "token1": "cf9373b6a81a539c",
+        "token2": "cf9373b6a81a539c"
       }
     },
     {
       "request_id": "sample_013",
       "human_label": {
-        "overall_score": 0.66,
+        "overall_score": 0.56,
         "label": "列表结构破坏",
         "flaws": [
           {
@@ -1296,7 +1343,7 @@
           }
         ],
         "dimension_scores": {
-          "semantic_consistency": 0.75,
+          "semantic_consistency": 0.5,
           "over_cleaning": 0.55,
           "readability_structure": 0.5,
           "factual_accuracy": 0.8
@@ -1304,102 +1351,90 @@
         "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对"
       },
       "evaluation": {
-        "overall_score": 0.3217,
+        "overall_score": 0.4485,
         "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
             "score": 0.5,
             "weight": 0.35,
-            "reason": "治理后保留了主要材料列表，但删除了每个材料括号内的附加要求（如技术路线说明、性能测试数据），导致核心信息不完整，语义有所偏离。"
+            "reason": "治理后文本删除了引导语中的'以下材料'以及每个列表项中的括号补充说明（如含技术路线说明、含性能测试数据），导致信息部分丢失。但核心材料名称完整保留，故评分中等偏低。"
           },
           {
             "dimension": "factual",
-            "score": 0.4,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "关键事实（括号内的具体说明）被删除，属于事实信息丢失。虽未改变数字等，但影响了信息的准确性和完整性。"
+            "reason": "治理后文本未篡改任何事实，所有材料名称正确，无无中生有或歪曲。"
           },
           {
             "dimension": "structure",
-            "score": 0.3,
+            "score": 0.2,
             "weight": 0.15,
-            "reason": "有序列表被压缩为单句，层级关系被扁平化，结构严重受损。"
+            "reason": "原文为有序列表结构（1-5项），治理后压缩为单个句子，列表层级完全丢失，结构严重损坏。"
           },
           {
             "dimension": "readability",
             "score": 0.9,
             "weight": 0.15,
-            "reason": "治理后句子通顺，标点使用正确，可读性良好。"
+            "reason": "治理后句子通顺，标点使用合理，排版规范，可读性良好。仅因信息合并略失清晰度，微扣。"
           }
         ],
         "flaws": [
           {
-            "category": "structure",
+            "category": "over_clean",
             "severity": "major",
-            "description": "有序列表被压缩为单句，层级关系被扁平化",
+            "description": "引导语中的限定词'以下材料'被删除，仅保留'项目验收需提交'，指示性信息丢失。",
             "location": {
-              "segment_id": "after 7",
+              "segment_id": "[After 7]",
               "start_char": 0,
-              "end_char": 46,
-              "snippet": "项目验收需提交项目总结报告"
+              "end_char": 0,
+              "snippet": "项目验收需提交以下材料："
             },
-            "suggestion": "恢复为有序列表形式以保持结构清晰"
+            "suggestion": "保留引导语结构，例如'项目验收需提交以下材料：'后再列举。"
           },
           {
             "category": "over_clean",
             "severity": "critical",
-            "description": "治理后丢失了'项目总结报告'的括号内容'含技术路线说明'",
+            "description": "列表项中的括号补充说明（如含技术路线说明、含性能测试数据）被完全删除，导致信息精度降低。算法预检标记为CRITICAL omission。",
             "location": {
-              "segment_id": "after 7",
-              "start_char": 7,
-              "end_char": 12,
-              "snippet": "项目总结报告"
+              "segment_id": "[After 7]",
+              "start_char": 0,
+              "end_char": 0,
+              "snippet": "项目总结报告（含技术路线说明）"
             },
-            "suggestion": "保留括号内的附加说明"
-          },
-          {
-            "category": "over_clean",
-            "severity": "critical",
-            "description": "治理后丢失了'测试报告'的括号内容'含性能测试数据'",
-            "location": {
-              "segment_id": "after 7",
-              "start_char": 14,
-              "end_char": 17,
-              "snippet": "测试报告"
-            },
-            "suggestion": "保留括号内的附加说明"
+            "suggestion": "保留括号内的补充说明，例如'项目总结报告（含技术路线说明）'。"
           },
           {
             "category": "over_clean",
             "severity": "major",
-            "description": "治理后删除了原文首行提示语'项目验收需提交以下材料：'中的'以下材料：'",
+            "description": "其余列表项（Before 3-6）中的括号补充说明亦被删除，包括测试报告的含性能测试数据、用户手册及操作指南（无括号）、源代码及部署文档（无括号）、知识产权证明文件（无括号）。实际有括号的仅Before2和Before3，但均被删除。",
             "location": {
-              "segment_id": "after 7",
+              "segment_id": "[After 7]",
               "start_char": 0,
-              "end_char": 6,
-              "snippet": "项目验收需提交"
+              "end_char": 0,
+              "snippet": "测试报告（含性能测试数据）"
             },
-            "suggestion": "恢复提示语以增强引导性"
+            "suggestion": "保留所有括号内补充信息。"
           },
           {
             "category": "structure",
-            "severity": "minor",
-            "description": "治理后文本将列表合并为单句，算法标记为新增段落，实际为格式转换",
+            "severity": "critical",
+            "description": "原文的有序列表结构（1-5项，逐项列出）被压缩为单个句子，层级关系和可视化对比性完全丧失。",
             "location": {
-              "segment_id": "after 7",
+              "segment_id": "[After 7]",
               "start_char": 0,
-              "end_char": 46,
-              "snippet": "项目验收需提交项目总结报告、测试报告、用户手册及操作指南、源代码及部署文档和知识产权证明文件。"
+              "end_char": 0,
+              "snippet": "1. 项目总结报告（含技术路线说明）"
             },
-            "suggestion": "无需修改，但需注意格式变化对可读性的影响"
+            "suggestion": "恢复列表结构，或至少使用项目符号分段列出。"
           }
         ],
-        "reproducibility_token": "8753c933da5f598c",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.5,\n      \"weight\": 0.35,\n      \"reason\": \"治理后保留了主要材料列表，但删除了每个材料括号内的附加要求（如技术路线说明、性能测试数据），导致核心信息不完整，语义有所偏离。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"关键事实（括号内的具体说明）被删除，属于事实信息丢失。虽未改变数字等，但影响了信息的准确性和完整性。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"有序列表被压缩为单句，层级关系被扁平化，结构严重受损。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子通顺，标点使用正确，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"major\",\n      \"description\": \"有序列表被压缩为单句，层级关系被扁平化\",\n      \"location\": {\n        \"segment_id\": \"after 7\",\n        \"start_char\": 0,\n        \"end_char\": 46,\n        \"snippet\": \"项目验收需提交项目总结报告\"\n      },\n      \"suggestion\": \"恢复为有序列表形式以保持结构清晰\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后丢失了'项目总结报告'的括号内容'含技术路线说明'\",\n      \"location\": {\n        \"segment_id\": \"after 7\",\n        \"start_char\": 7,\n        \"end_char\": 12,\n        \"snippet\": \"项目总结报告\"\n      },\n      \"suggestion\": \"保留括号内的附加说明\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后丢失了'测试报告'的括号内容'含性能测试数据'\",\n      \"location\": {\n        \"segment_id\": \"after 7\",\n        \"start_char\": 14,\n        \"end_char\": 17,\n        \"snippet\": \"测试报告\"\n      },\n      \"suggestion\": \"保留括号内的附加说明\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"治理后删除了原文首行提示语'项目验收需提交以下材料：'中的'以下材料：'\",\n      \"location\": {\n        \"segment_id\": \"after 7\",\n        \"start_char\": 0,\n        \"end_char\": 6,\n        \"snippet\": \"项目验收需提交\"\n      },\n      \"suggestion\": \"恢复提示语以增强引导性\"\n    },\n    {\n      \"category\": \"structure\",\n      \"severity\": \"minor\",\n      \"description\": \"治理后文本将列表合并为单句，算法标记为新增段落，实际为格式转换\",\n      \"location\": {\n        \"segment_id\": \"after 7\",\n        \"start_char\": 0,\n        \"end_char\": 46,\n        \"snippet\": \"项目验收需提交项目总结报告、测试报告、用户手册及操作指南、源代码及部署文档和知识产权证明文件。\"\n      },\n      \"suggestion\": \"无需修改，但需注意格式变化对可读性的影响\"\n    }\n  ]\n}",
-        "latency_seconds": 60.579,
-        "input_tokens": 2275,
-        "output_tokens": 5286,
-        "total_tokens": 7561
+        "reproducibility_token": "7871545dd7f04917",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.5,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本删除了引导语中的'以下材料'以及每个列表项中的括号补充说明（如含技术路线说明、含性能测试数据），导致信息部分丢失。但核心材料名称完整保留，故评分中等偏低。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有材料名称正确，无无中生有或歪曲。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.2,\n      \"weight\": 0.15,\n      \"reason\": \"原文为有序列表结构（1-5项），治理后压缩为单个句子，列表层级完全丢失，结构严重损坏。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子通顺，标点使用合理，排版规范，可读性良好。仅因信息合并略失清晰度，微扣。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"引导语中的限定词'以下材料'被删除，仅保留'项目验收需提交'，指示性信息丢失。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"项目验收需提交以下材料：\"\n      },\n      \"suggestion\": \"保留引导语结构，例如'项目验收需提交以下材料：'后再列举。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"列表项中的括号补充说明（如含技术路线说明、含性能测试数据）被完全删除，导致信息精度降低。算法预检标记为CRITICAL omission。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 2]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"项目总结报告（含技术路线说明）\"\n      },\n      \"suggestion\": \"保留括号内的补充说明，例如'项目总结报告（含技术路线说明）'。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"其余列表项（Before 3-6）中的括号补充说明亦被删除，包括测试报告的含性能测试数据、用户手册及操作指南（无括号）、源代码及部署文档（无括号）、知识产权证明文件（无括号）。实际有括号的仅Before2和Before3，但均被删除。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 3]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"测试报告（含性能测试数据）\"\n      },\n      \"suggestion\": \"保留所有括号内补充信息。\"\n    },\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"原文的有序列表结构（1-5项，逐项列出）被压缩为单个句子，层级关系和可视化对比性完全丧失。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]至[Before 6]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"1. 项目总结报告（含技术路线说明）\"\n      },\n      \"suggestion\": \"恢复列表结构，或至少使用项目符号分段列出。\"\n    }\n  ]\n}",
+        "latency_seconds": 23.085,
+        "input_tokens": 2677,
+        "output_tokens": 2271,
+        "total_tokens": 4948
       },
       "bias": {
         "length_bias": {
@@ -1412,12 +1447,12 @@
           "mitigation": "建议在评估时区分结构优化导致的长度变化与语义丢失"
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前3/后2），位置偏置风险低",
-          "front_count": 3,
-          "back_count": 2,
-          "total": 5
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（4/4），可能存在\"后严先松\"偏置",
+          "front_count": 0,
+          "back_count": 4,
+          "total": 4
         },
         "bias_mitigation_score": 1.0
       },
@@ -1425,8 +1460,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "8753c933da5f598c",
-        "token2": "8753c933da5f598c"
+        "token1": "7871545dd7f04917",
+        "token2": "7871545dd7f04917"
       }
     },
     {
@@ -1451,34 +1486,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本与治理前完全一致，语义完全相同，核心信息完整，无扭曲或过度泛化。"
+            "reason": "治理后文本完全保留了原文的所有信息，无遗漏、删除或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数字、日期、百分比（98.3%、2.1个百分点、99.8%、96.5%）均完全保留，未发生任何篡改。"
+            "reason": "治理后文本与原文事实完全一致，无任何篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑关系完全保持，总分结构（各部门费用合规率）、并列关系（研发与销售部门对比）未受影响。"
+            "reason": "治理后文本保持了原文的逻辑结构和组织方式，无变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，标点符号正确，排版规范，与治理前一致。"
+            "reason": "治理后文本句子通顺，标点规范，排版良好。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "d6e0b93d0ccea107",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本与治理前完全一致，语义完全相同，核心信息完整，无扭曲或过度泛化。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数字、日期、百分比（98.3%、2.1个百分点、99.8%、96.5%）均完全保留，未发生任何篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系完全保持，总分结构（各部门费用合规率）、并列关系（研发与销售部门对比）未受影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，标点符号正确，排版规范，与治理前一致。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 3.867,
-        "input_tokens": 2107,
-        "output_tokens": 362,
-        "total_tokens": 2469
+        "reproducibility_token": "8880080178878a6c",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完全保留了原文的所有信息，无遗漏、删除或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本与原文事实完全一致，无任何篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本保持了原文的逻辑结构和组织方式，无变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本句子通顺，标点规范，排版良好。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 2.218,
+        "input_tokens": 2509,
+        "output_tokens": 263,
+        "total_tokens": 2772
       },
       "bias": {
         "length_bias": {
@@ -1503,8 +1538,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "d6e0b93d0ccea107",
-        "token2": "d6e0b93d0ccea107"
+        "token1": "8880080178878a6c",
+        "token2": "8880080178878a6c"
       }
     },
     {
@@ -1529,34 +1564,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本完全保留了原意，核心信息完整，无扭曲或过度泛化。"
+            "reason": "治理后文本完整保留了原文的所有数值、单位、标点和句式，无信息遗漏或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数字、日期、金额等关键事实完全一致，未发生任何篡改。"
+            "reason": "治理后文本的所有数据、日期和名称与原文完全一致，无事实篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑关系和结构完全保持，无任何变化。"
+            "reason": "治理前后文本的句子结构和信息组织方式完全一致，无逻辑关系或层级变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后文本去除了多余空格，标点正确，排版更规范，可读性良好。"
+            "reason": "治理后文本仅去除了原文中不必要的空格，句子通顺，标点规范，可读性更佳。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "51a24482f3b3166b",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完全保留了原意，核心信息完整，无扭曲或过度泛化。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数字、日期、金额等关键事实完全一致，未发生任何篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系和结构完全保持，无任何变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本去除了多余空格，标点正确，排版更规范，可读性良好。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 3.072,
-        "input_tokens": 2053,
-        "output_tokens": 274,
-        "total_tokens": 2327
+        "reproducibility_token": "4fe660e60a7dcd74",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有数值、单位、标点和句式，无信息遗漏或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本的所有数据、日期和名称与原文完全一致，无事实篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本的句子结构和信息组织方式完全一致，无逻辑关系或层级变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本仅去除了原文中不必要的空格，句子通顺，标点规范，可读性更佳。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 3.105,
+        "input_tokens": 2455,
+        "output_tokens": 306,
+        "total_tokens": 2761
       },
       "bias": {
         "length_bias": {
@@ -1581,8 +1616,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "51a24482f3b3166b",
-        "token2": "51a24482f3b3166b"
+        "token1": "4fe660e60a7dcd74",
+        "token2": "4fe660e60a7dcd74"
       }
     },
     {
@@ -1600,41 +1635,41 @@
         "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好"
       },
       "evaluation": {
-        "overall_score": 1.0,
+        "overall_score": 0.9825,
         "verdict": "pass",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 1.0,
+            "score": 0.95,
             "weight": 0.35,
-            "reason": "治理后完整保留了原意，核心信息（微服务架构、核心组件、水平扩展、峰值QPS）未丢失或扭曲，仅将英文术语转为中文表达，语义完全一致。"
+            "reason": "治理后去掉了英文原文，但核心信息（微服务架构、核心组件、水平扩展、峰值QPS）完整保留，无信息遗漏或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数字、技术参数（峰值QPS 50,000）均准确，组件名称通过中文翻译正确表达，无事实性错误。"
+            "reason": "事实完全一致，数值、架构名称、功能描述均未改变。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "原文的列表结构（核心组件并列列举）和句间关系（系统特性）完全保持，未改变信息组织方式。"
+            "reason": "句子结构和信息组织方式完全保持。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后文本通顺自然，中文术语替换后更易读，标点符号使用规范。"
+            "reason": "表达通顺，标点正确，排版无问题。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "046e2d45fe06db5b",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后完整保留了原意，核心信息（微服务架构、核心组件、水平扩展、峰值QPS）未丢失或扭曲，仅将英文术语转为中文表达，语义完全一致。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数字、技术参数（峰值QPS 50,000）均准确，组件名称通过中文翻译正确表达，无事实性错误。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"原文的列表结构（核心组件并列列举）和句间关系（系统特性）完全保持，未改变信息组织方式。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本通顺自然，中文术语替换后更易读，标点符号使用规范。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 5.795,
-        "input_tokens": 2055,
-        "output_tokens": 472,
-        "total_tokens": 2527
+        "reproducibility_token": "ec0f39264cd48110",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.95,\n      \"weight\": 0.35,\n      \"reason\": \"治理后去掉了英文原文，但核心信息（微服务架构、核心组件、水平扩展、峰值QPS）完整保留，无信息遗漏或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"事实完全一致，数值、架构名称、功能描述均未改变。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子结构和信息组织方式完全保持。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"表达通顺，标点正确，排版无问题。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 4.025,
+        "input_tokens": 2457,
+        "output_tokens": 389,
+        "total_tokens": 2846
       },
       "bias": {
         "length_bias": {
@@ -1655,12 +1690,40 @@
         },
         "bias_mitigation_score": 0.8
       },
-      "stability": null,
+      "stability": {
+        "mean_score": 0.9051,
+        "variance": 0.002209,
+        "std_dev": 0.047,
+        "is_stable": true,
+        "samples": [
+          {
+            "semantic": 0.7,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 0.8502
+          },
+          {
+            "semantic": 0.85,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 0.9001
+          },
+          {
+            "semantic": 0.9,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 0.965
+          }
+        ]
+      },
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "046e2d45fe06db5b",
-        "token2": "046e2d45fe06db5b"
+        "token1": "ec0f39264cd48110",
+        "token2": "ec0f39264cd48110"
       }
     },
     {
@@ -1691,41 +1754,90 @@
         "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降"
       },
       "evaluation": {
-        "overall_score": 0.9,
-        "verdict": "pass",
+        "overall_score": 0.6417,
+        "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.9,
+            "score": 0.3,
             "weight": 0.35,
-            "reason": "核心语义完整保留，仅删除了部分修饰性表述（如'降低制度性交易成本'、'按照'能减则减、能合则合'的原则'），未扭曲或过度泛化原意。"
+            "reason": "治理后文本删除了多处重要信息：开头删除了'降低制度性交易成本，激发市场主体活力'和'全面推进政务服务标准化规范化便利化'；第一条删除了原则性表述'能减则减、能合则合'和'全面清理'；第二条删除了鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'；第三条删除了'主要申请条件符合要求的'和'在规定时间内'。这些删除导致关键政策信息和限定条件丢失，尤其是50%以内的压缩比例被整体删除，属于约束性信息缺失。"
           },
           {
             "dimension": "factual",
-            "score": 0.9,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "关键事实（2024年底前、压缩比例不低于30%）准确保留；删除了鼓励性的'50%以内'，但该条为非强制性要求，不影响核心事实。"
+            "reason": "治理后文本未篡改任何事实，所有数据（2024年底、不低于30%）、主体和责任均与原文一致，没有无中生有或歪曲。"
           },
           {
             "dimension": "structure",
-            "score": 0.9,
+            "score": 1.0,
             "weight": 0.15,
-            "reason": "原文总分结构及三个要点的编号完全保留，逻辑关系清晰未破坏。"
+            "reason": "治理前后文本结构完全相同，均采用三个要点的列表形式，逻辑关系和层级关系未受影响。"
           },
           {
             "dimension": "readability",
-            "score": 0.9,
+            "score": 1.0,
             "weight": 0.15,
-            "reason": "语句通顺，标点正确，排版规范，治理后更为简洁流畅。"
+            "reason": "治理后文本语句通顺，排版规范，标点正确，且因删除冗余表述而更加简洁易读。"
           }
         ],
-        "flaws": [],
-        "reproducibility_token": "9f849c570a687110",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.9,\n      \"weight\": 0.35,\n      \"reason\": \"核心语义完整保留，仅删除了部分修饰性表述（如'降低制度性交易成本'、'按照'能减则减、能合则合'的原则'），未扭曲或过度泛化原意。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.9,\n      \"weight\": 0.35,\n      \"reason\": \"关键事实（2024年底前、压缩比例不低于30%）准确保留；删除了鼓励性的'50%以内'，但该条为非强制性要求，不影响核心事实。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"原文总分结构及三个要点的编号完全保留，逻辑关系清晰未破坏。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"语句通顺，标点正确，排版规范，治理后更为简洁流畅。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 8.228,
-        "input_tokens": 2381,
-        "output_tokens": 641,
-        "total_tokens": 3022
+        "flaws": [
+          {
+            "category": "over_clean",
+            "severity": "minor",
+            "description": "删除了开头部分'降低制度性交易成本，激发市场主体活力'及'全面推进政务服务标准化规范化便利化'，弱化了政策背景表述。",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 198,
+              "snippet": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事"
+            },
+            "suggestion": "建议保留关键背景信息以维持政策完整性。"
+          },
+          {
+            "category": "over_clean",
+            "severity": "minor",
+            "description": "删除了第一条中的原则'按照'能减则减、能合则合'的原则'和'对现有行政许可事项进行全面清理'，弱化了清理工作的依据。",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 198,
+              "snippet": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事"
+            },
+            "suggestion": "建议保留原则性表述以指导执行。"
+          },
+          {
+            "category": "over_clean",
+            "severity": "major",
+            "description": "删除了第二条中的鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'，丢失了重要的差别化激励政策。",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 198,
+              "snippet": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事"
+            },
+            "suggestion": "建议恢复该条款，体现政策灵活性。"
+          },
+          {
+            "category": "over_clean",
+            "severity": "major",
+            "description": "删除了第三条中的条件'主要申请条件符合要求的'和时间要求'在规定时间内'，放宽了容缺受理的适用范围，丢失了重要限制信息。",
+            "location": {
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 198,
+              "snippet": "为贯彻落实党中央、国务院关于深化\"放管服\"改革的决策部署，持续优化营商环境，现就精简行政许可事项、压缩审批时限、推行\"容缺受理\"提出以下意见：一、精简行政许可事"
+            },
+            "suggestion": "建议恢复原文条件表述，避免政策执行歧义。"
+          }
+        ],
+        "reproducibility_token": "200c536d73de4f41",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本删除了多处重要信息：开头删除了'降低制度性交易成本，激发市场主体活力'和'全面推进政务服务标准化规范化便利化'；第一条删除了原则性表述'能减则减、能合则合'和'全面清理'；第二条删除了鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'；第三条删除了'主要申请条件符合要求的'和'在规定时间内'。这些删除导致关键政策信息和限定条件丢失，尤其是50%以内的压缩比例被整体删除，属于约束性信息缺失。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有数据（2024年底、不低于30%）、主体和责任均与原文一致，没有无中生有或歪曲。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构完全相同，均采用三个要点的列表形式，逻辑关系和层级关系未受影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本语句通顺，排版规范，标点正确，且因删除冗余表述而更加简洁易读。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"minor\",\n      \"description\": \"删除了开头部分'降低制度性交易成本，激发市场主体活力'及'全面推进政务服务标准化规范化便利化'，弱化了政策背景表述。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"降低制度性交易成本，激发市场主体活力\"\n      },\n      \"suggestion\": \"建议保留关键背景信息以维持政策完整性。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"minor\",\n      \"description\": \"删除了第一条中的原则'按照'能减则减、能合则合'的原则'和'对现有行政许可事项进行全面清理'，弱化了清理工作的依据。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"按照'能减则减、能合则合'的原则\"\n      },\n      \"suggestion\": \"建议保留原则性表述以指导执行。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"删除了第二条中的鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'，丢失了重要的差别化激励政策。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"鼓励有条件的地区将办理时限压缩至法定时限的50%以内\"\n      },\n      \"suggestion\": \"建议恢复该条款，体现政策灵活性。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"删除了第三条中的条件'主要申请条件符合要求的'和时间要求'在规定时间内'，放宽了容缺受理的适用范围，丢失了重要限制信息。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"主要申请条件符合要求的，可先行受理，要求申请人在规定时间内补齐材料\"\n      },\n      \"suggestion\": \"建议恢复原文条件表述，避免政策执行歧义。\"\n    }\n  ]\n}",
+        "latency_seconds": 19.403,
+        "input_tokens": 2783,
+        "output_tokens": 2366,
+        "total_tokens": 5149
       },
       "bias": {
         "length_bias": {
@@ -1738,20 +1850,21 @@
           "mitigation": null
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "无位置信息，无法检测位置偏置",
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（4/4），可能存在\"后严先松\"偏置",
           "front_count": 0,
-          "back_count": 0
+          "back_count": 4,
+          "total": 4
         },
-        "bias_mitigation_score": 0.8
+        "bias_mitigation_score": 1.0
       },
       "stability": null,
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "9f849c570a687110",
-        "token2": "9f849c570a687110"
+        "token1": "200c536d73de4f41",
+        "token2": "200c536d73de4f41"
       }
     },
     {
@@ -1782,54 +1895,54 @@
         "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降"
       },
       "evaluation": {
-        "overall_score": 0.9072,
+        "overall_score": 0.9215,
         "verdict": "pass",
         "dimensions": [
           {
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有核心信息完整保留，未发生扭曲或过度泛化，顺序调整不改变语义。"
+            "reason": "治理后文本完整保留了原文的所有信息，无信息删除、遗漏或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "数字、日期、金额等关键事实完全一致，无篡改。"
+            "reason": "治理后文本未篡改任何事实，数值、日期、名称等均与原文一致。"
           },
           {
             "dimension": "structure",
-            "score": 0.7,
+            "score": 0.8,
             "weight": 0.15,
-            "reason": "段落顺序调换，背景与目标的逻辑关系被轻微打乱（目标先于背景），但各部分内部关系保持，整体仍可理解。"
+            "reason": "治理后文本将【背景】和【目标】的顺序互换，破坏了原文“先背景后目标”的逻辑顺序，但内容层级关系和段落独立性未受实质影响。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，标点正确。"
+            "reason": "句子通顺，标点规范，排版清晰，无表达质量问题。"
           }
         ],
         "flaws": [
           {
             "category": "structure",
             "severity": "minor",
-            "description": "段落顺序调整：治理前顺序为背景、目标、方案、预算；治理后顺序为目标、背景、方案、预算。背景与目标位置互换，影响了逻辑连贯性。",
+            "description": "治理后文本将【背景】和【目标】的顺序互换，导致逻辑顺序改变。",
             "location": {
-              "segment_id": "1",
+              "segment_id": "[After 1]",
               "start_char": 0,
-              "end_char": 35,
-              "snippet": "【目标】通过智能信号灯控制系统"
+              "end_char": 104,
+              "snippet": "【目标】通过智能信号灯控制系统，将高峰期平均通行时间缩短20%。【背景】本项目旨在解决城市交通拥堵问题。【方案】采用深度强化学习算法，实时优化路口信号配时。【预"
             },
-            "suggestion": "恢复原文顺序，将背景段落置于目标之前。"
+            "suggestion": "恢复原文顺序：先【背景】再【目标】。"
           }
         ],
-        "reproducibility_token": "874461dde41f5470",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有核心信息完整保留，未发生扭曲或过度泛化，顺序调整不改变语义。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"数字、日期、金额等关键事实完全一致，无篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.7,\n      \"weight\": 0.15,\n      \"reason\": \"段落顺序调换，背景与目标的逻辑关系被轻微打乱（目标先于背景），但各部分内部关系保持，整体仍可理解。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，标点正确。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"minor\",\n      \"description\": \"段落顺序调整：治理前顺序为背景、目标、方案、预算；治理后顺序为目标、背景、方案、预算。背景与目标位置互换，影响了逻辑连贯性。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 0,\n        \"end_char\": 35,\n        \"snippet\": \"【目标】通过智能信号灯控制系统\"\n      },\n      \"suggestion\": \"恢复原文顺序，将背景段落置于目标之前。\"\n    }\n  ]\n}",
-        "latency_seconds": 10.869,
-        "input_tokens": 2103,
-        "output_tokens": 812,
-        "total_tokens": 2915
+        "reproducibility_token": "b81055ffc512531e",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息，无信息删除、遗漏或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，数值、日期、名称等均与原文一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.8,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本将【背景】和【目标】的顺序互换，破坏了原文“先背景后目标”的逻辑顺序，但内容层级关系和段落独立性未受实质影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，标点规范，排版清晰，无表达质量问题。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"minor\",\n      \"description\": \"治理后文本将【背景】和【目标】的顺序互换，导致逻辑顺序改变。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"【背景】本项目旨在解决城市交通拥堵问题。【目标】通过智能信号灯控制系统\"\n      },\n      \"suggestion\": \"恢复原文顺序：先【背景】再【目标】。\"\n    }\n  ]\n}",
+        "latency_seconds": 7.821,
+        "input_tokens": 2505,
+        "output_tokens": 788,
+        "total_tokens": 3293
       },
       "bias": {
         "length_bias": {
@@ -1855,8 +1968,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "874461dde41f5470",
-        "token2": "874461dde41f5470"
+        "token1": "b81055ffc512531e",
+        "token2": "b81055ffc512531e"
       }
     },
     {
@@ -1881,34 +1994,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后完全保留了原意，核心信息完整无缺失，仅日期格式标准化，无扭曲或过度泛化。"
+            "reason": "治理后文本完整保留了原文的所有信息，包括日期、项目事件和验收时间，没有信息被删除或泛化。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数字、日期完全一致，无任何事实变更。"
+            "reason": "治理后文本仅对日期格式进行标准化处理，所有事实（签署日期、有效期、会议日期、验收截止日期）均未改变。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑关系完全保持，句子结构相同，因果、并列关系未受影响。"
+            "reason": "治理前后文本的句子结构、信息顺序和逻辑关系完全一致，无结构变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，标点符号正确，日期标准化后可读性略有提升。"
+            "reason": "治理后文本将不规范的日期格式统一为ISO格式，消除了斜杠和汉字混用，提高了可读性。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "101a52ef4e3ad3cb",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后完全保留了原意，核心信息完整无缺失，仅日期格式标准化，无扭曲或过度泛化。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数字、日期完全一致，无任何事实变更。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑关系完全保持，句子结构相同，因果、并列关系未受影响。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，标点符号正确，日期标准化后可读性略有提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 5.215,
-        "input_tokens": 2057,
-        "output_tokens": 506,
-        "total_tokens": 2563
+        "reproducibility_token": "b4aeee1f898e9046",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息，包括日期、项目事件和验收时间，没有信息被删除或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本仅对日期格式进行标准化处理，所有事实（签署日期、有效期、会议日期、验收截止日期）均未改变。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本的句子结构、信息顺序和逻辑关系完全一致，无结构变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本将不规范的日期格式统一为ISO格式，消除了斜杠和汉字混用，提高了可读性。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 4.783,
+        "input_tokens": 2459,
+        "output_tokens": 554,
+        "total_tokens": 3013
       },
       "bias": {
         "length_bias": {
@@ -1933,8 +2046,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "101a52ef4e3ad3cb",
-        "token2": "101a52ef4e3ad3cb"
+        "token1": "b4aeee1f898e9046",
+        "token2": "b4aeee1f898e9046"
       }
     },
     {
@@ -1977,78 +2090,78 @@
         "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降"
       },
       "evaluation": {
-        "overall_score": 0.303,
+        "overall_score": 0.4517,
         "verdict": "fail",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.5,
+            "score": 0.3,
             "weight": 0.35,
-            "reason": "治理后保留了保密信息定义的基本框架和排除项，但删除了时间限定、获悉方式、标注要求以及简化了排除项中的形式要求，导致保密信息范围显著扩大，原意被弱化。"
+            "reason": "删除了多个关键限定词：'在本协议签署前后'、'以书面或口头形式获悉的'、'且甲方明确标注为'保密'或'机密''，以及排除项中的'乙方在获悉前'和'书面'，导致保密信息的定义范围被不当泛化，信息保真度严重受损。"
           },
           {
             "dimension": "factual",
-            "score": 0.3,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "关键事实变更：删除‘签署前后’、‘书面或口头’、‘明确标注为保密或机密’等限定，以及将‘经甲方书面同意’简化为‘经甲方同意’，属于定义条款弱化，事实准确性严重受损。"
+            "reason": "治理后文本未篡改任何事实性内容，所有变更均为信息删除而非事实修改。"
           },
           {
             "dimension": "structure",
             "score": 0.6,
             "weight": 0.15,
-            "reason": "原文采用总分结构并附编号列表，治理后合并为单句，但定义与排除的逻辑关系保持完整，未打乱因果或层级关系。"
+            "reason": "原文中的有序列表（（1）（2）（3））被压缩为连续句子，失去层级结构，但因果关系和排除逻辑仍清晰。"
           },
           {
             "dimension": "readability",
-            "score": 0.9,
+            "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后语句更简洁通顺，标点使用正确，排版规范，可读性良好。"
+            "reason": "治理后文本语句通顺，排版规范，无标点错误，可读性良好。"
           }
         ],
         "flaws": [
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "critical",
-            "description": "删除了关键定义限定词：‘在本协议签署前后’、‘以书面或口头形式获悉’、‘明确标注为保密或机密’，导致保密信息定义范围扩大，法律含义改变。",
+            "description": "删除了保密信息定义中的时间限定（签署前后）、方式限定（书面或口头）和认定标准（明确标注为保密或机密），导致定义范围被不当扩大。",
             "location": {
-              "segment_id": "1",
+              "segment_id": "[After 1]",
               "start_char": 0,
-              "end_char": 15,
-              "snippet": "本协议所称保密信息，是指甲方向乙方披露的"
+              "end_char": 84,
+              "snippet": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露"
             },
-            "suggestion": "恢复原文中的时间、方式和标注要求。"
+            "suggestion": "恢复被删除的限定词，确保定义完整准确。"
           },
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "major",
-            "description": "将‘经甲方书面同意’简化为‘经甲方同意’，删除了‘书面’方式限定，弱化了披露授权的形式要求。",
+            "description": "排除项中删除了'乙方在获悉前'和'经甲方书面同意'中的'书面'，改变了排除条件的范围。",
             "location": {
-              "segment_id": "1",
-              "start_char": 47,
-              "end_char": 53,
-              "snippet": "经甲方同意可披露"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 84,
+              "snippet": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露"
             },
-            "suggestion": "恢复‘书面’限定。"
+            "suggestion": "保持排除项的完整表述，明确排除前提。"
           },
           {
-            "category": "mis_edit",
-            "severity": "major",
-            "description": "将排除项‘乙方在获悉前已合法持有的信息’简化为‘已合法持有的信息’，未明确主体为乙方，可能导致主体泛化。",
+            "category": "structure",
+            "severity": "minor",
+            "description": "原文中的分项列举（（1）（2）（3））被合并为连续句子，结构化程度降低。",
             "location": {
-              "segment_id": "1",
-              "start_char": 40,
-              "end_char": 47,
-              "snippet": "已合法持有的信息"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 84,
+              "snippet": "本协议所称保密信息，是指甲方向乙方披露的与甲方业务相关的信息，包括技术信息、商业信息及其他信息，但不包括已合法持有的信息、公开渠道可获得的信息或经甲方同意可披露"
             },
-            "suggestion": "明确主体为‘乙方在获悉前已合法持有’。"
+            "suggestion": "建议保留列表形式以增强清晰度。"
           }
         ],
-        "reproducibility_token": "eba953e20b3b5e89",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.5,\n      \"weight\": 0.35,\n      \"reason\": \"治理后保留了保密信息定义的基本框架和排除项，但删除了时间限定、获悉方式、标注要求以及简化了排除项中的形式要求，导致保密信息范围显著扩大，原意被弱化。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"关键事实变更：删除‘签署前后’、‘书面或口头’、‘明确标注为保密或机密’等限定，以及将‘经甲方书面同意’简化为‘经甲方同意’，属于定义条款弱化，事实准确性严重受损。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.6,\n      \"weight\": 0.15,\n      \"reason\": \"原文采用总分结构并附编号列表，治理后合并为单句，但定义与排除的逻辑关系保持完整，未打乱因果或层级关系。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 0.9,\n      \"weight\": 0.15,\n      \"reason\": \"治理后语句更简洁通顺，标点使用正确，排版规范，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"critical\",\n      \"description\": \"删除了关键定义限定词：‘在本协议签署前后’、‘以书面或口头形式获悉’、‘明确标注为保密或机密’，导致保密信息定义范围扩大，法律含义改变。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 0,\n        \"end_char\": 0,\n        \"snippet\": \"本协议所称保密信息，是指甲方向乙方披露的\"\n      },\n      \"suggestion\": \"恢复原文中的时间、方式和标注要求。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"将‘经甲方书面同意’简化为‘经甲方同意’，删除了‘书面’方式限定，弱化了披露授权的形式要求。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 47,\n        \"end_char\": 53,\n        \"snippet\": \"经甲方同意可披露\"\n      },\n      \"suggestion\": \"恢复‘书面’限定。\"\n    },\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"将排除项‘乙方在获悉前已合法持有的信息’简化为‘已合法持有的信息’，未明确主体为乙方，可能导致主体泛化。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 40,\n        \"end_char\": 47,\n        \"snippet\": \"已合法持有的信息\"\n      },\n      \"suggestion\": \"明确主体为‘乙方在获悉前已合法持有’。\"\n    }\n  ]\n}",
-        "latency_seconds": 18.71,
-        "input_tokens": 2137,
-        "output_tokens": 1585,
-        "total_tokens": 3722
+        "reproducibility_token": "5857657160ccc9de",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"删除了多个关键限定词：'在本协议签署前后'、'以书面或口头形式获悉的'、'且甲方明确标注为'保密'或'机密''，以及排除项中的'乙方在获悉前'和'书面'，导致保密信息的定义范围被不当泛化，信息保真度严重受损。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实性内容，所有变更均为信息删除而非事实修改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.6,\n      \"weight\": 0.15,\n      \"reason\": \"原文中的有序列表（（1）（2）（3））被压缩为连续句子，失去层级结构，但因果关系和排除逻辑仍清晰。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本语句通顺，排版规范，无标点错误，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"critical\",\n      \"description\": \"删除了保密信息定义中的时间限定（签署前后）、方式限定（书面或口头）和认定标准（明确标注为保密或机密），导致定义范围被不当扩大。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"在本协议签署前后向乙方披露的、以书面或口头形式获悉的、且甲方明确标注为\"\n      },\n      \"suggestion\": \"恢复被删除的限定词，确保定义完整准确。\"\n    },\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"排除项中删除了'乙方在获悉前'和'经甲方书面同意'中的'书面'，改变了排除条件的范围。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"乙方在获悉前已合法持有的信息、经甲方书面同意可以披露的信息\"\n      },\n      \"suggestion\": \"保持排除项的完整表述，明确排除前提。\"\n    },\n    {\n      \"category\": \"structure\",\n      \"severity\": \"minor\",\n      \"description\": \"原文中的分项列举（（1）（2）（3））被合并为连续句子，结构化程度降低。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"但不包括：（1）乙方在获悉前已合法持有的信息；（2）通过公开渠道可获得的信息；（3）经甲方书面同意可以披露的信息。\"\n      },\n      \"suggestion\": \"建议保留列表形式以增强清晰度。\"\n    }\n  ]\n}",
+        "latency_seconds": 12.315,
+        "input_tokens": 2539,
+        "output_tokens": 1331,
+        "total_tokens": 3870
       },
       "bias": {
         "length_bias": {
@@ -2061,11 +2174,11 @@
           "mitigation": "建议在评估时区分结构优化导致的长度变化与语义丢失"
         },
         "position_bias": {
-          "has_bias": false,
-          "bias_type": null,
-          "description": "瑕疵分布较均匀（前1/后2），位置偏置风险低",
-          "front_count": 1,
-          "back_count": 2,
+          "has_bias": true,
+          "bias_type": "back_bias",
+          "description": "瑕疵集中出现在文本后半部分（3/3），可能存在\"后严先松\"偏置",
+          "front_count": 0,
+          "back_count": 3,
           "total": 3
         },
         "bias_mitigation_score": 1.0
@@ -2074,8 +2187,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "eba953e20b3b5e89",
-        "token2": "eba953e20b3b5e89"
+        "token1": "5857657160ccc9de",
+        "token2": "5857657160ccc9de"
       }
     },
     {
@@ -2100,34 +2213,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后完整保留了原意，核心信息（加密算法、协议、安全功能）无缺失，仅去除了重复的冗余词，语义完全一致。"
+            "reason": "治理后文本完整保留了原文的所有信息，仅去除了重复词汇，未遗漏或泛化任何内容。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有事实（AES-256加密算法、TLS 1.3协议、多因素身份认证、异常登录检测、日志审计）均准确无误，无任何篡改或丢失。"
+            "reason": "治理后文本未篡改任何事实，所有技术参数（AES-256、TLS 1.3等）和功能描述均保持一致。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "原文为单一段落内的并列列举，治理后保持了相同的逻辑顺序和层次，无结构变化。"
+            "reason": "逻辑结构和段落组织完全一致，未改变任何关系或顺序。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后去除了重复词，句子更通顺，标点符号使用正确，排版规范，可读性提升。"
+            "reason": "治理后文本去除了重复词汇，句子更通顺，标点符号使用正确，可读性显著提升。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "aaf31d7d557971e7",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后完整保留了原意，核心信息（加密算法、协议、安全功能）无缺失，仅去除了重复的冗余词，语义完全一致。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有事实（AES-256加密算法、TLS 1.3协议、多因素身份认证、异常登录检测、日志审计）均准确无误，无任何篡改或丢失。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"原文为单一段落内的并列列举，治理后保持了相同的逻辑顺序和层次，无结构变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后去除了重复词，句子更通顺，标点符号使用正确，排版规范，可读性提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 4.975,
-        "input_tokens": 2119,
-        "output_tokens": 443,
-        "total_tokens": 2562
+        "reproducibility_token": "4c3d85ca9de30ae1",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文的所有信息，仅去除了重复词汇，未遗漏或泛化任何内容。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本未篡改任何事实，所有技术参数（AES-256、TLS 1.3等）和功能描述均保持一致。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑结构和段落组织完全一致，未改变任何关系或顺序。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本去除了重复词汇，句子更通顺，标点符号使用正确，可读性显著提升。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 3.584,
+        "input_tokens": 2521,
+        "output_tokens": 374,
+        "total_tokens": 2895
       },
       "bias": {
         "length_bias": {
@@ -2148,12 +2261,40 @@
         },
         "bias_mitigation_score": 0.8
       },
-      "stability": null,
+      "stability": {
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "std_dev": 0.0,
+        "is_stable": true,
+        "samples": [
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          },
+          {
+            "semantic": 1.0,
+            "factual": 1.0,
+            "structure": 1.0,
+            "readability": 1.0,
+            "overall": 1.0
+          }
+        ]
+      },
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "aaf31d7d557971e7",
-        "token2": "aaf31d7d557971e7"
+        "token1": "4c3d85ca9de30ae1",
+        "token2": "4c3d85ca9de30ae1"
       }
     },
     {
@@ -2184,54 +2325,54 @@
         "rationale": "文本结构和表达保持一致，但关键财务数据被篡改，属于严重事实错误。"
       },
       "evaluation": {
-        "overall_score": 0.4632,
-        "verdict": "fail",
+        "overall_score": 0.5525,
+        "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.4,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "核心财务数据（营业收入）被篡改，数值从126.8变为128.6，导致原意部分失真；其他信息保留完整。"
+            "reason": "治理后文本完整保留了原文除一个数值外的所有信息，没有信息被删除或泛化。"
           },
           {
             "dimension": "factual",
-            "score": 0.3,
+            "score": 0.0,
             "weight": 0.35,
-            "reason": "营业收入关键数据被错误修改，属事实性错误，尽管偏差不大但核心数据不可接受。"
+            "reason": "原文营业收入为126.8亿元，治理后错误地改为128.6亿元，事实被篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理前后文本结构完全一致，无逻辑关系或层级变化。"
+            "reason": "治理前后文本结构一致，均为单句叙述，信息组织方式未改变。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理前后可读性相同，语句通顺，标点正确。"
+            "reason": "治理后文本语句通顺，标点正确，可读性良好。"
           }
         ],
         "flaws": [
           {
             "category": "mis_edit",
             "severity": "major",
-            "description": "营业收入数值从126.8亿元被错误修改为128.6亿元。",
+            "description": "原文营业收入为126.8亿元，治理后错误地改为128.6亿元，数值差1.8亿元，属于事实篡改。",
             "location": {
-              "segment_id": "1",
-              "start_char": 21,
-              "end_char": 28,
-              "snippet": "128.6亿元"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 92,
+              "snippet": "截至2024年6月30日，公司实现营业收入128.6亿元，同比增长18.4%；归属于上市公司股东的净利润21.6亿元，同比增长24.8%。研发投入9.8亿元，占"
             },
-            "suggestion": "将128.6亿元恢复为126.8亿元。"
+            "suggestion": "将128.6亿元恢复为126.8亿元"
           }
         ],
-        "reproducibility_token": "230f283a13f83764",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"核心财务数据（营业收入）被篡改，数值从126.8变为128.6，导致原意部分失真；其他信息保留完整。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"营业收入关键数据被错误修改，属事实性错误，尽管偏差不大但核心数据不可接受。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构完全一致，无逻辑关系或层级变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后可读性相同，语句通顺，标点正确。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"营业收入数值从126.8亿元被错误修改为128.6亿元。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 21,\n        \"end_char\": 28,\n        \"snippet\": \"128.6亿元\"\n      },\n      \"suggestion\": \"将128.6亿元恢复为126.8亿元。\"\n    }\n  ]\n}",
-        "latency_seconds": 19.772,
-        "input_tokens": 2079,
-        "output_tokens": 1666,
-        "total_tokens": 3745
+        "reproducibility_token": "fc07d548dd18b3f3",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文除一个数值外的所有信息，没有信息被删除或泛化。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 0.0,\n      \"weight\": 0.35,\n      \"reason\": \"原文营业收入为126.8亿元，治理后错误地改为128.6亿元，事实被篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理前后文本结构一致，均为单句叙述，信息组织方式未改变。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本语句通顺，标点正确，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"原文营业收入为126.8亿元，治理后错误地改为128.6亿元，数值差1.8亿元，属于事实篡改。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"实现营业收入126.8亿元\"\n      },\n      \"suggestion\": \"将128.6亿元恢复为126.8亿元\"\n    }\n  ]\n}",
+        "latency_seconds": 4.815,
+        "input_tokens": 2481,
+        "output_tokens": 550,
+        "total_tokens": 3031
       },
       "bias": {
         "length_bias": {
@@ -2251,14 +2392,14 @@
           "back_count": 1,
           "total": 1
         },
-        "bias_mitigation_score": 1.0
+        "bias_mitigation_score": 0.75
       },
       "stability": null,
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "230f283a13f83764",
-        "token2": "230f283a13f83764"
+        "token1": "fc07d548dd18b3f3",
+        "token2": "fc07d548dd18b3f3"
       }
     },
     {
@@ -2283,34 +2424,34 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "治理后文本将15亿元转换为150000万元，核心信息完全一致，原意完整保留。"
+            "reason": "治理后文本完整保留了原文信息，仅将'15亿元'等价转换为'150000万元'，未遗漏或删除任何内容。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "15亿元与150000万元等值，事实准确无误。"
+            "reason": "数值等价（15亿元=150000万元），事实未篡改。"
           },
           {
             "dimension": "structure",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "逻辑结构完全一致，无任何改动。"
+            "reason": "结构完全一致，无变化。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺，排版规范，与原文相同。"
+            "reason": "句子通顺，排版规范，标点正确。"
           }
         ],
         "flaws": [],
-        "reproducibility_token": "7e4dfb7babcc205a",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本将15亿元转换为150000万元，核心信息完全一致，原意完整保留。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"15亿元与150000万元等值，事实准确无误。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"逻辑结构完全一致，无任何改动。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，与原文相同。\"\n    }\n  ],\n  \"flaws\": []\n}",
-        "latency_seconds": 3.264,
-        "input_tokens": 1961,
-        "output_tokens": 294,
-        "total_tokens": 2255
+        "reproducibility_token": "7df742aa06b5169f",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文信息，仅将'15亿元'等价转换为'150000万元'，未遗漏或删除任何内容。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"数值等价（15亿元=150000万元），事实未篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"结构完全一致，无变化。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺，排版规范，标点正确。\"\n    }\n  ],\n  \"flaws\": []\n}",
+        "latency_seconds": 2.776,
+        "input_tokens": 2363,
+        "output_tokens": 286,
+        "total_tokens": 2649
       },
       "bias": {
         "length_bias": {
@@ -2335,8 +2476,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "7e4dfb7babcc205a",
-        "token2": "7e4dfb7babcc205a"
+        "token1": "7df742aa06b5169f",
+        "token2": "7df742aa06b5169f"
       }
     },
     {
@@ -2367,54 +2508,54 @@
         "rationale": "删除了原文明确列举的重要信息，属于典型过度治理，但未篡改已有事实。"
       },
       "evaluation": {
-        "overall_score": 0.3995,
-        "verdict": "fail",
+        "overall_score": 0.731,
+        "verdict": "review",
         "dimensions": [
           {
             "dimension": "semantic",
-            "score": 0.3,
+            "score": 0.6,
             "weight": 0.35,
-            "reason": "原文列举了四个重点方向（人工智能、大数据、工业互联网、数字孪生），治理后仅保留两个（人工智能、大数据），删除了工业互联网和数字孪生，核心信息丢失约50%，语义被大幅简化，故给0.3。"
+            "reason": "治理后删除了'工业互联网'和'数字孪生'两个方向，信息不完整，但核心布局人工智能和大数据的方向保留。"
           },
           {
             "dimension": "factual",
-            "score": 0.4,
+            "score": 1.0,
             "weight": 0.35,
-            "reason": "虽然未篡改数值或日期，但删除了原文明确列出的两个方向（工业互联网、数字孪生），属于事实信息丢失，且未声明删除原因，故给0.4。"
+            "reason": "未篡改任何事实，仅删除了部分信息。"
           },
           {
             "dimension": "structure",
-            "score": 0.5,
+            "score": 1.0,
             "weight": 0.15,
-            "reason": "原文为并列列举四个方向，治理后破坏了并列关系，仅保留两个，结构被简化，但整体仍保持因果（布局→推进）关系，故给0.5。"
+            "reason": "结构保持并列列举形式，未改变逻辑关系。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "治理后句子通顺，标点正确，无语法问题，可读性不受影响。"
+            "reason": "语句通顺，标点正确。"
           }
         ],
         "flaws": [
           {
-            "category": "mis_edit",
+            "category": "over_clean",
             "severity": "major",
-            "description": "删除了原文明确提及的'工业互联网及数字孪生四个方向'，导致核心信息丢失约一半。",
+            "description": "删除了'工业互联网'和'数字孪生'两个重点方向，导致信息不完整。",
             "location": {
-              "segment_id": "1",
-              "start_char": 17,
-              "end_char": 17,
-              "snippet": "工业互联网及数字孪生四个方向"
+              "segment_id": "[After 1]",
+              "start_char": 0,
+              "end_char": 30,
+              "snippet": "公司未来将重点布局人工智能和大数据，并持续推进智能制造升级。"
             },
-            "suggestion": "建议保留原文所有四个方向，或补充说明删除理由。"
+            "suggestion": "保留所有四个方向，或说明删除理由。"
           }
         ],
-        "reproducibility_token": "273cb49eda240bf2",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 0.3,\n      \"weight\": 0.35,\n      \"reason\": \"原文列举了四个重点方向（人工智能、大数据、工业互联网、数字孪生），治理后仅保留两个（人工智能、大数据），删除了工业互联网和数字孪生，核心信息丢失约50%，语义被大幅简化，故给0.3。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 0.4,\n      \"weight\": 0.35,\n      \"reason\": \"虽然未篡改数值或日期，但删除了原文明确列出的两个方向（工业互联网、数字孪生），属于事实信息丢失，且未声明删除原因，故给0.4。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.5,\n      \"weight\": 0.15,\n      \"reason\": \"原文为并列列举四个方向，治理后破坏了并列关系，仅保留两个，结构被简化，但整体仍保持因果（布局→推进）关系，故给0.5。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后句子通顺，标点正确，无语法问题，可读性不受影响。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"mis_edit\",\n      \"severity\": \"major\",\n      \"description\": \"删除了原文明确提及的'工业互联网及数字孪生四个方向'，导致核心信息丢失约一半。\",\n      \"location\": {\n        \"segment_id\": \"1\",\n        \"start_char\": 17,\n        \"end_char\": 17,\n        \"snippet\": \"工业互联网及数字孪生四个方向\"\n      },\n      \"suggestion\": \"建议保留原文所有四个方向，或补充说明删除理由。\"\n    }\n  ]\n}",
-        "latency_seconds": 13.77,
-        "input_tokens": 1955,
-        "output_tokens": 1184,
-        "total_tokens": 3139
+        "reproducibility_token": "d6d32d8454e84c7b",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 0.6,\n      \"weight\": 0.35,\n      \"reason\": \"治理后删除了'工业互联网'和'数字孪生'两个方向，信息不完整，但核心布局人工智能和大数据的方向保留。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"未篡改任何事实，仅删除了部分信息。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"结构保持并列列举形式，未改变逻辑关系。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"语句通顺，标点正确。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"over_clean\",\n      \"severity\": \"major\",\n      \"description\": \"删除了'工业互联网'和'数字孪生'两个重点方向，导致信息不完整。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1]\",\n        \"after_anchor\": \"[After 1]\",\n        \"snippet\": \"人工智能、大数据、工业互联网及数字孪生\"\n      },\n      \"suggestion\": \"保留所有四个方向，或说明删除理由。\"\n    }\n  ]\n}",
+        "latency_seconds": 4.666,
+        "input_tokens": 2357,
+        "output_tokens": 537,
+        "total_tokens": 2894
       },
       "bias": {
         "length_bias": {
@@ -2440,8 +2581,8 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "273cb49eda240bf2",
-        "token2": "273cb49eda240bf2"
+        "token1": "d6d32d8454e84c7b",
+        "token2": "d6d32d8454e84c7b"
       }
     },
     {
@@ -2479,47 +2620,47 @@
             "dimension": "semantic",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有核心信息（产品名称、单价、库存、总销售额）均完整保留，无扭曲或泛化，语义完全一致。"
+            "reason": "治理后文本完整保留了原文所有信息，包括产品名称、单价、库存数量和总销售额，无信息遗漏或删除。"
           },
           {
             "dimension": "factual",
             "score": 1.0,
             "weight": 0.35,
-            "reason": "所有数值（98元、168元、299元、125、86、42、47.5万元）及产品名称均准确无误，未发生任何篡改。"
+            "reason": "治理后文本中的所有数值（98元、168元、299元、125件、86件、42件、47.5万元）与原文完全一致，无事实篡改。"
           },
           {
             "dimension": "structure",
             "score": 0.3,
             "weight": 0.15,
-            "reason": "原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化关系（行、列对齐）完全丢失，导致信息检索和对比效率下降。"
+            "reason": "原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式被破坏，导致结构保真度严重下降。"
           },
           {
             "dimension": "readability",
             "score": 1.0,
             "weight": 0.15,
-            "reason": "句子通顺连贯，标点使用正确，排版清晰，可读性良好。"
+            "reason": "治理后文本句子通顺，标点使用正确，排版规范，比表格更易读。"
           }
         ],
         "flaws": [
           {
             "category": "structure",
             "severity": "critical",
-            "description": "Markdown表格被转换为纯文本，破坏了表格结构及数据的列对齐对比性，属于结构损伤。",
+            "description": "治理后文本将原文的表格结构完全转换为纯文本段落，丢失了表格的格式化对比信息，属于结构破坏。",
             "location": {
-              "segment_id": "7",
+              "segment_id": "[After 7]",
               "start_char": 0,
-              "end_char": 85,
-              "snippet": "A系列售价98元，库存125件；B系列售价168元，库存86件；C系列售价299元，库存42件。总销售额约47.5万元。"
+              "end_char": 0,
+              "snippet": "| 产品 | 单价 | 库存 | ... | C系列 | 299元 | 42 |"
             },
-            "suggestion": "建议保留表格格式以提高数据对比效率，或使用更清晰的列表格式。"
+            "suggestion": "若需保留结构化对比优势，建议继续使用表格形式或以列表形式呈现。"
           }
         ],
-        "reproducibility_token": "d979690909862f11",
-        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有核心信息（产品名称、单价、库存、总销售额）均完整保留，无扭曲或泛化，语义完全一致。\"\n    },\n    {\n      \"dimension\": \"factual\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"所有数值（98元、168元、299元、125、86、42、47.5万元）及产品名称均准确无误，未发生任何篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化关系（行、列对齐）完全丢失，导致信息检索和对比效率下降。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"句子通顺连贯，标点使用正确，排版清晰，可读性良好。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"Markdown表格被转换为纯文本，破坏了表格结构及数据的列对齐对比性，属于结构损伤。\",\n      \"location\": {\n        \"segment_id\": \"7\",\n        \"start_char\": 0,\n        \"end_char\": 85,\n        \"snippet\": \"A系列售价98元，库存125件；B系列售价168元，库存86件；C系列售价299元，库存42件。总销售额约47.5万元。\"\n      },\n      \"suggestion\": \"建议保留表格格式以提高数据对比效率，或使用更清晰的列表格式。\"\n    }\n  ]\n}",
-        "latency_seconds": 14.62,
-        "input_tokens": 2308,
-        "output_tokens": 1101,
-        "total_tokens": 3409
+        "reproducibility_token": "c214c340fa436715",
+        "raw_llm_output": "{\n  \"dimensions\": [\n    {\n      \"dimension\": \"semantic_fidelity\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本完整保留了原文所有信息，包括产品名称、单价、库存数量和总销售额，无信息遗漏或删除。\"\n    },\n    {\n      \"dimension\": \"factual_consistency\",\n      \"score\": 1.0,\n      \"weight\": 0.35,\n      \"reason\": \"治理后文本中的所有数值（98元、168元、299元、125件、86件、42件、47.5万元）与原文完全一致，无事实篡改。\"\n    },\n    {\n      \"dimension\": \"structure\",\n      \"score\": 0.3,\n      \"weight\": 0.15,\n      \"reason\": \"原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式被破坏，导致结构保真度严重下降。\"\n    },\n    {\n      \"dimension\": \"readability\",\n      \"score\": 1.0,\n      \"weight\": 0.15,\n      \"reason\": \"治理后文本句子通顺，标点使用正确，排版规范，比表格更易读。\"\n    }\n  ],\n  \"flaws\": [\n    {\n      \"category\": \"structure\",\n      \"severity\": \"critical\",\n      \"description\": \"治理后文本将原文的表格结构完全转换为纯文本段落，丢失了表格的格式化对比信息，属于结构破坏。\",\n      \"location\": {\n        \"before_anchor\": \"[Before 1] to [Before 5]\",\n        \"after_anchor\": \"[After 7]\",\n        \"snippet\": \"| 产品 | 单价 | 库存 | ... | C系列 | 299元 | 42 |\"\n      },\n      \"suggestion\": \"若需保留结构化对比优势，建议继续使用表格形式或以列表形式呈现。\"\n    }\n  ]\n}",
+        "latency_seconds": 12.746,
+        "input_tokens": 2710,
+        "output_tokens": 1250,
+        "total_tokens": 3960
       },
       "bias": {
         "length_bias": {
@@ -2545,17 +2686,17 @@
       "reproducibility": {
         "token_match": true,
         "score_diff": 0.0,
-        "token1": "d979690909862f11",
-        "token2": "d979690909862f11"
+        "token1": "c214c340fa436715",
+        "token2": "c214c340fa436715"
       }
     }
   ],
   "calibration": {
-    "pearson_r": 0.8461,
-    "spearman_rho": 0.882,
-    "mae": 0.1305,
-    "rmse": 0.1867,
-    "consistency_rate": 0.52,
+    "pearson_r": 0.9161,
+    "spearman_rho": 0.9065,
+    "mae": 0.0638,
+    "rmse": 0.1042,
+    "consistency_rate": 0.72,
     "sample_count": 25,
     "details": [
       {
@@ -2563,197 +2704,1047 @@
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的全部信息，无任何信息删除、泛化或遗漏。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有数值、日期、名称均与原文一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理后文本与原文结构完全相同，段落、列表及逻辑关系均未改变。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本通顺流畅，标点规范，且去除了原文中的多余空格，可读性略有提升。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_002",
-        "llm_score": 0.1527,
+        "llm_score": 0.325,
         "human_score": 0.3,
-        "diff": 0.1473,
-        "consistent": false
+        "diff": 0.025,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.0,
+              "reason": "治理后完全删除了原文的三个具体升级方面（界面改版、智能推荐、性能提升50%），仅保留概括性描述，信息严重丢失。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本没有篡改任何事实，未引入错误信息，仅删除内容。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.0,
+              "reason": "原文采用总分结构列出三个方面，治理后变为单句，结构完全丧失。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后语句通顺，标点正确，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "critical",
+              "description": "原文三个方面的具体内容（界面改版、智能推荐、性能提升50%）被全部删除，仅保留模糊概括，属于严重信息丢失。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_003",
-        "llm_score": 0.369,
-        "human_score": 0.655,
-        "diff": 0.286,
-        "consistent": false
+        "llm_score": 0.612,
+        "human_score": 0.795,
+        "diff": 0.183,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息项，没有删除、泛化或遗漏任何信息。数值变更属于事实篡改，不影响语义保真度。"
+            },
+            {
+              "dimension": "factual",
+              "score": 0.2,
+              "reason": "治理后文本对原文多个数据进行了篡改：营业收入由125.8亿元改为128.5亿元，营业收入同比增长由23.5%改为23.6%，净利润同比增长由31.2%改为31.3%，研发投入占比由8.7%改为8.8%。这些改动全部属于事实错误，造成较大范围的信息失真，故得分极低。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本的段落结构、句子顺序、标点符号完全一致，逻辑关系未受任何影响。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本语句通顺，排版规范，标点正确，可读性与原文无异。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "mis_edit",
+              "severity": "major",
+              "description": "营业收入数值被篡改：125.8亿元改为128.5亿元"
+            },
+            {
+              "category": "mis_edit",
+              "severity": "minor",
+              "description": "营业收入同比增长率被篡改：23.5%改为23.6%"
+            },
+            {
+              "category": "mis_edit",
+              "severity": "minor",
+              "description": "净利润同比增长率被篡改：31.2%改为31.3%"
+            },
+            {
+              "category": "mis_edit",
+              "severity": "minor",
+              "description": "研发投入占营收比例被篡改：8.7%改为8.8%"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_004",
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息，没有删除、泛化或遗漏任何内容。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改原文的任何事实，包括订单号、日期、电话号码等均保持不变。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理后文本保持了原文的段落结构、句子顺序和逻辑关系，仅调整了空格。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本去掉了多余的空格，语句通顺，排版更规范，可读性略有提升。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_005",
-        "llm_score": 0.6712,
-        "human_score": 0.81,
-        "diff": 0.1388,
-        "consistent": false
+        "llm_score": 0.6581,
+        "human_score": 0.78,
+        "diff": 0.1219,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.95,
+              "reason": "治理后文本完整保留了所有产品数据（价格、销量）和总计销售额，仅省略了表格表头（产品、价格、销量列名），但核心信息未丢失，语义保真度高。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "所有事实数据（产品名、价格、销量、总计销售额）均与原文一致，无篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.3,
+              "reason": "原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式丧失，根据规则，得分不超过0.3。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本为自然流畅的句子，标点正确，排版规范，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "structure",
+              "severity": "critical",
+              "description": "Markdown表格被转为纯文本，表格结构丢失，影响信息的对比性和结构化呈现。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_006",
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理前后文本完全相同，信息完整保留，无遗漏或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理前后文本一致，无事实篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后结构一致，逻辑关系、段落划分均未改变。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "文本通顺，排版规范，无格式问题。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_007",
-        "llm_score": 0.555,
+        "llm_score": 0.48,
         "human_score": 0.4775,
-        "diff": 0.0775,
-        "consistent": true
+        "diff": 0.0025,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.7,
+              "reason": "核心信息基本保留，但部分词汇被过度简化（如'保存登录信息'变为'保存登录信'，'立即联系'变为'立联'），导致信息轻微丢失，但不影响整体含义理解。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "所有事实（如每90天、公共设备、异常登录联系技术支持）均未篡改，数值和关系完全一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.2,
+              "reason": "原文使用有序列表（1. 2. 3.）组织信息，治理后完全丢失列表结构，所有内容被压缩为连续文本，逻辑层次严重受损。"
+            },
+            {
+              "dimension": "readability",
+              "score": 0.1,
+              "reason": "治理后文本无任何标点符号和空格，词语被过度缩略（如'改密'、'立联'），阅读极为困难，流畅性极差。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "structure",
+              "severity": "critical",
+              "description": "原文的有序列表结构（1. 2. 3.）被完全清除，内容连续排列导致逻辑关系不清晰。"
+            },
+            {
+              "category": "readability",
+              "severity": "major",
+              "description": "全篇缺少标点符号和空格，大量词汇被简写（如'改密'、'立联'），导致语句断裂，难以流畅阅读。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "minor",
+              "description": "治理后文本将'保存登录信息'简化为'保存登录信'，省略'信息'二字；将'立即联系'简化为'立联'，省略'即'和'系'，导致信息表达略有缺失。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_008",
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息，没有遗漏、删除或泛化。仅是标点符号和空格规范化处理，不影响信息完整性。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有数值、人名、项目内容均与原文一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "原文的逻辑结构（会议纪要列表）完全保持，列表项顺序、层级关系未发生变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本标点符号使用规范，空格处理得当，语句通顺，排版更规整，可读性优于原文。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_009",
-        "llm_score": 0.255,
+        "llm_score": 0.5865,
         "human_score": 0.5725,
-        "diff": 0.3175,
-        "consistent": false
+        "diff": 0.014,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.2,
+              "reason": "治理后文本删除了大量具体信息：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元等，导致核心战略细节丢失，仅保留泛化表述，语义保真度严重下降。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有保留的信息均与原文一致，无无中生有或歪曲。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.8,
+              "reason": "治理后文本保持了原文的并列列表结构，但内部修饰性内容被删除，结构完整性略有下降，但基本逻辑关系未破坏。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本句子通顺，排版规范，标点正确，简洁易读。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "治理后删除了原文中多项关键战略细节：构建智能制造体系、优化全球采购网络、争取2030年实现碳中和目标、预计新增营收15亿元。这些信息对理解战略重点至关重要，过度简化导致信息丢失。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_010",
-        "llm_score": 0.285,
-        "human_score": 0.685,
-        "diff": 0.4,
-        "consistent": false
+        "llm_score": 0.3795,
+        "human_score": 0.6775,
+        "diff": 0.298,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.95,
+              "reason": "治理后文本将全称缩略为常用简称，但核心信息（合作主体、领域、技术方向）完整保留，无重要信息遗漏或删除。"
+            },
+            {
+              "dimension": "factual",
+              "score": 0.0,
+              "reason": "治理后文本将±1100千伏错误修改为±1000千伏，关键电压等级数值被篡改，事实严重不一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后均为单一段落结构，信息顺序和逻辑关系完全一致。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本句子通顺，标点正确，排版规范，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "mis_edit",
+              "severity": "critical",
+              "description": "将原文'±1100千伏'错误改为'±1000千伏'，电压等级数值被篡改，属于关键事实错误。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_011",
-        "llm_score": 0.4505,
-        "human_score": 0.315,
-        "diff": 0.1355,
-        "consistent": false
+        "llm_score": 0.494,
+        "human_score": 0.4125,
+        "diff": 0.0815,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.4,
+              "reason": "删除了重要信息：法律依据（《中华人民共和国数据安全法》第三十条）、主体限定（重要数据的处理者→数据处理者）、义务要求（按照规定、向有关主管部门报告）、报告内容中的'以及其他需要报告的事项'。核心语义保留但缺失大量关键限定，根据约束词删除规则，评分≤0.4。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "未篡改事实，仅删除信息，无新增或歪曲内容。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.8,
+              "reason": "原文为两个句子：义务规定+报告内容列举。治理后保持相同结构，但报告内容的并列项被简化（删除最后一项'以及其他需要报告的事项'），整体逻辑关系完整。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后句子简短通顺，无语法或标点错误，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "critical",
+              "description": "治理后文本删除了多项关键信息：法律依据‘《中华人民共和国数据安全法》第三十条规定’、主体限定‘重要数据的’、义务细节‘按照规定’和‘向有关主管部门报告’、报告内容中的‘以及其他需要报告的事项’。这些删除导致法律条款的完整性和约束力严重受损。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_012",
-        "llm_score": 1.0,
+        "llm_score": 0.895,
         "human_score": 1.0,
-        "diff": 0.0,
-        "consistent": true
+        "diff": 0.105,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.7,
+              "reason": "治理后文本将客户姓名和身份证号替换为星号（张**、***），属于信息泛化/删除，丢失了具体身份信息。但核心业务信息（投诉记录、时间、电话、问题、工单编号）均完整保留，整体语义保真度较高。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，日期、电话号码、工单编号等均与原文一致。姓名和身份证号的脱敏处理不属于事实篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本结构完全相同，均为一个完整句子，无列表、表格或层级关系变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本语句通顺，标点符号正确，星号不影响阅读流畅性。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_013",
-        "llm_score": 0.3217,
-        "human_score": 0.66,
-        "diff": 0.3383,
-        "consistent": false
+        "llm_score": 0.4485,
+        "human_score": 0.56,
+        "diff": 0.1115,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.5,
+              "reason": "治理后文本删除了引导语中的'以下材料'以及每个列表项中的括号补充说明（如含技术路线说明、含性能测试数据），导致信息部分丢失。但核心材料名称完整保留，故评分中等偏低。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有材料名称正确，无无中生有或歪曲。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.2,
+              "reason": "原文为有序列表结构（1-5项），治理后压缩为单个句子，列表层级完全丢失，结构严重损坏。"
+            },
+            {
+              "dimension": "readability",
+              "score": 0.9,
+              "reason": "治理后句子通顺，标点使用合理，排版规范，可读性良好。仅因信息合并略失清晰度，微扣。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "引导语中的限定词'以下材料'被删除，仅保留'项目验收需提交'，指示性信息丢失。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "critical",
+              "description": "列表项中的括号补充说明（如含技术路线说明、含性能测试数据）被完全删除，导致信息精度降低。算法预检标记为CRITICAL omission。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "其余列表项（Before 3-6）中的括号补充说明亦被删除，包括测试报告的含性能测试数据、用户手册及操作指南（无括号）、源代码及部署文档（无括号）、知识产权证明文件（无括号）。实际有括号的仅Before2和Before3，但均被删除。"
+            },
+            {
+              "category": "structure",
+              "severity": "critical",
+              "description": "原文的有序列表结构（1-5项，逐项列出）被压缩为单个句子，层级关系和可视化对比性完全丧失。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_014",
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完全保留了原文的所有信息，无遗漏、删除或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本与原文事实完全一致，无任何篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理后文本保持了原文的逻辑结构和组织方式，无变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本句子通顺，标点规范，排版良好。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_015",
         "llm_score": 1.0,
         "human_score": 1.0,
         "diff": 0.0,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有数值、单位、标点和句式，无信息遗漏或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本的所有数据、日期和名称与原文完全一致，无事实篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本的句子结构和信息组织方式完全一致，无逻辑关系或层级变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本仅去除了原文中不必要的空格，句子通顺，标点规范，可读性更佳。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_016",
-        "llm_score": 1.0,
+        "llm_score": 0.9825,
         "human_score": 0.9275,
-        "diff": 0.0725,
-        "consistent": true
+        "diff": 0.055,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.95,
+              "reason": "治理后去掉了英文原文，但核心信息（微服务架构、核心组件、水平扩展、峰值QPS）完整保留，无信息遗漏或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "事实完全一致，数值、架构名称、功能描述均未改变。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "句子结构和信息组织方式完全保持。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "表达通顺，标点正确，排版无问题。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_017",
-        "llm_score": 0.9,
+        "llm_score": 0.6417,
         "human_score": 0.6075,
-        "diff": 0.2925,
-        "consistent": false
+        "diff": 0.0342,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.3,
+              "reason": "治理后文本删除了多处重要信息：开头删除了'降低制度性交易成本，激发市场主体活力'和'全面推进政务服务标准化规范化便利化'；第一条删除了原则性表述'能减则减、能合则合'和'全面清理'；第二条删除了鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'；第三条删除了'主要申请条件符合要求的'和'在规定时间内'。这些删除导致关键政策信息和限定条件丢失，尤其是50%以内的压缩比例被整体删除，属于约束性信息缺失。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有数据（2024年底、不低于30%）、主体和责任均与原文一致，没有无中生有或歪曲。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本结构完全相同，均采用三个要点的列表形式，逻辑关系和层级关系未受影响。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本语句通顺，排版规范，标点正确，且因删除冗余表述而更加简洁易读。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "minor",
+              "description": "删除了开头部分'降低制度性交易成本，激发市场主体活力'及'全面推进政务服务标准化规范化便利化'，弱化了政策背景表述。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "minor",
+              "description": "删除了第一条中的原则'按照'能减则减、能合则合'的原则'和'对现有行政许可事项进行全面清理'，弱化了清理工作的依据。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "删除了第二条中的鼓励性条款'鼓励有条件的地区将办理时限压缩至法定时限的50%以内'，丢失了重要的差别化激励政策。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "删除了第三条中的条件'主要申请条件符合要求的'和时间要求'在规定时间内'，放宽了容缺受理的适用范围，丢失了重要限制信息。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_018",
-        "llm_score": 0.9072,
+        "llm_score": 0.9215,
         "human_score": 0.985,
-        "diff": 0.0778,
-        "consistent": true
+        "diff": 0.0635,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息，无信息删除、遗漏或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，数值、日期、名称等均与原文一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.8,
+              "reason": "治理后文本将【背景】和【目标】的顺序互换，破坏了原文“先背景后目标”的逻辑顺序，但内容层级关系和段落独立性未受实质影响。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "句子通顺，标点规范，排版清晰，无表达质量问题。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "structure",
+              "severity": "minor",
+              "description": "治理后文本将【背景】和【目标】的顺序互换，导致逻辑顺序改变。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_019",
         "llm_score": 1.0,
         "human_score": 0.985,
         "diff": 0.015,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息，包括日期、项目事件和验收时间，没有信息被删除或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本仅对日期格式进行标准化处理，所有事实（签署日期、有效期、会议日期、验收截止日期）均未改变。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本的句子结构、信息顺序和逻辑关系完全一致，无结构变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本将不规范的日期格式统一为ISO格式，消除了斜杠和汉字混用，提高了可读性。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_020",
-        "llm_score": 0.303,
+        "llm_score": 0.4517,
         "human_score": 0.4325,
-        "diff": 0.1295,
-        "consistent": false
+        "diff": 0.0192,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "fail",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.3,
+              "reason": "删除了多个关键限定词：'在本协议签署前后'、'以书面或口头形式获悉的'、'且甲方明确标注为'保密'或'机密''，以及排除项中的'乙方在获悉前'和'书面'，导致保密信息的定义范围被不当泛化，信息保真度严重受损。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实性内容，所有变更均为信息删除而非事实修改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.6,
+              "reason": "原文中的有序列表（（1）（2）（3））被压缩为连续句子，失去层级结构，但因果关系和排除逻辑仍清晰。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本语句通顺，排版规范，无标点错误，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "critical",
+              "description": "删除了保密信息定义中的时间限定（签署前后）、方式限定（书面或口头）和认定标准（明确标注为保密或机密），导致定义范围被不当扩大。"
+            },
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "排除项中删除了'乙方在获悉前'和'经甲方书面同意'中的'书面'，改变了排除条件的范围。"
+            },
+            {
+              "category": "structure",
+              "severity": "minor",
+              "description": "原文中的分项列举（（1）（2）（3））被合并为连续句子，结构化程度降低。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_021",
         "llm_score": 1.0,
         "human_score": 0.997,
         "diff": 0.003,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文的所有信息，仅去除了重复词汇，未遗漏或泛化任何内容。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本未篡改任何事实，所有技术参数（AES-256、TLS 1.3等）和功能描述均保持一致。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "逻辑结构和段落组织完全一致，未改变任何关系或顺序。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本去除了重复词汇，句子更通顺，标点符号使用正确，可读性显著提升。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_022",
-        "llm_score": 0.4632,
+        "llm_score": 0.5525,
         "human_score": 0.777,
-        "diff": 0.3138,
-        "consistent": false
+        "diff": 0.2245,
+        "consistent": false,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文除一个数值外的所有信息，没有信息被删除或泛化。"
+            },
+            {
+              "dimension": "factual",
+              "score": 0.0,
+              "reason": "原文营业收入为126.8亿元，治理后错误地改为128.6亿元，事实被篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "治理前后文本结构一致，均为单句叙述，信息组织方式未改变。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本语句通顺，标点正确，可读性良好。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "mis_edit",
+              "severity": "major",
+              "description": "原文营业收入为126.8亿元，治理后错误地改为128.6亿元，数值差1.8亿元，属于事实篡改。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_023",
         "llm_score": 1.0,
         "human_score": 0.997,
         "diff": 0.003,
-        "consistent": true
+        "consistent": true,
+        "evaluation": {
+          "verdict": "pass",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文信息，仅将'15亿元'等价转换为'150000万元'，未遗漏或删除任何内容。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "数值等价（15亿元=150000万元），事实未篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "结构完全一致，无变化。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "句子通顺，排版规范，标点正确。"
+            }
+          ],
+          "flaws": []
+        }
       },
       {
         "request_id": "sample_024",
-        "llm_score": 0.3995,
+        "llm_score": 0.731,
         "human_score": 0.705,
-        "diff": 0.3055,
-        "consistent": false
+        "diff": 0.026,
+        "consistent": true,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 0.6,
+              "reason": "治理后删除了'工业互联网'和'数字孪生'两个方向，信息不完整，但核心布局人工智能和大数据的方向保留。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "未篡改任何事实，仅删除了部分信息。"
+            },
+            {
+              "dimension": "structure",
+              "score": 1.0,
+              "reason": "结构保持并列列举形式，未改变逻辑关系。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "语句通顺，标点正确。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "over_clean",
+              "severity": "major",
+              "description": "删除了'工业互联网'和'数字孪生'两个重点方向，导致信息不完整。"
+            }
+          ]
+        }
       },
       {
         "request_id": "sample_025",
         "llm_score": 0.6712,
         "human_score": 0.8795,
         "diff": 0.2083,
-        "consistent": false
+        "consistent": false,
+        "evaluation": {
+          "verdict": "review",
+          "dimensions": [
+            {
+              "dimension": "semantic",
+              "score": 1.0,
+              "reason": "治理后文本完整保留了原文所有信息，包括产品名称、单价、库存数量和总销售额，无信息遗漏或删除。"
+            },
+            {
+              "dimension": "factual",
+              "score": 1.0,
+              "reason": "治理后文本中的所有数值（98元、168元、299元、125件、86件、42件、47.5万元）与原文完全一致，无事实篡改。"
+            },
+            {
+              "dimension": "structure",
+              "score": 0.3,
+              "reason": "原文为Markdown表格结构，治理后转为纯文本句子，表格的对比性和结构化组织方式被破坏，导致结构保真度严重下降。"
+            },
+            {
+              "dimension": "readability",
+              "score": 1.0,
+              "reason": "治理后文本句子通顺，标点使用正确，排版规范，比表格更易读。"
+            }
+          ],
+          "flaws": [
+            {
+              "category": "structure",
+              "severity": "critical",
+              "description": "治理后文本将原文的表格结构完全转换为纯文本段落，丢失了表格的格式化对比信息，属于结构破坏。"
+            }
+          ]
+        }
       }
     ],
     "pass_threshold_0_8": true
   },
-  "stability_summary": {},
+  "stability_summary": {
+    "total": 5,
+    "stable_count": 5,
+    "stable_rate": 1.0,
+    "avg_variance": 0.000536,
+    "details": [
+      {
+        "request_id": "sample_001",
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "is_stable": true
+      },
+      {
+        "request_id": "sample_006",
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "is_stable": true
+      },
+      {
+        "request_id": "sample_011",
+        "mean_score": 0.5992,
+        "variance": 0.00047,
+        "is_stable": true
+      },
+      {
+        "request_id": "sample_016",
+        "mean_score": 0.9051,
+        "variance": 0.002209,
+        "is_stable": true
+      },
+      {
+        "request_id": "sample_021",
+        "mean_score": 1.0,
+        "variance": 0.0,
+        "is_stable": true
+      }
+    ]
+  },
   "flaw_metrics": {
-    "precision": 0.5714,
-    "recall": 0.8889,
-    "f1": 0.6957,
+    "precision": 0.6667,
+    "recall": 1.0,
+    "f1": 0.8,
+    "tp": 18,
+    "fp": 9,
+    "fn": 0,
     "support": 18,
-    "pass_threshold_0_8": false
+    "match_mode": "many_to_one",
+    "pass_threshold_0_8": true
   },
   "anchor_metrics": {
-    "accuracy": 0.8889,
+    "anchor_accuracy": 0.9444,
+    "location_precision": 0.6296,
+    "location_recall": 0.9444,
+    "location_f1": 0.7556,
+    "location_tp": 17,
+    "location_fp": 10,
+    "location_fn": 1,
+    "classification_precision": 0.9412,
+    "classification_recall": 0.8889,
+    "classification_f1": 0.9143,
+    "classification_tp": 16,
     "total": 18,
-    "correct": 16,
-    "pass_threshold_0_9": false
+    "correct": 17,
+    "pass_threshold_0_9": true
   },
   "bias_analysis": {
-    "avg_bias_mitigation_score": 0.886,
+    "avg_bias_mitigation_score": 0.872,
     "high_length_bias_count": 1,
-    "position_bias_count": 7,
+    "position_bias_count": 14,
     "details": [
       {
         "request_id": "sample_001",
@@ -2767,13 +3758,13 @@
         "length_ratio": 0.1064,
         "length_bias_risk": "high",
         "position_bias_type": "back_bias",
-        "bias_mitigation_score": 0.75
+        "bias_mitigation_score": 0.5
       },
       {
         "request_id": "sample_003",
         "length_ratio": 1.0,
         "length_bias_risk": "low",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 1.0
       },
       {
@@ -2801,7 +3792,7 @@
         "request_id": "sample_007",
         "length_ratio": 0.6395,
         "length_bias_risk": "low",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 1.0
       },
       {
@@ -2815,7 +3806,7 @@
         "request_id": "sample_009",
         "length_ratio": 0.5102,
         "length_bias_risk": "medium",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 1.0
       },
       {
@@ -2823,13 +3814,13 @@
         "length_ratio": 0.7531,
         "length_bias_risk": "low",
         "position_bias_type": "back_bias",
-        "bias_mitigation_score": 1.0
+        "bias_mitigation_score": 0.75
       },
       {
         "request_id": "sample_011",
         "length_ratio": 0.3478,
         "length_bias_risk": "medium",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 0.9
       },
       {
@@ -2837,13 +3828,13 @@
         "length_ratio": 0.885,
         "length_bias_risk": "low",
         "position_bias_type": null,
-        "bias_mitigation_score": 0.8
+        "bias_mitigation_score": 1.0
       },
       {
         "request_id": "sample_013",
         "length_ratio": 0.5529,
         "length_bias_risk": "medium",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 1.0
       },
       {
@@ -2871,8 +3862,8 @@
         "request_id": "sample_017",
         "length_ratio": 0.6188,
         "length_bias_risk": "low",
-        "position_bias_type": null,
-        "bias_mitigation_score": 0.8
+        "position_bias_type": "back_bias",
+        "bias_mitigation_score": 1.0
       },
       {
         "request_id": "sample_018",
@@ -2892,7 +3883,7 @@
         "request_id": "sample_020",
         "length_ratio": 0.5915,
         "length_bias_risk": "medium",
-        "position_bias_type": null,
+        "position_bias_type": "back_bias",
         "bias_mitigation_score": 1.0
       },
       {
@@ -2907,7 +3898,7 @@
         "length_ratio": 1.0,
         "length_bias_risk": "low",
         "position_bias_type": "back_bias",
-        "bias_mitigation_score": 1.0
+        "bias_mitigation_score": 0.75
       },
       {
         "request_id": "sample_023",
@@ -2941,42 +3932,42 @@
     {
       "item": "一致性（Spearman rho ≥ 0.8）",
       "passed": true,
-      "value": 0.882
+      "value": 0.9065
     },
     {
       "item": "一致性（Pearson r ≥ 0.8）[辅助]",
       "passed": true,
-      "value": 0.8461
+      "value": 0.9161
     },
     {
       "item": "Kappa ≥ 0.6",
       "passed": true,
-      "value": 0.7588
+      "value": 0.9201
     },
     {
       "item": "Kendall's W ≥ 0.8",
       "passed": true,
-      "value": 0.941
+      "value": 0.9532
     },
     {
       "item": "瑕疵检出 F1 ≥ 0.8",
-      "passed": false,
-      "value": 0.6957
+      "passed": true,
+      "value": 0.8
     },
     {
       "item": "锚点定位准确率 ≥ 90%",
-      "passed": false,
-      "value": 0.8889
+      "passed": true,
+      "value": 0.9444
     },
     {
       "item": "LLM 延迟 < 3s（平均）",
       "passed": false,
-      "value": 13.76
+      "value": 3.113
     },
     {
       "item": "评分稳定性（稳定率 ≥ 80%）",
-      "passed": false,
-      "value": 0
+      "passed": true,
+      "value": 1.0
     },
     {
       "item": "评估可复现",
@@ -2985,47 +3976,52 @@
     }
   ],
   "consistency_metrics": {
-    "pearson_r": 0.8461,
-    "spearman_rho": 0.882,
-    "kappa": 0.7588,
-    "kendalls_w": 0.941,
-    "mae": 0.1305,
-    "rmse": 0.1867,
+    "pearson_r": 0.9161,
+    "spearman_rho": 0.9065,
+    "kappa": 0.9201,
+    "kendalls_w": 0.9532,
+    "mae": 0.0638,
+    "rmse": 0.1042,
     "n_samples": 25
   },
   "kappa_metrics": {
     "pass_fail": {
-      "kappa": 0.7588,
-      "agreement_rate": 0.88,
+      "kappa": 0.9201,
+      "agreement_rate": 0.96,
       "n_samples": 25
     },
     "pass_review_fail": {
-      "kappa": 0.3523,
-      "agreement_rate": 0.6,
+      "kappa": 0.8072,
+      "agreement_rate": 0.88,
       "n_samples": 25
     }
   },
   "kendalls_w": {
-    "kendalls_w": 0.941,
-    "spearman_rho": 0.882,
+    "kendalls_w": 0.9532,
+    "spearman_rho": 0.9065,
     "n_samples": 25
   },
   "rouge_l": {
-    "rouge_l_precision": 0.155,
-    "rouge_l_recall": 0.1286,
-    "rouge_l_f1": 0.137
+    "rouge_l_precision": 0.1522,
+    "rouge_l_recall": 0.166,
+    "rouge_l_f1": 0.149
   },
   "latency_stats": {
-    "mean_seconds": 13.76,
-    "min_seconds": 2.524,
-    "max_seconds": 60.579,
+    "mean_seconds": 10.571,
+    "min_seconds": 2.218,
+    "max_seconds": 26.597,
     "samples": 25,
-    "pass_below_3s": 1,
-    "pass_rate_below_3s": 0.04
+    "pass_below_3s": 3,
+    "pass_rate_below_3s": 0.12,
+    "wall_clock_seconds": 162.334,
+    "evaluation_wall_clock_seconds": 77.821,
+    "stability_wall_clock_seconds": 84.513,
+    "throughput_latency": 3.113,
+    "concurrent_workers": 4
   },
   "token_stats": {
-    "mean_tokens": 3304,
-    "total_tokens": 82604,
+    "mean_tokens": 3596,
+    "total_tokens": 89890,
     "samples": 25
   }
 }
