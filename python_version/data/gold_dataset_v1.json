@@ -1,481 +1,1145 @@
 [
   {
-    "id": "sample_000",
-    "category": "Good Governance",
-    "difficulty": "easy",
-    "text_type": "政务通告",
-    "before_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品应统一通过OA系统提交申请。采购金额在5000元以下的，由部门负责人审批；5000元（含）以上至5万元以下的，由采购中心负责人审批；5万元（含）以上的，须报分管副总经理审批。所有采购记录应保存不少于三年。",
-    "after_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品统一通过OA系统提交申请。采购金额5000元以下由部门负责人审批；5000元（含）以上至5万元以下由采购中心负责人审批；5万元（含）以上须报分管副总经理审批。所有采购记录保存不少于三年。",
-    "gold_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 1.0,
-      "verdict": "pass"
-    },
-    "anchors": [],
-    "rationale": "仅进行了表达精简和格式规范化，无语义、事实或结构损失。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_001",
-    "category": "Good Governance",
-    "difficulty": "easy",
-    "text_type": "技术文档",
-    "before_text": "系统支持用户通过用户名和密码登录。首次登录后，用户应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户将自动锁定30分钟。",
-    "after_text": "系统支持用户使用用户名和密码登录。首次登录后，应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户自动锁定30分钟。",
-    "gold_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 1.0,
-      "verdict": "pass"
-    },
-    "anchors": [],
-    "rationale": "合理润色，不影响任何信息。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_002",
-    "category": "Over Cleaning",
-    "difficulty": "medium",
-    "text_type": "企业公告",
-    "before_text": "项目建设分三个阶段实施。第一阶段完成基础设施部署，包括服务器安装、数据库初始化和网络环境配置；第二阶段完成业务系统上线，并开展用户培训；第三阶段完成验收测试和运行评估，形成总结报告。",
-    "after_text": "项目建设分三个阶段实施，完成基础设施部署、业务系统上线和项目验收。",
-    "gold_scores": {
-      "semantic_consistency": 0.75,
-      "over_cleaning": 0.5,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 0.77,
-      "verdict": "review"
-    },
-    "anchors": [
+    "id": "eval_001",
+    "before_text": "| 产品名称 | 规格型号 | 单价（元） | 库存量 | 安全库存 |\n|---------|---------|-----------|--------|---------|\n| 精密轴承 | BRG-200 | 1,250 | 480 | 100 |\n| 伺服电机 | SVM-55 | 8,900 | 32 | 15 |\n| 液压阀 | HV-80A | 3,600 | 210 | 50 |",
+    "after_text": "精密轴承BRG-200单价1250元库存480件，伺服电机SVM-55单价8900元库存32件，液压阀HV-80A单价3600元库存210件。",
+    "dimensions": [
       {
-        "rule_id": "OC-02",
-        "severity": "major",
-        "before_snippet": "数据库初始化、网络环境配置；开展用户培训；形成总结报告",
-        "after_snippet": null,
-        "reason": "删除了多个执行细节。"
-      }
-    ],
-    "rationale": "核心流程保留，但大量实施细节被删除，属于过度清洗。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_003",
-    "category": "Over Cleaning",
-    "difficulty": "medium",
-    "text_type": "企业公告",
-    "before_text": "公司计划于2030年前实现碳中和目标，并持续推进绿色供应链建设。预计未来三年累计投入环保资金12亿元，新建光伏发电设施80MW，每年减少碳排放约15万吨。",
-    "after_text": "公司将持续推进绿色发展，并加强绿色供应链建设。",
-    "gold_scores": {
-      "semantic_consistency": 0.5,
-      "over_cleaning": 0.25,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 0.62,
-      "verdict": "fail"
-    },
-    "anchors": [
-      {
-        "rule_id": "OC-03",
-        "severity": "critical",
-        "before_snippet": "2030年前实现碳中和、12亿元、80MW、15万吨",
-        "after_snippet": null,
-        "reason": "删除关键目标及量化信息。"
-      }
-    ],
-    "rationale": "核心方向保留，但所有关键指标均被删除。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_004",
-    "category": "Semantic Drift",
-    "difficulty": "medium",
-    "text_type": "技术文档",
-    "before_text": "本系统采用增量备份策略，每日凌晨2点自动执行备份任务，仅保存自上次备份以来发生变化的数据，以降低存储成本并缩短备份时间。",
-    "after_text": "本系统采用全量备份策略，每日凌晨2点自动执行备份任务，保存全部业务数据，以确保数据完整性。",
-    "gold_scores": {
-      "semantic_consistency": 0.25,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 0.25
-    },
-    "overall": {
-      "weighted_score": 0.62,
-      "verdict": "fail"
-    },
-    "anchors": [
-      {
-        "rule_id": "SC-01",
-        "severity": "critical",
-        "before_snippet": "增量备份策略",
-        "after_snippet": "全量备份策略",
-        "reason": "核心技术方案发生改变。"
+        "dimension": "semantic_fidelity",
+        "score": 0.65,
+        "reason": "所有产品数值完整保留，但安全库存列和规格型号列标题丢失。"
       },
       {
-        "rule_id": "FA-04",
-        "severity": "critical",
-        "before_snippet": "仅保存变化数据",
-        "after_snippet": "保存全部业务数据",
-        "reason": "技术事实被错误修改。"
-      }
-    ],
-    "rationale": "治理后改变了核心技术方案，语义与事实均发生严重偏离。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_005",
-    "category": "Semantic Drift",
-    "difficulty": "hard",
-    "text_type": "企业公告",
-    "before_text": "员工因出差无法参加现场培训的，可在培训结束后七日内完成线上补学，经考核合格后视为完成培训。",
-    "after_text": "员工因出差无法参加现场培训的，可免于参加培训。",
-    "gold_scores": {
-      "semantic_consistency": 0.0,
-      "over_cleaning": 0.5,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 0.55,
-      "verdict": "fail"
-    },
-    "anchors": [
+        "dimension": "factual_consistency",
+        "score": 1.0,
+        "reason": "保留的数值均与原文一致，无任何篡改。"
+      },
       {
-        "rule_id": "SC-01",
-        "severity": "critical",
-        "before_snippet": "七日内完成线上补学，经考核合格后视为完成培训",
-        "after_snippet": "免于参加培训",
-        "reason": "制度要求被完全改变。"
-      }
-    ],
-    "rationale": "治理后将补学要求改为免培训，造成制度语义完全改变。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_006",
-    "category": "Factual Error",
-    "difficulty": "easy",
-    "text_type": "企业公告",
-    "before_text": "公司2025年度实现营业收入126.8亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
-    "after_text": "公司2025年度实现营业收入128.6亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
-    "gold_scores": {
-      "semantic_consistency": 0.75,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 0.0
-    },
-    "overall": {
-      "weighted_score": 0.72,
-      "verdict": "fail"
-    },
-    "anchors": [
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
       {
-        "rule_id": "FA-01",
-        "severity": "critical",
-        "before_snippet": "126.8亿元",
-        "after_snippet": "128.6亿元",
-        "reason": "核心经营数据被篡改。"
-      }
-    ],
-    "rationale": "仅修改了营业收入，但属于核心事实错误。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_007",
-    "category": "Factual Error",
-    "difficulty": "medium",
-    "text_type": "政务通告",
-    "before_text": "《设备维护管理办法》自2026年8月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
-    "after_text": "《设备维护管理办法》自2026年9月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
-    "gold_scores": {
-      "semantic_consistency": 0.75,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 0.0
-    },
-    "overall": {
-      "weighted_score": 0.72,
-      "verdict": "fail"
-    },
-    "anchors": [
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "表格完全拍平为逗号连接的散文。"
+      },
       {
-        "rule_id": "FA-02",
-        "severity": "critical",
-        "before_snippet": "2026年8月1日",
-        "after_snippet": "2026年9月1日",
-        "reason": "生效日期错误。"
+        "dimension": "readability",
+        "score": 0.5,
+        "reason": "长句堆砌，信息密度过高。"
       }
     ],
-    "rationale": "实施日期属于关键事实，错误不可接受。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
+    "flaws": [
+      {
+        "category": "structure",
+        "severity": "critical",
+        "description": "表格被拍平为流水句，列标题和安全库存数据全部丢失。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "精密轴承BRG-200单价1250元库存480件，伺服电机SVM-55"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.69,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
   },
   {
-    "id": "sample_008",
-    "category": "Mixed Errors",
-    "difficulty": "hard",
-    "text_type": "企业公告",
-    "before_text": "为加强数据安全管理，公司规定：第一，所有数据库每日凌晨1:00执行自动备份；第二，备份文件至少保存180天；第三，涉及客户个人信息的数据应采用AES-256算法加密存储；第四，未经信息安全部门书面批准，不得将生产数据复制至外部存储介质。",
-    "after_text": "为加强数据安全管理，公司规定：数据库每日自动备份；备份文件保存30天；涉及客户信息的数据应加密保存；未经批准，不得复制生产数据。",
-    "gold_scores": {
-      "semantic_consistency": 0.5,
-      "over_cleaning": 0.25,
-      "readability_structure": 0.75,
-      "factual_accuracy": 0.25
+    "id": "eval_002",
+    "before_text": "季度销售数据：Q1销售额3,200万元，Q2销售额4,150万元，Q3销售额3,880万元，Q4销售额5,620万元。全年合计16,850万元，同比增长23.7%。",
+    "after_text": "季度销售数据：Q1销售额3,200万元，Q2销售额4,150万元，Q3销售额3,880万元，Q4销售额5,620万元。全年合计16,850万元，同比增长32.7%。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.9,
+        "reason": "整体语义框架完全保留，仅年度增长率改变。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.4,
+        "reason": "同比增长率从23.7%篡改为32.7%。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "分项加总结构完整保留。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "语句通顺流畅。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "同比增长率从23.7%被错误修改为32.7%。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 69,
+          "end_char": 78,
+          "snippet": "同比增长32.7%"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.66,
+      "verdict": "review"
     },
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval_003",
+    "before_text": "| 检查项 | 标准值 | 实测值 | 判定 |\n|-------|-------|-------|------|\n| 绝缘电阻 | ≥100MΩ | 156MΩ | 合格 |\n| 耐压强度 | ≥2kV | 2.3kV | 合格 |\n| 泄漏电流 | ≤0.5mA | 0.38mA | 合格 |\n| 接地电阻 | ≤0.1Ω | 0.12Ω | 不合格 |",
+    "after_text": "检测结果：绝缘电阻156MΩ合格，耐压强度2.3kV合格，泄漏电流0.38mA合格，接地电阻0.12Ω不合格。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.5,
+        "reason": "实测值保留，但所有标准值（判定依据）全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.9,
+        "reason": "实测数值与判定结果与原文一致。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "表格被拍平为流水句，列对照关系完全丧失。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.7,
+        "reason": "通过分号略有分隔，基本可读。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "structure",
+        "severity": "critical",
+        "description": "表格结构完全拍平，行列对照关系和标准值列均丢失。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "检测结果：绝缘电阻156MΩ合格"
+        }
+      },
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "删除了全部标准值，导致判定依据缺失。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 40,
+          "snippet": "检测结果：绝缘电阻156MΩ合格，耐压强度2.3kV合格"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.63,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_004",
+    "before_text": "用户等级体系：普通用户（注册即享）、银卡会员（年消费≥5,000元）、金卡会员（年消费≥20,000元）、钻石会员（年消费≥50,000元，享专属客服）。各级别享对应折扣率分别为：无折扣、95折、9折、85折。",
+    "after_text": "用户等级体系：普通用户无折扣，银卡会员95折，金卡会员9折，钻石会员85折。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.4,
+        "reason": "等级名称和折扣率保留，但晋升门槛和专属权益全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.5,
+        "reason": "折扣率正确，但晋升门槛被删除属于关键事实缺失。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.5,
+        "reason": "双层信息被压缩为单层。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "简洁流畅。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除晋升门槛（≥5,000元等）和钻石会员专属客服权益。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 12,
+          "end_char": 35,
+          "snippet": "普通用户无折扣，银卡会员95折，金卡会员9折，钻石会员85折"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval_005",
+    "before_text": "服务器集群配置：\n- 节点A: 192.168.1.101, 32核, 128GB内存, 2TB SSD\n- 节点B: 192.168.1.102, 32核, 128GB内存, 2TB SSD\n- 节点C: 192.168.1.103, 64核, 256GB内存, 4TB SSD\n负载均衡策略：轮询，健康检查间隔5秒。",
+    "after_text": "服务器集群配置：\n- 节点A: 192.168.1.101, 32核, 128GB内存, 2TB SSD\n- 节点B: 192.168.1.201, 32核, 128GB内存, 2TB SSD\n- 节点C: 192.168.1.103, 64核, 256GB内存, 4TB SSD\n负载均衡策略：轮询，健康检查间隔10秒。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.8,
+        "reason": "大部分配置信息保留，仅IP和健康检查间隔改变。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.3,
+        "reason": "节点B的IP和健康检查间隔两个关键技术参数被篡改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "列表结构完整保留。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "表达清晰。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "节点B IP从.102改为.201。",
+        "location": {
+          "segment_id": "After 3",
+          "start_char": 10,
+          "end_char": 24,
+          "snippet": "192.168.1.201"
+        }
+      },
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "健康检查间隔从5秒改为10秒。",
+        "location": {
+          "segment_id": "After 5",
+          "start_char": 12,
+          "end_char": 18,
+          "snippet": "健康检查间隔10秒"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.59,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_006",
+    "before_text": "故障处理记录：\n时间：2026-07-10 14:32:18\n故障类型：数据库连接池耗尽\n影响范围：订单服务、支付服务\n持续时间：23分钟\n根因：未释放的数据库连接累积\n处理人：王工（工号E0823）\n解决方案：重启连接池并添加连接泄漏检测",
+    "after_text": "故障处理记录：2026年7月10日下午数据库出现问题，影响订单和支付服务约20分钟，经王工处理后恢复。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.25,
+        "reason": "精确时间、故障类型、根因、工号、解决方案等核心信息全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.4,
+        "reason": "持续时间从23分钟改为20分钟，事实偏差。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "结构化记录被压缩为一句叙述。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.8,
+        "reason": "口语化叙述，可读但不正式。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除了精确时间、故障类型、根因、工号、解决方案等关键运维信息。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 28,
+          "snippet": "故障处理记录：2026年7月10日下午数据库出现问题"
+        }
+      },
+      {
+        "category": "mis_edit",
+        "severity": "major",
+        "description": "持续时间从23分钟改为约20分钟。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 40,
+          "end_char": 48,
+          "snippet": "约20分钟"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "字段化记录被拍平为一段话。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 40,
+          "snippet": "故障处理记录：2026年7月10日下午数据库出现问题"
+        }
+      }
+    ],
     "overall": {
       "weighted_score": 0.42,
       "verdict": "fail"
     },
-    "anchors": [
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval_007",
+    "before_text": "产品规格对比表：\n| 参数 | A型号 | B型号 | C型号 |\n|------|------|------|------|\n| 功率 | 1500W | 1800W | 2000W |\n| 容量 | 1.2L | 1.5L | 1.8L |\n| 重量 | 2.1kg | 2.8kg | 3.5kg |\n| 噪音 | 65dB | 68dB | 62dB |\n| 售价 | 399元 | 499元 | 599元 |",
+    "after_text": "产品规格对比：A型号功率1500W容量1.2L重2.1kg噪音65dB售价399元，B型号功率1800W容量1.5L重2.8kg噪音68dB售价499元，C型号功率2000W容量1.8L重3.5kg噪音68dB售价599元。",
+    "dimensions": [
       {
-        "rule_id": "OC-02",
-        "severity": "critical",
-        "before_snippet": "AES-256算法",
-        "after_snippet": null,
-        "reason": "删除关键技术参数。"
+        "dimension": "semantic_fidelity",
+        "score": 0.75,
+        "reason": "大部分数据保留，仅C型号噪音一个数值错误。"
       },
       {
-        "rule_id": "FA-04",
-        "severity": "critical",
-        "before_snippet": "180天",
-        "after_snippet": "30天",
-        "reason": "保存期限被错误修改。"
+        "dimension": "factual_consistency",
+        "score": 0.7,
+        "reason": "C型号噪音从62dB误改为68dB。"
       },
       {
-        "rule_id": "OC-04",
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.2,
+        "reason": "表格完全拍平为流水句。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.3,
+        "reason": "大量参数无分隔堆砌，接近电报体。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "structure",
+        "severity": "critical",
+        "description": "表格完全拍平为参数串，行列结构尽失。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "产品规格对比：A型号功率1500W容量1.2L重2.1kg"
+        }
+      },
+      {
+        "category": "mis_edit",
         "severity": "major",
-        "before_snippet": "信息安全部门书面批准",
-        "after_snippet": "批准",
-        "reason": "删除限定条件。"
+        "description": "C型号噪音被错误写为68dB（原文为62dB）。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 75,
+          "end_char": 82,
+          "snippet": "C型号功率2000W容量1.8L重3.5kg噪音68dB"
+        }
       }
     ],
-    "rationale": "同时存在事实错误、过度清洗及语义弱化，属于综合严重问题。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_009",
-    "category": "Mixed Errors",
-    "difficulty": "hard",
-    "text_type": "企业公告",
-    "before_text": "项目验收应满足以下条件：①所有功能测试通过；②性能测试达到每秒处理请求不少于5000次；③连续稳定运行不少于30天；④完成用户培训并提交完整验收文档，经项目负责人和客户双方签字确认后方可正式交付。",
-    "after_text": "项目验收应满足以下条件：功能测试通过；性能测试达到每秒处理请求不少于3000次；完成用户培训后即可交付。",
-    "gold_scores": {
-      "semantic_consistency": 0.25,
-      "over_cleaning": 0.25,
-      "readability_structure": 0.75,
-      "factual_accuracy": 0.0
-    },
     "overall": {
-      "weighted_score": 0.3,
-      "verdict": "fail"
-    },
-    "anchors": [
-      {
-        "rule_id": "FA-04",
-        "severity": "critical",
-        "before_snippet": "5000次",
-        "after_snippet": "3000次",
-        "reason": "性能指标被错误修改。"
-      },
-      {
-        "rule_id": "OC-05",
-        "severity": "critical",
-        "before_snippet": "连续稳定运行不少于30天",
-        "after_snippet": null,
-        "reason": "删除关键验收条件。"
-      },
-      {
-        "rule_id": "OC-06",
-        "severity": "major",
-        "before_snippet": "项目负责人和客户双方签字确认",
-        "after_snippet": null,
-        "reason": "删除正式交付前置条件。"
-      }
-    ],
-    "rationale": "性能指标被篡改，多个验收条件被删除，整体语义和事实均受到严重影响。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_010",
-    "category": "Good Governance",
-    "difficulty": "easy",
-    "text_type": "技术文档",
-    "before_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续五次输入错误密码后，账户将自动锁定30分钟。",
-    "after_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续输入错误密码五次后，账户将自动锁定30分钟。",
-    "gold_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 1.0,
-      "verdict": "pass"
-    },
-    "anchors": [],
-    "rationale": "仅进行了数字表达规范化，不影响任何信息。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_011",
-    "category": "Good Governance",
-    "difficulty": "easy",
-    "text_type": "企业公告",
-    "before_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化及权限管理模块重构。",
-    "after_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化以及权限管理模块重构。",
-    "gold_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 1.0,
-      "verdict": "pass"
-    },
-    "anchors": [],
-    "rationale": "仅进行了连接词优化，未改变内容。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_012",
-    "category": "Over Cleaning",
-    "difficulty": "medium",
-    "text_type": "企业公告",
-    "before_text": "客户服务规范要求：客服人员应在收到工单后5分钟内响应，30分钟内完成首次处理意见反馈；复杂问题应在24小时内升级至二线支持，并同步通知客户预计处理时间。",
-    "after_text": "客户服务规范要求：客服人员应及时响应工单，并处理客户问题。",
-    "gold_scores": {
-      "semantic_consistency": 0.5,
-      "over_cleaning": 0.25,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 0.62,
-      "verdict": "fail"
-    },
-    "anchors": [
-      {
-        "rule_id": "OC-03",
-        "severity": "critical",
-        "before_snippet": "5分钟、30分钟、24小时、预计处理时间",
-        "after_snippet": null,
-        "reason": "删除关键流程要求和时间约束。"
-      }
-    ],
-    "rationale": "治理后仅保留笼统描述，大量执行细节被删除。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
-  },
-  {
-    "id": "sample_013",
-    "category": "Over Cleaning",
-    "difficulty": "medium",
-    "text_type": "技术文档",
-    "before_text": "数据库部署完成后，应依次执行初始化脚本、权限配置、备份策略配置、连接测试和性能基准测试，并将测试结果归档保存。",
-    "after_text": "数据库部署完成后，应完成初始化并进行测试。",
-    "gold_scores": {
-      "semantic_consistency": 0.75,
-      "over_cleaning": 0.5,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
-    },
-    "overall": {
-      "weighted_score": 0.77,
+      "weighted_score": 0.53,
       "verdict": "review"
     },
-    "anchors": [
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_008",
+    "before_text": "协议条款第7条：用户上传的内容，平台获得全球范围内的、免费的、不可撤销的使用许可。该许可在用户删除内容后仍持续有效。",
+    "after_text": "协议条款第7条：用户上传的内容，平台获得全球范围内的、免费的、可撤销的使用许可。用户可随时删除内容并终止授权。",
+    "dimensions": [
       {
-        "rule_id": "OC-02",
-        "severity": "major",
-        "before_snippet": "权限配置、备份策略配置、连接测试、性能基准测试、归档保存",
-        "after_snippet": null,
-        "reason": "删除多项关键实施步骤。"
+        "dimension": "semantic_fidelity",
+        "score": 0.0,
+        "reason": "授权性质从不可撤销变为可撤销，语义被彻底反转。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.0,
+        "reason": "核心法律事实全部被篡改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.9,
+        "reason": "条款结构保持完整。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "语句通顺。"
       }
     ],
-    "rationale": "保留了主要流程，但实施细节明显缺失。",
-    "annotation_meta": {
-      "annotator": "manual",
-      "annotation_time": "2026-06-29",
-      "reviewed_by": "manual",
-      "review_time": "2026-06-29"
-    }
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将\"不可撤销\"改为\"可撤销\"，并将\"删除后仍持续有效\"改为\"随时终止授权\"，核心法律语义被彻底反转。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 25,
+          "end_char": 45,
+          "snippet": "可撤销的使用许可。用户可随时删除内容并终止授权"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.25,
+      "verdict": "fail"
+    },
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval_009",
+    "before_text": "药敏试验报告：\n细菌名称：金黄色葡萄球菌\n标本来源：伤口分泌物\n检测方法：纸片扩散法（Kirby-Bauer）\n抗生素敏感性：\n- 青霉素：耐药（MIC>8μg/mL）\n- 头孢唑林：敏感（MIC≤2μg/mL）\n- 万古霉素：敏感（MIC≤0.5μg/mL）\n- 左氧氟沙星：中介（MIC 4μg/mL）",
+    "after_text": "药敏试验报告：金黄色葡萄球菌对青霉素耐药，对头孢唑林敏感，对万古霉素敏感，对左氧氟沙星中介。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.35,
+        "reason": "药敏结果保留，但标本来源、检测方法和MIC定量阈值全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.9,
+        "reason": "保留的菌名和敏感性结论与原文一致。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "结构化报告条目被压缩为单句。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.9,
+        "reason": "叙述流畅。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除标本来源、检测方法和四个MIC定量值。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 26,
+          "snippet": "药敏试验报告：金黄色葡萄球菌对青霉素耐药"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "结构化报告被压缩为单句。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 40,
+          "snippet": "药敏试验报告：金黄色葡萄球菌对青霉素耐药，对头孢唑林敏感"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.59,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_010",
+    "before_text": "年度预算分配：研发部3200万（占比40%），市场部1600万（占比20%），销售部2000万（占比25%），行政部800万（占比10%），机动预留400万（占比5%）。",
+    "after_text": "年度预算分配：研发部4000万（占比40%），市场部2000万（占比20%），销售部2500万（占比25%），行政部1000万（占比10%），机动预留500万（占比5%）。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.7,
+        "reason": "预算分配结构和比例保留，但全部金额被等比虚增。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.2,
+        "reason": "五个部门的预算数值全部篡改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "并列结构保留。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "语句通顺。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "全部预算数值被等比例篡改，总计从8000万虚增至1亿。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 7,
+          "end_char": 40,
+          "snippet": "研发部4000万（占比40%），市场部2000万"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.48,
+      "verdict": "fail"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_011",
+    "before_text": "零件清单（BOM）：\n1. 底座总成（PN: BAS-001）x1\n2. 轴承座（PN: BRG-202）x2\n3. 传动轴（PN: SHF-150）x1\n4. 紧固螺栓M8x25（PN: BLT-M825）x8\n5. 密封圈（PN: SL-030）x2\n6. 端盖（PN: CAP-045）x1\n总装工时预估：45分钟/台",
+    "after_text": "零件清单：底座总成1个、轴承座2个、传动轴1个、紧固螺栓8个、密封圈2个、端盖1个，装配约需45分钟。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.35,
+        "reason": "零件数量保留，但所有物料编号和规格全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.7,
+        "reason": "数量信息正确，但缺失编号属于关键标识丢失。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "编号清单结构被拍平为逗号句。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.8,
+        "reason": "逗号分隔尚可阅读。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除所有零件编号和螺栓规格，丧失物料唯一标识。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "零件清单：底座总成1个、轴承座2个、传动轴1个、紧固螺栓8个"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "清单式结构被拍平为流水句。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 40,
+          "snippet": "零件清单：底座总成1个、轴承座2个、传动轴1个"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.58,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_012",
+    "before_text": "环境监测数据：\n监测点位：厂界东侧\n监测时间：2026-07-10 08:00-20:00\nPM2.5均值：35μg/m³（标准≤75μg/m³）\nPM10均值：68μg/m³（标准≤150μg/m³）\n噪声Leq：62dB(A)（标准≤65dB(A)）\n结论：各项指标达标",
+    "after_text": "环境监测数据：厂界东侧2026年7月10日监测结果，各项指标均达标。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.15,
+        "reason": "仅保留监测点位和结论，所有实测值和标准限值全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.5,
+        "reason": "结论正确但失去数据支撑。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "结构化监测报告被压缩为单句结论。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.9,
+        "reason": "语句简洁通顺。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除监测时段、三项实测值和对应标准限值。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 25,
+          "snippet": "环境监测数据：厂界东侧2026年7月10日监测结果"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "结构化报告被压缩为一句结论。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 35,
+          "snippet": "环境监测数据：厂界东侧2026年7月10日监测结果，各项指标均达标"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.44,
+      "verdict": "fail"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_013",
+    "before_text": "员工绩效评定：\n姓名：张伟 | 部门：技术部 | 岗位：高级工程师\n考核维度得分：\n- 工作质量：92分（权重30%）\n- 工作效率：85分（权重25%）\n- 团队协作：90分（权重20%）\n- 创新能力：78分（权重15%）\n- 学习成长：88分（权重10%）\n加权总分：87.75分 | 等级：A",
+    "after_text": "员工绩效评定：\n姓名：张伟 | 部门：技术部 | 岗位：高级工程师\n考核维度得分：\n- 工作质量：92分（权重30%）\n- 工作效率：85分（权重25%）\n- 团队协作：95分（权重20%）\n- 创新能力：78分（权重15%）\n- 学习成长：88分（权重10%）\n加权总分：88.75分 | 等级：A",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.8,
+        "reason": "大部分得分和权重保留，仅团队协作和总分改变。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.4,
+        "reason": "团队协作得分和加权总分被篡改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "维度列表结构完整。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "表达清晰。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "团队协作得分从90改为95，总分从87.75改为88.75。",
+        "location": {
+          "segment_id": "After 5",
+          "start_char": 7,
+          "end_char": 17,
+          "snippet": "团队协作：95分"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval_014",
+    "before_text": "临床试验入组标准：\n1. 年龄18-65周岁\n2. BMI 18.5-28.0 kg/m²\n3. 确诊2型糖尿病，病程≥6个月\n4. HbA1c 7.0%-10.0%\n5. 未使用胰岛素治疗\n排除标准：妊娠期、严重肝肾功能不全、近3个月参与其他临床试验。",
+    "after_text": "临床试验入组标准：\n1. 年龄18-70周岁\n2. BMI 18.5-30.0 kg/m²\n3. 确诊2型糖尿病，病程≥6个月\n4. HbA1c 7.0%-10.0%\n5. 未使用胰岛素治疗\n排除标准：妊娠期、严重肝肾功能不全、近3个月参与其他临床试验。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.8,
+        "reason": "除年龄和BMI上限放宽外，其他条件均保留。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.4,
+        "reason": "入组年龄和BMI阈值两个关键参数被修改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "列表结构保持。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "表达规范。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "年龄上限从65改为70，BMI上限从28.0改为30.0。",
+        "location": {
+          "segment_id": "After 2",
+          "start_char": 3,
+          "end_char": 12,
+          "snippet": "年龄18-70周岁"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval_015",
+    "before_text": "运维值班表（2026年8月）：\n| 日期 | 白班（8:00-16:00） | 夜班（16:00-24:00） | 值班主管 |\n|------|-------------------|---------------------|----------|\n| 8/1 | 李明 | 赵强 | 王工 |\n| 8/2 | 陈芳 | 周杰 | 王工 |\n| 8/3 | 李明 | 赵强 | 张工 |\n注：值班期间保持手机畅通，紧急情况5分钟内响应。",
+    "after_text": "运维值班表（2026年8月）：\n| 日期 | 白班（8:00-16:00） | 夜班（16:00-24:00） | 值班主管 |\n|------|-------------------|---------------------|----------|\n| 8/1 | 李明 | 赵强 | 王工 |\n| 8/2 | 陈芳 | 周杰 | 张工 |\n| 8/3 | 李明 | 赵强 | 张工 |\n注：值班期间保持手机畅通。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.75,
+        "reason": "大部分值班安排和表格保留，仅一个主管姓名错误和响应要求删除。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.5,
+        "reason": "8月2日主管被改为张工，事实错误；并缺失响应时限。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.9,
+        "reason": "表格结构保留。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "清晰可读。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "major",
+        "description": "8月2日值班主管被错误改为张工。",
+        "location": {
+          "segment_id": "After 4",
+          "start_char": 35,
+          "end_char": 38,
+          "snippet": "张工"
+        }
+      },
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "删除紧急情况5分钟内响应的值班要求。",
+        "location": {
+          "segment_id": "After 7",
+          "start_char": 8,
+          "end_char": 17,
+          "snippet": "值班期间保持手机畅通。"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.78,
+      "verdict": "pass"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_016",
+    "before_text": "合同条款第3.2条：违约金按逾期交货部分金额的每日万分之五计算，累计不超过合同总金额的10%。逾期超过30日的，买方有权单方面解除合同。",
+    "after_text": "合同条款第3.2条：违约金按逾期交货部分金额的每日万分之三计算，累计不超过合同总金额的10%。逾期超过60日的，买方有权单方面解除合同。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.6,
+        "reason": "违约金和解除期限改变，但条款结构保留。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.2,
+        "reason": "违约金率和解除期限两个核心数字被篡改。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 1.0,
+        "reason": "合同条款结构完整。"
+      },
+      {
+        "dimension": "readability",
+        "score": 1.0,
+        "reason": "法律语言规范。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "违约金率从万分之五改为万分之三，解除期限从30日改为60日。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 15,
+          "end_char": 35,
+          "snippet": "违约金按逾期交货部分金额的每日万分之三计算"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.48,
+      "verdict": "fail"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_017",
+    "before_text": "物流路由信息：\n始发地：上海分拨中心（SHA-01）\n目的地：成都武侯区站点（CDU-03）\n中转节点：武汉分拨中心（WUH-01）→ 重庆分拨中心（CKG-01）\n预计时效：全程72小时\n当前状态：已离开武汉，预计7月12日18:00抵达重庆",
+    "after_text": "物流路由信息：从上海发往成都，途经武汉和重庆，当前已离开武汉前往重庆。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.25,
+        "reason": "路由节点名称保留，但所有站点编号、时效和精确时间全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.6,
+        "reason": "所述节点和方向正确，但信息不完整。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.4,
+        "reason": "字段化的路由信息被压缩为简单叙述。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.9,
+        "reason": "叙述流畅。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除站点编号、全程时效和预计抵达时间。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 22,
+          "snippet": "从上海发往成都，途经武汉和重庆，当前已离开武汉前往重庆"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "字段化路由信息被拍平为单句。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "从上海发往成都，途经武汉和重庆，当前已离开武汉前往重庆"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.57,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "eval_018",
+    "before_text": "试剂配制记录：\n试剂名称：PBS缓冲液（10×）\n配制日期：2026-07-10\n配制人：张实验员\n配方：NaCl 80g + KCl 2g + Na₂HPO₄ 14.4g + KH₂PO₄ 2.4g，定容至1L\npH值：7.40（校准温度25°C）\n灭菌方式：高压蒸汽121°C 20min\n有效期至：2026-10-10",
+    "after_text": "试剂配制记录：2026年7月10日配制PBS缓冲液，121°C灭菌20分钟，有效期为三个月。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.1,
+        "reason": "试剂配方、pH值、配制人等核心实验信息几乎全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.3,
+        "reason": "有效期从固定日期变为模糊的三个月，事实错误。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "结构化记录被压缩为一句话。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.8,
+        "reason": "单句尚可阅读。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除配制人、完整配方、pH值、校准温度。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 22,
+          "snippet": "2026年7月10日配制PBS缓冲液，121°C灭菌20分钟，有效期为三个月"
+        }
+      },
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "有效期从精确日期改为模糊的三个月。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 37,
+          "end_char": 44,
+          "snippet": "有效期为三个月"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "结构化记录被压扁为单句。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 40,
+          "snippet": "2026年7月10日配制PBS缓冲液，121°C灭菌20分钟"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.29,
+      "verdict": "fail"
+    },
+    "difficulty": "hard"
+  },
+  {
+    "id": "eval_019",
+    "before_text": "财务审批矩阵：\n| 费用类型 | 金额区间 | 一级审批 | 二级审批 |\n|---------|---------|---------|----------|\n| 差旅费 | <5000元 | 部门经理 | - |\n| 差旅费 | ≥5000元 | 部门经理 | 总监 |\n| 采购费 | <2万元 | 部门经理 | - |\n| 采购费 | 2-10万元 | 部门经理 | 总监 |\n| 采购费 | ≥10万元 | 总监 | VP |\n| 招待费 | 不限 | 部门经理 | 总监 |",
+    "after_text": "财务审批：差旅费5000元以下部门经理审批，以上加签总监；采购费2万元以下部门经理审批，2-10万元加签总监，10万元以上需总监和VP双签；招待费一律部门经理和总监双签。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.95,
+        "reason": "所有审批金额区间、审批层级完整保留。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 1.0,
+        "reason": "转述后所有条件和角色均正确无误。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.7,
+        "reason": "表格结构降级为分号分隔的描述。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.85,
+        "reason": "表达流畅。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "structure",
+        "severity": "minor",
+        "description": "审批矩阵表格被转换为散文形式，失去行列对照。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 30,
+          "snippet": "财务审批：差旅费5000元以下部门经理审批，以上加签总监"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.92,
+      "verdict": "pass"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "eval_020",
+    "before_text": "设备报废鉴定：\n设备名称：数控铣床XK-200\n购置日期：2016年3月\n原值：186万元\n已使用年限：10年\n鉴定意见：主轴精度超差（0.05mm，标准≤0.02mm），导轨磨损严重，维修成本超设备残值。\n建议：作报废处理，残值约3.5万元。\n鉴定人：李工程师、王技师\n日期：2026-07-10",
+    "after_text": "设备报废鉴定：数控铣床XK-200因主轴精度超差、导轨磨损，建议报废，残值约3.5万元。鉴定日期2026年7月10日。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "score": 0.3,
+        "reason": "设备名称和残值保留，但购置日期、原值、使用年限、精度偏差量化、鉴定人等核心鉴定依据全部丢失。"
+      },
+      {
+        "dimension": "factual_consistency",
+        "score": 0.6,
+        "reason": "保留的信息正确，但鉴定意见被过度简化。"
+      },
+      {
+        "dimension": "hallucination",
+        "score": 1.0,
+        "reason": "治理后文本中未发现与原文完全无关的凭空编造信息；数值篡改属于 mis_edit 范畴。"
+      },
+      {
+        "dimension": "structure",
+        "score": 0.3,
+        "reason": "字段化的鉴定报告被压缩为两个短句。"
+      },
+      {
+        "dimension": "readability",
+        "score": 0.9,
+        "reason": "表述通顺。"
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除购置日期、原值、已使用年限、精度偏差值、鉴定人等关键字段。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 28,
+          "snippet": "数控铣床XK-200因主轴精度超差、导轨磨损，建议报废，残值约3.5万元"
+        }
+      },
+      {
+        "category": "structure",
+        "severity": "major",
+        "description": "结构化鉴定报告被压缩为简短结论。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 35,
+          "snippet": "数控铣床XK-200因主轴精度超差、导轨磨损，建议报废，残值约3.5万元"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.52,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
   }
 ]

@@ -184,13 +184,91 @@ def _lcs_ratio(s1: str, s2: str) -> float:
     return max_len / max(len1, len2)
 
 
+def _range_iou(pred: FlawLocation, gt: FlawLocation) -> float:
+    """区间 IoU（Intersection over Union）—— 基于字符坐标的物理区间重叠度。
+
+    当双方都有有效的 start_char/end_char 时，计算区间重叠。
+    解决"长短句不一"、"父子项包含"导致的刚性不匹配。
+    """
+    p_start, p_end = pred.start_char, pred.end_char
+    g_start, g_end = gt.start_char, gt.end_char
+
+    # 双方都必须有有效坐标
+    if p_start < 0 or p_end <= p_start or g_start < 0 or g_end <= g_start:
+        return 0.0
+
+    # 计算交集
+    inter_start = max(p_start, g_start)
+    inter_end = min(p_end, g_end)
+    intersection = max(0, inter_end - inter_start)
+
+    # 计算并集
+    union = (p_end - p_start) + (g_end - g_start) - intersection
+    if union <= 0:
+        return 0.0
+
+    return intersection / union
+
+
+def _ngram_overlap(s1: str, s2: str, n: int = 3) -> float:
+    """字符级 n-gram 重叠率 —— 比 Jaccard 更宽容的文本匹配。
+
+    计算 s1 中有多少比例的 n-gram 出现在 s2 中。
+    解决 snippet 被改写/扩展但仍指向同一位置的问题。
+    """
+    if not s1 or not s2 or len(s1) < n or len(s2) < n:
+        return 0.0
+    grams1 = set(s1[i:i+n] for i in range(len(s1) - n + 1))
+    grams2 = set(s2[i:i+n] for i in range(len(s2) - n + 1))
+    if not grams1:
+        return 0.0
+    overlap = len(grams1 & grams2)
+    # 取双向最大覆盖（解决长短 snippet 问题）
+    return max(overlap / len(grams1), overlap / len(grams2)) if grams2 else 0.0
+
+
+def _snippet_containment(pred_snippet: str, gt_snippet: str) -> float:
+    """片段包含度 —— 短片段是否被长片段包含。
+
+    解决 GT snippet 较短（如"126.8亿元"）而 LLM snippet 较长
+    （如"公司实现营业收入128.6亿元"）时的匹配问题。
+    """
+    if not pred_snippet or not gt_snippet:
+        return 0.0
+    shorter = gt_snippet if len(gt_snippet) <= len(pred_snippet) else pred_snippet
+    longer = pred_snippet if gt_snippet == shorter else gt_snippet
+    # 短片段的核心部分（取前 10 字）是否在长片段中出现
+    core = shorter[:min(10, len(shorter))]
+    if core in longer:
+        return 1.0
+    # 退而求其次：短片段的一半以上是否在长片段中
+    half = shorter[:max(3, len(shorter) // 2)]
+    if half in longer:
+        return 0.7
+    return 0.0
+
+
 def _sim_text(pred: FlawLocation, gt: FlawLocation) -> float:
-    """文本相似度：取 Jaccard 和 LCS 比例的最大值"""
+    """增强版文本相似度：取多种匹配信号的最大值。
+
+    包含：Jaccard、LCS、n-gram 重叠、片段包含度、区间 IoU。
+    """
     s1 = pred.snippet or ""
     s2 = gt.snippet or ""
-    if not s1 or not s2:
-        return 0.0
-    return max(_jaccard_similarity(s1, s2), _lcs_ratio(s1, s2))
+
+    scores = []
+    if s1 and s2:
+        scores.append(_jaccard_similarity(s1, s2))
+        scores.append(_lcs_ratio(s1, s2))
+        scores.append(_ngram_overlap(s1, s2))
+        scores.append(_snippet_containment(s1, s2))
+
+    # 区间 IoU（如果坐标有效）
+    iou = _range_iou(pred, gt)
+    if iou > 0:
+        scores.append(iou)
+
+    return max(scores) if scores else 0.0
 
 
 def _match_category(pred_cat: str, gt_cat: str) -> float:
@@ -222,7 +300,7 @@ def build_similarity_matrix(
             anchor_score = _match_anchor(pred.location, gt.location)
             text_score = _sim_text(pred.location, gt.location)
             cat_score = _match_category(pred.category, gt.category)
-            matrix[i, j] = 0.6 * anchor_score + 0.3 * text_score + 0.1 * cat_score
+            matrix[i, j] = 0.2 * anchor_score + 0.5 * text_score + 0.3 * cat_score
 
     return matrix
 
@@ -273,10 +351,10 @@ def double_gate_check(
     score: float,
     min_score: float = 0.50,
 ) -> tuple[bool, str]:
-    """双阀防线检查。
+    """双阀防线检查（增强版）。
 
     防线 1：最小相似度门槛 ≥ 0.50
-    防线 2：文本必须有交集（Sim-text > 0）
+    防线 2：文本必须有交集（Sim-text > 0）或区间 IoU > 0.3
 
     Returns:
         (通过?, 原因)
@@ -285,12 +363,125 @@ def double_gate_check(
     if score < min_score:
         return False, f"相似度 {score:.4f} < {min_score}"
 
-    # 防线 2
+    # 防线 2（增强：允许区间 IoU 或高文本相似度通过）
     text_sim = _sim_text(pred.location, gt.location)
-    if text_sim <= 0.0:
-        return False, "文本片段零交集"
+    iou = _range_iou(pred.location, gt.location)
+    if text_sim <= 0.0 and iou < 0.3:
+        return False, "文本片段零交集且区间 IoU < 0.3"
 
     return True, "通过"
+
+
+# ============================================================
+# 5b. 匈牙利后补扫（Post-Hungarian Sweeper）
+# ============================================================
+
+def _container_sweep(
+    preds: list[Flaw],
+    gts: list[Flaw],
+    valid_matches: list[MatchPair],
+    coverage_threshold: float = 0.80,
+) -> list[MatchPair]:
+    """区间包含度补扫 —— 解决 LLM 合并多条 GT 为一条大瑕疵的问题。
+
+    对未匹配的 GT，检查其字符区间是否被已匹配的预测区间高比例包含。
+    如果包含比例 >= coverage_threshold，则该 GT 视为"定位成功"。
+
+    Args:
+        preds: 预测瑕疵列表
+        gts: 人工标注瑕疵列表
+        valid_matches: 匈牙利算法 + 双阀防线后的有效匹配对
+        coverage_threshold: 区间包含度阈值（默认 0.80）
+
+    Returns:
+        补充匹配对列表（追加到 valid_matches）
+    """
+    # 已匹配的 GT 和 Pred 索引
+    matched_gt_indices = {m.gt_idx for m in valid_matches}
+    matched_pred_indices = {m.pred_idx for m in valid_matches}
+
+    # 未匹配的 GT
+    unmatched_gt_indices = [j for j in range(len(gts)) if j not in matched_gt_indices]
+    if not unmatched_gt_indices:
+        return []
+
+    supplementary: list[MatchPair] = []
+
+    for gt_idx in unmatched_gt_indices:
+        gt = gts[gt_idx]
+        g_start = gt.location.start_char
+        g_end = gt.location.end_char
+        g_len = g_end - g_start if g_end > g_start > 0 else 0
+
+        if g_len <= 0:
+            # GT 没有有效坐标，尝试用文本包含度
+            for pred_idx in matched_pred_indices:
+                pred = preds[pred_idx]
+                containment = _snippet_containment(pred.location.snippet, gt.location.snippet)
+                if containment >= coverage_threshold:
+                    anchor_score = _match_anchor(pred.location, gt.location)
+                    text_score = _sim_text(pred.location, gt.location)
+                    cat_score = _match_category(pred.category, gt.category)
+                    supplementary.append(MatchPair(
+                        pred_idx=pred_idx,
+                        gt_idx=gt_idx,
+                        score=max(text_score, containment),
+                        anchor_score=anchor_score,
+                        text_score=text_score,
+                        category_score=cat_score,
+                        category_match=(cat_score == 1.0),
+                    ))
+                    break  # 一个 GT 只补扫到一个 pred
+            continue
+
+        # GT 有有效坐标，检查区间包含度
+        best_pred_idx = -1
+        best_coverage = 0.0
+
+        for pred_idx in matched_pred_indices:
+            pred = preds[pred_idx]
+            p_start = pred.location.start_char
+            p_end = pred.location.end_char
+            p_len = p_end - p_start if p_end > p_start > 0 else 0
+
+            if p_len <= 0:
+                continue
+
+            # 计算 GT 区间被 Pred 区间包含的比例
+            inter_start = max(p_start, g_start)
+            inter_end = min(p_end, g_end)
+            intersection = max(0, inter_end - inter_start)
+            coverage = intersection / g_len  # GT 被覆盖的比例
+
+            if coverage > best_coverage:
+                best_coverage = coverage
+                best_pred_idx = pred_idx
+
+        # 区间包含度不够，再试文本包含度
+        if best_coverage < coverage_threshold:
+            for pred_idx in matched_pred_indices:
+                pred = preds[pred_idx]
+                containment = _snippet_containment(pred.location.snippet, gt.location.snippet)
+                if containment >= coverage_threshold and containment > best_coverage:
+                    best_coverage = containment
+                    best_pred_idx = pred_idx
+
+        if best_coverage >= coverage_threshold and best_pred_idx >= 0:
+            pred = preds[best_pred_idx]
+            anchor_score = _match_anchor(pred.location, gt.location)
+            text_score = _sim_text(pred.location, gt.location)
+            cat_score = _match_category(pred.category, gt.category)
+            supplementary.append(MatchPair(
+                pred_idx=best_pred_idx,
+                gt_idx=gt_idx,
+                score=best_coverage,
+                anchor_score=anchor_score,
+                text_score=text_score,
+                category_score=cat_score,
+                category_match=(cat_score == 1.0),
+            ))
+
+    return supplementary
 
 
 # ============================================================
@@ -361,10 +552,24 @@ def dual_track_evaluate(
 
     result.matches = valid_matches
 
-    # 计算定位指标（只要匹配成功就算定位正确）
-    result.location_tp = len(valid_matches)
-    result.location_fp = len(preds) - result.location_tp
-    result.location_fn = len(gts) - result.location_tp
+    # 第三步b：匈牙利后补扫 —— 对未匹配 GT 做区间包含度补扫（多对一覆盖）
+    supplementary = _container_sweep(preds, gts, valid_matches, coverage_threshold=0.80)
+    if supplementary:
+        valid_matches.extend(supplementary)
+        result.matches = valid_matches
+
+    # 计算定位指标（多对一去重口径）
+    # 修复：补扫会复用同一 pred 覆盖多个 GT，valid_matches 中 pred_idx 可能重复。
+    # 若直接用 len(valid_matches) 作 TP，会导致 TP > pred 总数 → FP 为负、precision > 1。
+    # 正确定义（与 compute_flaw_metrics 的 many_to_one 一致）：
+    #   TP = 被至少一个 pred 匹配到的【去重 GT 数】
+    #   FP = 未匹配到任何 GT 的【去重 pred 数】
+    #   FN = 未被任何 pred 覆盖的【去重 GT 数】
+    matched_gt_ids = {m.gt_idx for m in valid_matches}
+    matched_pred_ids = {m.pred_idx for m in valid_matches}
+    result.location_tp = len(matched_gt_ids)
+    result.location_fp = len(preds) - len(matched_pred_ids)
+    result.location_fn = len(gts) - len(matched_gt_ids)
 
     if result.location_tp + result.location_fp > 0:
         result.location_precision = result.location_tp / (result.location_tp + result.location_fp)
@@ -377,7 +582,9 @@ def dual_track_evaluate(
         )
 
     # 计算分类指标（在定位成功的基础上，再检查分类是否一致）
-    result.classification_tp = sum(1 for m in valid_matches if m.category_match)
+    # 同样按去重 GT：一个 GT 只要有一个 category_match 的匹配即算分类正确
+    classified_gt_ids = {m.gt_idx for m in valid_matches if m.category_match}
+    result.classification_tp = len(classified_gt_ids)
 
     if result.location_tp > 0:
         result.classification_precision = result.classification_tp / result.location_tp

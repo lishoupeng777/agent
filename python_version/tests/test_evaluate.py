@@ -106,7 +106,7 @@ def main():
         report = run_full_evaluation(
             requests,
             run_stability=True,
-            stability_samples=2,
+            stability_samples=3,
             consistency_samples=3,
         )
         print_report_summary(report)

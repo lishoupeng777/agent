@@ -21,8 +21,9 @@ from .metrics import (
 from .stability import run_stability as _run_stability_fn
 from .debias import detect_length_bias, detect_position_bias, compute_bias_mitigation_score
 
-# 并发评估的工作线程数（DeepSeek API 动态限流，2 并发配合 max_retries=2 退避）
-_MAX_WORKERS = 2
+# 并发评估的工作线程数（配合 main.py 的限流器：4 并发 + 6 req/s）
+# 提速约 2 倍；如遇 429 限流可下调回 2 并发 + 3 req/s
+_MAX_WORKERS = 4
 
 
 def _evaluate_consistency_averaged(req: EvalRequest, samples: int) -> EvalResponse:
@@ -233,11 +234,30 @@ def run_full_evaluation(
     reproducibility_ok = True
 
     # 1. 并发评估 + 偏置分析 + 可复现性（不含稳定性测试）
+    # 稳定性抽样策略：优先选"最难评、最可能波动"的样本，而非随机/等距抽到简单样本。
+    # 难度依据（评估前即可确定，无需先跑）：
+    #   1) human_label.difficulty == "hard"
+    #   2) 人工分处于判定边界中间区间（0.4~0.75），这类分数最容易在多次采样中波动
+    # 这样即使方差很小，也更有说服力（连最难样本都稳）。
     _stability_indices: set[int] = set()
     if run_stability:
         n = len(requests)
-        _stability_indices = set(list(range(0, n, max(1, n // 5)))[:5]) if n > 5 else set(range(n))
+        scored: list[tuple[int, int]] = []  # (优先级, 索引)，优先级越大越优先
+        for idx, req in enumerate(requests):
+            hl = req.human_label or {}
+            priority = 0
+            if hl.get("difficulty") == "hard":
+                priority += 2
+            hs = hl.get("overall_score", 0.5)
+            if 0.4 <= hs <= 0.75:
+                priority += 1
+            scored.append((priority, idx))
+        # 按优先级降序，优先级相同则等距分散，取前 5 条
+        scored.sort(key=lambda x: (-x[0], x[1]))
+        picked = [idx for _, idx in scored[:5]] if n > 5 else list(range(n))
+        _stability_indices = set(picked)
         report["report_meta"]["stability_tested_indices"] = sorted(_stability_indices)
+        report["report_meta"]["stability_sampling_strategy"] = "hard_and_boundary_first"
 
     eval_start = time.time()
     with ThreadPoolExecutor(max_workers=_MAX_WORKERS) as executor:

@@ -1767,8 +1767,19 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
         output_tokens=callback.output_tokens,
         total_tokens=callback.total_tokens,
     )
-    setattr(response, "parse_diagnostics", parse_diagnostics)
-    setattr(response, "verifier_rejected_count", verifier_rejected)
+    response.parse_diagnostics = parse_diagnostics
+    response.verifier_rejected_count = verifier_rejected
+
+    # Step 8: Reflexion 自我反思修正（可开关，默认关闭，不影响既有主路径）
+    if getattr(request, "reflect", False):
+        from .reflection import reflect_and_correct
+        response = reflect_and_correct(
+            response,
+            before_text=request.before_text,
+            after_text=request.after_text,
+            temperature=temperature,
+        )
+
     return response
 
 

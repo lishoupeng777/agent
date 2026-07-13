@@ -1,0 +1,1131 @@
+[
+  {
+    "id": "sample_000",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息保留率100%，仅删除'应''的'等虚词，所有核心约束条件（5000元/5万元阈值、审批层级、三年保存期限）完整保留。",
+        "score": 1.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "逐项核对：5000元、5万元阈值未变；审批层级（部门负责人/采购中心负责人/分管副总）未变；三年保存期限未变。无任何事实篡改。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文所有信息均可在原文中找到对应依据，无任何凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为单段通知文本，治理后保持相同段落结构和信息顺序，无结构破坏。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺，去虚词后表达更简洁有力，无电报体问题。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [],
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "before_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品应统一通过OA系统提交申请。采购金额在5000元以下的，由部门负责人审批；5000元（含）以上至5万元以下的，由采购中心负责人审批；5万元（含）以上的，须报分管副总经理审批。所有采购记录应保存不少于三年。",
+    "after_text": "关于进一步规范办公用品采购流程的通知。自2026年7月1日起，各部门采购办公用品统一通过OA系统提交申请。采购金额5000元以下由部门负责人审批；5000元（含）以上至5万元以下由采购中心负责人审批；5万元（含）以上须报分管副总经理审批。所有采购记录保存不少于三年。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_001",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息保留率100%，核心安全策略完整：初始密码修改、手机绑定、5次锁定、30分钟。'通过'改'使用'、删除'用户''将'仅为润色。",
+        "score": 1.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "逐项核对：5次错误锁定未变；30分钟锁定时长未变；绑定手机号码要求未变。无任何事实篡改。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文所有信息均可在原文中找到依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为三个连贯句，治理后保持相同句子顺序和逻辑层次。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达流畅自然，无过度缩写或电报体。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [],
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "before_text": "系统支持用户通过用户名和密码登录。首次登录后，用户应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户将自动锁定30分钟。",
+    "after_text": "系统支持用户使用用户名和密码登录。首次登录后，应立即修改初始密码，并绑定手机号码用于身份验证。连续输入错误密码5次后，账户自动锁定30分钟。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_002",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文三个阶段的详细执行清单（服务器安装、数据库初始化、网络环境配置；业务系统上线+用户培训；验收测试+运行评估+总结报告）被压缩为三个短语（基础设施部署、业务系统上线、项目验收），保留率约40%，核心实施细节丢失。",
+        "score": 0.4
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "三个阶段的命名与原文框架一致，未产生事实性错误。但'项目验收'替代了原文的'验收测试和运行评估，形成总结报告'，存在信息损失但非事实篡改。",
+        "score": 0.8
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文中的'基础设施部署''业务系统上线''项目验收'在原文中均有对应依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'分三个阶段实施'的总分结构，治理后压缩为单句并列，层次被抹平但三阶段逻辑框架保留。",
+        "score": 0.6
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺流畅，无电报体。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "第一阶段删除'服务器安装、数据库初始化、网络环境配置'三项具体任务；第二阶段删除'用户培训'；第三阶段删除'验收测试、运行评估、形成总结报告'三项交付物。",
+        "suggestion": "建议保留各阶段的关键执行条目，可使用缩略形式但不应完全删除。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 10,
+          "end_char": 45,
+          "snippet": "完成基础设施部署、业务系统上线和项目验收"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.76,
+      "verdict": "pass"
+    },
+    "before_text": "项目建设分三个阶段实施。第一阶段完成基础设施部署，包括服务器安装、数据库初始化和网络环境配置；第二阶段完成业务系统上线，并开展用户培训；第三阶段完成验收测试和运行评估，形成总结报告。",
+    "after_text": "项目建设分三个阶段实施，完成基础设施部署、业务系统上线和项目验收。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_003",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文含4项核心量化信息（2030年碳中和目标、12亿元投资、80MW光伏、15万吨减排），治理后全部丢失，仅保留'绿色发展'这一模糊方向，保留率不足20%。【连带惩罚】核心量化指标被删除。",
+        "score": 0.2
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】四项核心量化指标（2030年、12亿元、80MW、15万吨）均被删除，虽非篡改但造成关键事实信息完全丢失。按核心指标删除连带规则，此维度不得高于0.6。",
+        "score": 0.5
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "'绿色发展''绿色供应链建设'在原文'碳中和目标''绿色供应链建设'中有对应依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'目标+路径+量化支撑'的多层结构，治理后压缩为单一抽象表述，逻辑层次被完全抹平。",
+        "score": 0.4
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺，但内容因过度删减而空洞。【警惕流畅性偏见】语法正确但信息量极低。",
+        "score": 0.9
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除'2030年前实现碳中和目标'这一核心承诺、'12亿元'环保投入、'80MW'光伏建设规模、'15万吨'年减排量四项核心量化指标。",
+        "suggestion": "必须保留碳中和目标年份和关键量化指标，这些是原文的核心价值信息。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 20,
+          "snippet": "公司将持续推进绿色发展，并加强绿色供应链建设"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.61,
+      "verdict": "review"
+    },
+    "before_text": "公司计划于2030年前实现碳中和目标，并持续推进绿色供应链建设。预计未来三年累计投入环保资金12亿元，新建光伏发电设施80MW，每年减少碳排放约15万吨。",
+    "after_text": "公司将持续推进绿色发展，并加强绿色供应链建设。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_004",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文语义核心为'增量备份策略'（仅保存变化数据、降低存储成本、缩短备份时间），治理后改为'全量备份策略'（保存全部数据、确保数据完整性），语义完全翻转。",
+        "score": 0.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "核心技术事实被篡改：备份策略从增量→全量，备份范围从变化数据→全部业务数据，备份目的从降低成本→确保完整性。三处事实错误。",
+        "score": 0.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文中的'全量备份策略''保存全部业务数据''确保数据完整性'在原文中无任何依据，均为凭空编造，属于严重幻觉。",
+        "score": 0.2
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文的'策略类型+时间+范围+目的'四层结构形式上保留，但内容被全面替换。",
+        "score": 0.8
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺流畅。【警惕】语法完美但内容完全错误。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将'增量备份策略'篡改为'全量备份策略'，将'仅保存自上次备份以来发生变化的数据'篡改为'保存全部业务数据'，将'降低存储成本并缩短备份时间'篡改为'确保数据完整性'。",
+        "suggestion": "必须恢复原文的增量备份策略描述，不可改变技术方案。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 4,
+          "end_char": 12,
+          "snippet": "本系统采用全量备份策略"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.3,
+      "verdict": "fail"
+    },
+    "before_text": "本系统采用增量备份策略，每日凌晨2点自动执行备份任务，仅保存自上次备份以来发生变化的数据，以降低存储成本并缩短备份时间。",
+    "after_text": "本系统采用全量备份策略，每日凌晨2点自动执行备份任务，保存全部业务数据，以确保数据完整性。",
+    "difficulty": "hard"
+  },
+  {
+    "id": "sample_005",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文语义核心为'有条件的补救机制'（七日内线上补学+考核合格=完成培训），治理后改为'完全免除义务'，语义完全改变，保留率为0。",
+        "score": 0.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "制度事实发生根本改变：培训补救义务被改为免除。但此项属于语义层面的彻底重写，非数值/日期类事实篡改。按正交原则，主要扣分在semantic_fidelity。",
+        "score": 0.7
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "'免于参加培训'在原文中无依据，原文规定的是'补学补救'而非'免除'，属于凭空编造新的制度安排。",
+        "score": 0.4
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文的'条件→补救措施→结果'逻辑结构被改为'条件→直接豁免'的简单结构。",
+        "score": 0.5
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺。【警惕】简短易读但内容完全偏离原文。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将'可在培训结束后七日内完成线上补学，经考核合格后视为完成培训'改为'可免于参加培训'，制度要求从补救机制变为完全免除。",
+        "suggestion": "必须保留补学机制和考核要求，不可将补救义务改为豁免。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 15,
+          "end_char": 22,
+          "snippet": "可免于参加培训"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.47,
+      "verdict": "fail"
+    },
+    "before_text": "员工因出差无法参加现场培训的，可在培训结束后七日内完成线上补学，经考核合格后视为完成培训。",
+    "after_text": "员工因出差无法参加现场培训的，可免于参加培训。",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_006",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "整体语义结构保留（年度+指标+数值+增长率），但'营业收入'的具体数值从126.8→128.6，属于核心数字改变。【连带惩罚】核心数字被篡改，此维度不得高于0.6。",
+        "score": 0.5
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】营业收入126.8亿元被改为128.6亿元，核心经营数据篡改。仅1处篡改，此维度不得高于0.6。",
+        "score": 0.4
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "128.6亿元在原文中无依据，属于凭空编造的财务数据。但结构和其他数据点（同比增长率、净利润）有原文支撑。",
+        "score": 0.4
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文的'收入+增长+利润+增长'并列结构完整保留，格式一致。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达流畅，无任何可读性问题。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将营业收入从126.8亿元错误修改为128.6亿元，属于核心财务数据篡改。",
+        "suggestion": "必须恢复原文的126.8亿元，财务数据不得更改。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 13,
+          "end_char": 19,
+          "snippet": "营业收入128.6亿元"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.54,
+      "verdict": "review"
+    },
+    "before_text": "公司2025年度实现营业收入126.8亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
+    "after_text": "公司2025年度实现营业收入128.6亿元，同比增长18.4%；实现净利润15.2亿元，同比增长12.6%。",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_007",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "整体语义结构保留（文件名称+生效日期+废止声明），仅生效日期从8月→9月。【连带惩罚】核心日期被修改，此维度不得高于0.6。",
+        "score": 0.5
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】生效日期从2026年8月1日改为9月1日，属于关键日期事实错误。仅1处，不得高于0.6。",
+        "score": 0.4
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "2026年9月1日在原文中无依据，属于凭空编造的日期。",
+        "score": 0.4
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文的'新规+实施日期+旧规废止'三段结构完整保留。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达规范，无任何可读性问题。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将生效日期从2026年8月1日错误修改为2026年9月1日。",
+        "suggestion": "必须恢复原文的2026年8月1日。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 11,
+          "end_char": 19,
+          "snippet": "2026年9月1日起正式实施"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.54,
+      "verdict": "review"
+    },
+    "before_text": "《设备维护管理办法》自2026年8月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
+    "after_text": "《设备维护管理办法》自2026年9月1日起正式实施，原《设备维护制度（2022版）》同时废止。",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_008",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文4项规定含7项关键信息（凌晨1:00、180天、AES-256算法、客户个人信息、信息安全部门、书面批准、外部存储介质），治理后仅保留约3项（每日备份、加密、批准），保留率约40%。【连带惩罚】核心量化指标180天被改为30天。",
+        "score": 0.3
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】备份保存期限从180天被错误改为30天，核心技术参数被篡改。同时AES-256算法被删除，加密标准降级。此维度不得高于0.6。",
+        "score": 0.3
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "30天保存期限在原文中无依据，属于凭空编造。其他内容在原文中有迹可循但被简化。",
+        "score": 0.5
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'第一/第二/第三/第四'的四项并列结构，治理后压缩为流水句，编号层级丢失，有序列表被压缩。",
+        "score": 0.5
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子可读但部分简化后略显生硬（如'保存30天'缺乏语境），但尚未达到电报体程度。",
+        "score": 0.7
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将备份保存期限从180天错误修改为30天，严重降低数据安全标准。",
+        "suggestion": "必须恢复原文的180天保存期限。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 42,
+          "end_char": 55,
+          "snippet": "涉及客户信息的数据应加密保存"
+        }
+      },
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除'AES-256算法'加密标准，将'客户个人信息'泛化为'客户信息'，删除'信息安全部门书面'审批限定。",
+        "suggestion": "必须保留加密算法标准和审批部门要求。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 23,
+          "end_char": 30,
+          "snippet": "备份文件保存30天"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.42,
+      "verdict": "fail"
+    },
+    "before_text": "为加强数据安全管理，公司规定：第一，所有数据库每日凌晨1:00执行自动备份；第二，备份文件至少保存180天；第三，涉及客户个人信息的数据应采用AES-256算法加密存储；第四，未经信息安全部门书面批准，不得将生产数据复制至外部存储介质。",
+    "after_text": "为加强数据安全管理，公司规定：数据库每日自动备份；备份文件保存30天；涉及客户信息的数据应加密保存；未经批准，不得复制生产数据。",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_009",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文5项验收条件，治理后仅保留2项且1项被篡改（5000→3000）。删除'连续稳定运行30天''完整验收文档''双方签字确认'三项关键约束，保留率不足20%。",
+        "score": 0.1
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】性能指标从5000次/秒改为3000次/秒，核心量化阈值被篡改。同时多项验收条件被删除。此维度不得高于0.6。",
+        "score": 0.2
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "3000次/秒的性能指标在原文中无依据，属于凭空编造。",
+        "score": 0.4
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'①②③④'序号列表的清晰验收条件结构，治理后变为流水句，有序列表被严重压缩。",
+        "score": 0.4
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子可读但被过度简化，'完成用户培训后即可交付'丢失了前置条件的严谨性。",
+        "score": 0.7
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "将性能指标从'每秒处理请求不少于5000次'改为'3000次'，严重降低验收标准。",
+        "suggestion": "必须恢复原文的5000次/秒性能指标。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 25,
+          "end_char": 39,
+          "snippet": "性能测试达到每秒处理请求不少于3000次"
+        }
+      },
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除'连续稳定运行不少于30天'、'提交完整验收文档'、'项目负责人和客户双方签字确认'三项核心验收前置条件。",
+        "suggestion": "必须保留稳定性运行要求、文档交付要求和双方签字确认流程。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 28,
+          "snippet": "项目验收应满足以下条件：功能测试通过；性能测试达到每秒处理请求不少于3000次；完成用户培训后即可交付。"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.29,
+      "verdict": "fail"
+    },
+    "before_text": "项目验收应满足以下条件：①所有功能测试通过；②性能测试达到每秒处理请求不少于5000次；③连续稳定运行不少于30天；④完成用户培训并提交完整验收文档，经项目负责人和客户双方签字确认后方可正式交付。",
+    "after_text": "项目验收应满足以下条件：功能测试通过；性能测试达到每秒处理请求不少于3000次；完成用户培训后即可交付。",
+    "difficulty": "hard"
+  },
+  {
+    "id": "sample_010",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息100%保留，仅将'连续五次输入'改为'连续输入错误密码五次'，词序调整，语义完全一致。",
+        "score": 1.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "逐项核对：统一身份认证、修改初始密码、双因素认证、5次锁定、30分钟，五项事实均未改变。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文所有信息在原文中均有依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文三句逻辑顺序完整保留，无结构变化。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达流畅自然，调整后语序更通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [],
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "before_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续五次输入错误密码后，账户将自动锁定30分钟。",
+    "after_text": "根据公司信息安全管理制度，所有员工应使用统一身份认证系统登录办公平台。首次登录后应及时修改初始密码，并开启双因素认证。连续输入错误密码五次后，账户将自动锁定30分钟。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_011",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息100%保留，仅将'及'改为'以及'，属于连接词优化，无任何语义变化。",
+        "score": 1.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "所有事实信息完全一致：研发中心、2026年9月、智能质检平台二期、三项建设内容。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无任何新增信息。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文的单句+三项并列结构完全保留。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "连接词优化后更符合书面表达习惯。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [],
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "before_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化及权限管理模块重构。",
+    "after_text": "会议纪要：研发中心将于2026年9月启动智能质检平台二期建设，重点完成规则引擎升级、日志追踪优化以及权限管理模块重构。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_012",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文含4项时间约束（5分钟响应、30分钟反馈、24小时升级、同步通知预计时间），治理后全部丢失，仅保留'及时响应''处理问题'的模糊表述，保留率约20%。【连带惩罚】核心量化时间指标被删除。",
+        "score": 0.2
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "【连带惩罚】四项SLA时间指标（5分钟、30分钟、24小时、同步通知）均被删除，虽非篡改但造成关键事实信息完全丢失。按核心指标删除连带规则，不得高于0.6。",
+        "score": 0.5
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "'及时响应''处理客户问题'在原文'响应''处理'中有概括性依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'总述+两个分号连接的详细流程'结构，治理后变为单一笼统描述，流程层次完全丢失。",
+        "score": 0.4
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺。【警惕流畅性偏见】语法正确但操作性信息完全丢失。",
+        "score": 0.9
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "critical",
+        "description": "删除'5分钟内响应''30分钟内完成首次处理意见反馈''24小时内升级至二线支持''同步通知客户预计处理时间'四项SLA标准。",
+        "suggestion": "必须保留所有时间约束和升级流转规则，这些是服务规范的核心内容。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 0,
+          "end_char": 23,
+          "snippet": "客服人员应及时响应工单，并处理客户问题"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.58,
+      "verdict": "review"
+    },
+    "before_text": "客户服务规范要求：客服人员应在收到工单后5分钟内响应，30分钟内完成首次处理意见反馈；复杂问题应在24小时内升级至二线支持，并同步通知客户预计处理时间。",
+    "after_text": "客户服务规范要求：客服人员应及时响应工单，并处理客户问题。",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_013",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "核算信息保留率：原文5项具体步骤（初始化脚本、权限配置、备份策略配置、连接测试、性能基准测试+归档保存），治理后压缩为'初始化并进行测试'，保留率约30%。",
+        "score": 0.3
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "未产生事实性错误，'初始化'和'测试'在原文中有对应依据。但权限配置、备份策略等关键操作信息丢失。",
+        "score": 0.7
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "后文中的'初始化''测试'在原文中均有依据，无凭空编造。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "原文为'依次执行'五个步骤的有序序列，治理后变为两个动作的简单并列，有序列表被压缩。",
+        "score": 0.5
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "句子通顺，简洁明了。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "删除'权限配置''备份策略配置''连接测试''性能基准测试''归档保存'五项操作步骤。",
+        "suggestion": "建议保留关键配置和测试步骤的名称，可使用缩略形式。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 9,
+          "end_char": 18,
+          "snippet": "应完成初始化并进行测试"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.62,
+      "verdict": "review"
+    },
+    "before_text": "数据库部署完成后，应依次执行初始化脚本、权限配置、备份策略配置、连接测试和性能基准测试，并将测试结果归档保存。",
+    "after_text": "数据库部署完成后，应完成初始化并进行测试。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_014",
+    "before_text": "根据项目管理要求，项目组每周召开一次进度会议，会议内容包括任务完成情况、风险问题分析、下周工作计划，并形成会议纪要。",
+    "after_text": "根据项目管理要求，项目组定期召开进度会议，并形成会议纪要。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "删除会议具体内容要求，但未改变整体流程。",
+        "score": 0.75
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "无事实篡改。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无幻觉。",
+        "score": 0.95
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 0.9
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "删除会议具体内容要求，但未改变整体流程。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 4,
+          "end_char": 24,
+          "snippet": "项目组定期召开进度会议，并形成会议纪要"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.9,
+      "verdict": "pass"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_015",
+    "before_text": "系统上线前需要完成安全测试、压力测试和兼容性测试，测试通过后由项目负责人提交上线申请。",
+    "after_text": "系统上线前需要完成安全测试和压力测试，通过后即可上线。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "删除兼容性测试和审批流程要求。",
+        "score": 0.5
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "部分上线前置条件被删除。",
+        "score": 0.75
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无幻觉。",
+        "score": 0.95
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 0.9
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "over_clean",
+        "severity": "major",
+        "description": "删除兼容性测试和审批流程要求。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 18,
+          "end_char": 25,
+          "snippet": "通过后即可上线"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.75,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_016",
+    "before_text": "公司将于2026年12月完成数据中心迁移工作，迁移范围包括服务器、数据库及存储设备。",
+    "after_text": "公司将于2027年12月完成数据中心迁移工作，迁移范围包括服务器、数据库及存储设备。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "日期被篡改但信息框架保留。",
+        "score": 0.75
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "项目时间被错误修改。",
+        "score": 0.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无幻觉。",
+        "score": 0.95
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "项目时间被错误修改（2026->2027）。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 5,
+          "end_char": 14,
+          "snippet": "2027年12月完成数据中心迁移工作"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.56,
+      "verdict": "review"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_017",
+    "before_text": "用户密码连续错误输入5次后，账户锁定30分钟。",
+    "after_text": "用户密码连续错误输入10次后，账户锁定60分钟。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "安全策略参数被修改，信息保真度严重下降。",
+        "score": 0.25
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "关键配置参数错误修改。",
+        "score": 0.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无幻觉。",
+        "score": 0.95
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "mis_edit",
+        "severity": "critical",
+        "description": "安全策略参数被修改（5次->10次，30分钟->60分钟）。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 6,
+          "end_char": 24,
+          "snippet": "连续错误输入10次后，账户锁定60分钟"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.36,
+      "verdict": "fail"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": "sample_018",
+    "before_text": "系统支持OCR识别功能，可识别图片中的文字内容，并支持中文、英文两种语言。",
+    "after_text": "系统支持OCR智能识别功能，可识别图片文字，并支持中文、英文和日文三种语言。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息基本保留。",
+        "score": 0.75
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "新增了不存在的语言支持。",
+        "score": 0.5
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "新增原文不存在的日文支持能力。",
+        "score": 0.6
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "hallucination",
+        "severity": "major",
+        "description": "新增原文不存在的日文支持能力。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 22,
+          "end_char": 34,
+          "snippet": "支持中文、英文和日文三种语言"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.7,
+      "verdict": "review"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_019",
+    "before_text": "年度预算包括研发费用500万元、市场推广费用300万元和人员成本800万元。",
+    "after_text": "年度预算包括研发费用500万元、市场推广费用300万元和人员成本800万元，总预算达到2000万元。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "原文信息保留完整。",
+        "score": 0.9
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "新增总预算计算但计算错误。",
+        "score": 0.75
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "新增计算结果，但计算错误导致轻微幻觉。",
+        "score": 0.7
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [
+      {
+        "category": "hallucination",
+        "severity": "minor",
+        "description": "新增总预算计算错误信息。",
+        "location": {
+          "segment_id": "After 1",
+          "start_char": 35,
+          "end_char": 44,
+          "snippet": "总预算达到2000万元"
+        }
+      }
+    ],
+    "overall": {
+      "weighted_score": 0.84,
+      "verdict": "pass"
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": "sample_020",
+    "before_text": "采购流程包括需求申请、部门审批、采购执行、验收确认四个步骤。",
+    "after_text": "采购流程包括需求申请、审批、采购、验收四个环节。",
+    "dimensions": [
+      {
+        "dimension": "semantic_fidelity",
+        "weight": 0.3,
+        "reason": "同义改写，信息完整保留。",
+        "score": 1.0
+      },
+      {
+        "dimension": "factual_consistency",
+        "weight": 0.3,
+        "reason": "无事实篡改。",
+        "score": 1.0
+      },
+      {
+        "dimension": "hallucination",
+        "weight": 0.2,
+        "reason": "无幻觉。",
+        "score": 1.0
+      },
+      {
+        "dimension": "structure",
+        "weight": 0.1,
+        "reason": "结构保持。",
+        "score": 1.0
+      },
+      {
+        "dimension": "readability",
+        "weight": 0.1,
+        "reason": "表达通顺。",
+        "score": 1.0
+      }
+    ],
+    "flaws": [],
+    "overall": {
+      "weighted_score": 1.0,
+      "verdict": "pass"
+    },
+    "difficulty": "easy"
+  }
+]

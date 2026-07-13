@@ -36,8 +36,8 @@ app.include_router(router)
 # 启动时恢复任务状态
 load_tasks_from_disk()
 
-# 启用 LLM API 限流（每秒最多 3 次请求，防止触发 429）
-enable_rate_limiter(requests_per_second=3.0)
+# 启用 LLM API 限流（每秒最多 6 次请求，配合 4 并发提速；如遇 429 可下调回 3.0）
+enable_rate_limiter(requests_per_second=6.0)
 
 # 挂载静态文件目录（中文前端页面）
 static_dir = os.path.join(os.path.dirname(__file__), "static")

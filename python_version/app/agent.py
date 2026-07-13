@@ -263,26 +263,31 @@ def run_agent(
     before_text: str,
     after_text: str,
     evaluation_profile: str | None = None,
+    max_iterations: int = 5,
 ) -> dict[str, Any]:
-    """运行评估 Agent。
+    """运行评估 Agent（真正的 ReAct 多轮循环）。
 
     如果指定了 evaluation_profile，直接用该模式评估。
-    如果未指定，让 Agent 自动判断文本类型并选择最合适的模式。
+    如果未指定，进入 ReAct 循环：Agent 每轮自主决定调用哪些工具（Action），
+    观察工具返回（Observation），再决定下一步，直到它调用 evaluate_single
+    完成评估或达到 max_iterations。
 
     Args:
         before_text: 治理前原文
         after_text: 治理后文本
         evaluation_profile: 指定评估模式（可选）
+        max_iterations: ReAct 最大轮数（防止死循环）
 
     Returns:
-        dict: 包含评估结果和 Agent 分析过程
+        dict: 包含评估结果和 Agent 完整推理轨迹（ReAct trajectory）
     """
-    llm = create_agent_llm()
+    from langchain_core.messages import ToolMessage, AIMessage
+
     tools = [detect_text_type, extract_key_facts, check_fact_preservation,
              analyze_structure, evaluate_single]
-    llm_with_tools = llm.bind_tools(tools)
+    tool_map = {t.name: t for t in tools}
 
-    # 如果指定了 profile，直接评估
+    # 如果指定了 profile，直接评估（跳过 ReAct）
     if evaluation_profile:
         result = evaluate_single.invoke({
             "before_text": before_text,
@@ -293,59 +298,101 @@ def run_agent(
             "evaluation": json.loads(result),
             "agent_reasoning": f"使用指定模式 {evaluation_profile} 直接评估",
             "auto_profile": False,
+            "iterations": 0,
         }
 
-    # 未指定 profile，让 Agent 自主决策
-    messages = [
+    llm = create_agent_llm()
+    llm_with_tools = llm.bind_tools(tools)
+
+    messages: list[Any] = [
         SystemMessage(content=AGENT_SYSTEM_PROMPT),
-        HumanMessage(content=f"请评估以下治理前后文本的质量：\n\n【治理前】\n{before_text[:1000]}\n\n【治理后】\n{after_text[:500]}"),
+        HumanMessage(content=(
+            f"请评估以下治理前后文本的质量。请按需调用工具收集证据，"
+            f"最后必须调用 evaluate_single 完成正式评分。\n\n"
+            f"【治理前】\n{before_text[:1000]}\n\n【治理后】\n{after_text[:500]}"
+        )),
     ]
 
-    # 第一轮：Agent 分析 + 工具调用
-    reasoning_steps = []
-    response = llm_with_tools.invoke(messages)
-    reasoning_steps.append({"step": "initial_analysis", "content": str(response.content)[:500]})
+    trajectory: list[dict[str, Any]] = []
+    tool_results: dict[str, str] = {}
+    evaluation: dict[str, Any] | None = None
+    iterations = 0
 
-    # 执行 Agent 请求的工具调用
-    tool_results = {}
-    if hasattr(response, "tool_calls") and response.tool_calls:
-        for tc in response.tool_calls:
-            tool_name = tc["name"]
-            tool_args = tc["args"]
-            # 执行工具
-            for t in tools:
-                if t.name == tool_name:
-                    result = t.invoke(tool_args)
-                    tool_results[tool_name] = result
-                    reasoning_steps.append({"step": f"tool:{tool_name}", "result": result[:300]})
-                    break
+    # ── ReAct 循环：Thought → Action → Observation → 重复 ──
+    for _ in range(max_iterations):
+        iterations += 1
+        ai_msg = llm_with_tools.invoke(messages)
+        messages.append(ai_msg)
 
-    # 第二轮：基于工具结果做最终评估
-    # 自动选择 profile
-    if "detect_text_type" in tool_results:
-        detection = json.loads(tool_results["detect_text_type"])
-        selected_profile = detection["recommended_profile"]
-        reasoning_steps.append({"step": "profile_selection", "profile": selected_profile,
-                                "reason": detection["reason"]})
-    else:
-        selected_profile = PROFILE_GENERAL
-        reasoning_steps.append({"step": "profile_selection", "profile": selected_profile,
-                                "reason": "默认使用通用模式"})
+        thought = str(ai_msg.content).strip() if ai_msg.content else ""
+        calls = getattr(ai_msg, "tool_calls", None) or []
 
-    # 执行评估
-    eval_result = evaluate_single.invoke({
-        "before_text": before_text,
-        "after_text": after_text,
-        "profile": selected_profile,
-    })
-    evaluation = json.loads(eval_result)
-    reasoning_steps.append({"step": "evaluation", "result": evaluation})
+        trajectory.append({
+            "iteration": iterations,
+            "thought": thought[:400],
+            "actions": [c["name"] for c in calls],
+        })
+
+        # 没有工具调用 → Agent 认为已完成推理，结束循环
+        if not calls:
+            break
+
+        # 执行本轮所有工具调用（Action → Observation）
+        for tc in calls:
+            name = tc["name"]
+            args = tc.get("args", {})
+            tool = tool_map.get(name)
+            if tool is None:
+                observation = json.dumps({"error": f"未知工具 {name}"}, ensure_ascii=False)
+            else:
+                try:
+                    observation = tool.invoke(args)
+                except Exception as e:
+                    observation = json.dumps({"error": str(e)}, ensure_ascii=False)
+
+            tool_results[name] = observation
+            if name == "evaluate_single":
+                try:
+                    evaluation = json.loads(observation)
+                except json.JSONDecodeError:
+                    pass
+
+            # 把 Observation 作为 ToolMessage 回填，供下一轮推理
+            messages.append(ToolMessage(content=observation[:1200], tool_call_id=tc.get("id", name)))
+
+        # Agent 已完成正式评分 → 结束循环
+        if evaluation is not None:
+            break
+
+    # 兜底：若 Agent 循环结束仍未产出评分，用检测到的 profile（或默认）补一次评估
+    if evaluation is None:
+        if "detect_text_type" in tool_results:
+            try:
+                selected_profile = json.loads(tool_results["detect_text_type"]).get(
+                    "recommended_profile", PROFILE_GENERAL)
+            except json.JSONDecodeError:
+                selected_profile = PROFILE_GENERAL
+        else:
+            selected_profile = PROFILE_GENERAL
+        eval_result = evaluate_single.invoke({
+            "before_text": before_text,
+            "after_text": after_text,
+            "profile": selected_profile,
+        })
+        evaluation = json.loads(eval_result)
+        tool_results["evaluate_single"] = eval_result
+        trajectory.append({
+            "iteration": iterations + 1,
+            "thought": "ReAct 循环未主动完成评分，兜底执行评估",
+            "actions": ["evaluate_single"],
+        })
 
     return {
         "evaluation": evaluation,
-        "agent_reasoning": reasoning_steps,
+        "agent_reasoning": trajectory,
         "auto_profile": True,
         "tool_results": tool_results,
+        "iterations": iterations,
     }
 
 
@@ -375,6 +422,7 @@ def evaluate_with_agent(
 
     # 从 Agent 结果构建 EvalResponse
     eval_data = result["evaluation"]
+    tool_results = result.get("tool_results", {})
 
     from .models import DimensionScore, FlawItem, AnchorSpan
 
@@ -382,21 +430,77 @@ def evaluate_with_agent(
         DimensionScore(
             dimension=d["dimension"],
             score=d["score"],
-            weight=0.4 if "语义" in d["dimension"] else 0.3 if "清洗" in d["dimension"] or "误改" in d["dimension"] else 0.15,
+            weight=0.35 if d["dimension"] in ("semantic_fidelity", "factual_consistency") else 0.15,
             reason=d.get("reason", ""),
         )
         for d in eval_data.get("dimensions", [])
     ]
+
+    # 将工具检测结果转为 FlawItem
+    flaws = _extract_flaws_from_tools(tool_results, request.before_text, request.after_text)
 
     return EvalResponse(
         request_id=request.request_id,
         evaluation_profile=eval_data.get("profile", PROFILE_GENERAL),
         dimensions=dimensions,
         overall_score=eval_data.get("overall_score", 0.5),
-        flaws=[],  # Agent 模式下瑕疵已在 dimensions 中体现
+        flaws=flaws,
         verdict=eval_data.get("verdict", "review"),
         reproducibility_token="agent",
         model_version=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         prompt_version="agent",
         raw_llm_output=json.dumps(result, ensure_ascii=False),
     )
+
+
+def _extract_flaws_from_tools(
+    tool_results: dict[str, str],
+    before_text: str,
+    after_text: str,
+) -> list:
+    """将 Agent 工具检测结果转为 FlawItem 列表。"""
+    from .models import FlawItem, AnchorSpan
+
+    flaws = []
+
+    # 1. check_fact_preservation → 丢失的事实 → over_clean 瑕疵
+    if "check_fact_preservation" in tool_results:
+        try:
+            data = json.loads(tool_results["check_fact_preservation"])
+            for fact in data.get("missing", []):
+                severity = "critical" if fact["type"] in ("date", "range") else "major"
+                flaws.append(FlawItem(
+                    category="over_clean",
+                    severity=severity,
+                    description=f"关键事实缺失：原文中的「{fact['value']}」在改写后未保留（类型：{fact['type']}）",
+                    location=AnchorSpan(
+                        segment_id="agent",
+                        start_char=0, end_char=0,
+                        snippet=str(fact["value"]),
+                    ),
+                    suggestion=f"请保留原文中的关键数据「{fact['value']}」",
+                ))
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    # 2. analyze_structure → 结构变化 → structure 瑕疵
+    if "analyze_structure" in tool_results:
+        try:
+            data = json.loads(tool_results["analyze_structure"])
+            for change in data.get("changes", []):
+                if "丢失" in change:
+                    flaws.append(FlawItem(
+                        category="structure",
+                        severity="major",
+                        description=f"结构变化：{change}",
+                        location=AnchorSpan(
+                            segment_id="agent",
+                            start_char=0, end_char=0,
+                            snippet=change,
+                        ),
+                        suggestion="请保留原文的结构化组织方式",
+                    ))
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    return flaws

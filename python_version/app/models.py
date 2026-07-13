@@ -51,6 +51,7 @@ class EvalRequest(BaseModel):
     model: Optional[str] = Field(None, description="指定模型（deepseek/mimo/gpt），None 则使用默认模型")
     stabilize: bool = Field(False, description="是否启用多次采样稳定化")
     sample_count: int = Field(3, ge=1, le=5, description="稳定化采样次数")
+    reflect: bool = Field(False, description="是否启用 Reflexion 自我反思修正（检测评分与证据矛盾后按需重评）")
 
     @field_validator("evaluation_profile")
     @classmethod
@@ -82,6 +83,7 @@ class EvalResponse(BaseModel):
     total_tokens: int | None = Field(None, description="总 token 数")
     parse_diagnostics: dict[str, Any] | None = Field(None, description="解析诊断信息（原始解析/验证降级情况）")
     verifier_rejected_count: int | None = Field(None, description="二阶段验证剔除的候选瑕疵数")
+    reflection: dict[str, Any] | None = Field(None, description="Reflexion 反思轨迹（检测到的矛盾 + 是否重评 + 分数变化）")
 
     @field_validator("evaluation_profile")
     @classmethod
