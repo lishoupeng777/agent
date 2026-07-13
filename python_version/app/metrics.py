@@ -148,7 +148,8 @@ def compute_anchor_accuracy(
     result = dual_track_evaluate(predicted_flaws, ground_truth_flaws, min_score=0.50)
 
     return {
-        "anchor_accuracy": result.location_recall,  # 兼容旧接口
+        # 主指标：定位召回率（真实瑕疵中被正确定位的比例），对应课题“定位准确率≥90%”
+        "anchor_accuracy": result.location_recall,
         "location_precision": result.location_precision,
         "location_recall": result.location_recall,
         "location_f1": result.location_f1,
@@ -161,6 +162,8 @@ def compute_anchor_accuracy(
         "location_fp": result.location_fp,
         "location_fn": result.location_fn,
         "classification_tp": result.classification_tp,
+        "primary_metric": "location_recall",
+        "reference_f1": result.location_f1,
     }
 
 

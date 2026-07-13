@@ -80,6 +80,8 @@ class EvalResponse(BaseModel):
     input_tokens: int | None = Field(None, description="输入 token 数")
     output_tokens: int | None = Field(None, description="输出 token 数")
     total_tokens: int | None = Field(None, description="总 token 数")
+    parse_diagnostics: dict[str, Any] | None = Field(None, description="解析诊断信息（原始解析/验证降级情况）")
+    verifier_rejected_count: int | None = Field(None, description="二阶段验证剔除的候选瑕疵数")
 
     @field_validator("evaluation_profile")
     @classmethod
@@ -151,3 +153,53 @@ class RecalcReport(BaseModel):
     mae: float | None = None
     rmse: float | None = None
     consistency_rate: float | None = None
+
+
+# ============================================================
+# Pairwise Comparison Models（Chatbot Arena 风格）
+# ============================================================
+
+class CompareRequest(BaseModel):
+    """对比评估请求：同一段原文 + 两个治理结果"""
+    before_text: str = Field(..., description="治理前原文")
+    output_a: str = Field(..., description="治理结果 A")
+    output_b: str = Field(..., description="治理结果 B")
+    evaluation_profile: str = Field(PROFILE_GENERAL, description="评估模式")
+    label_a: str = Field("A", description="结果 A 的显示标签")
+    label_b: str = Field("B", description="结果 B 的显示标签")
+    model: Optional[str] = Field(None, description="指定模型，None 则使用默认模型")
+
+    @field_validator("evaluation_profile")
+    @classmethod
+    def validate_evaluation_profile(cls, value: str) -> str:
+        return validate_profile_key(value)
+
+
+class DimensionDelta(BaseModel):
+    """单维度对比差异"""
+    dimension: str
+    score_a: float = Field(..., ge=0.0, le=1.0)
+    score_b: float = Field(..., ge=0.0, le=1.0)
+    delta: float = Field(..., description="score_a - score_b")
+    winner: str = Field(..., description="A / B / tie")
+
+
+class SideEvaluation(BaseModel):
+    """单侧评估结果（A 或 B）"""
+    dimensions: list[DimensionScore] = Field(default_factory=list)
+    flaws: list[FlawItem] = Field(default_factory=list)
+    overall_score: float = 0.0
+    verdict: str = "pass"
+
+
+class CompareResponse(BaseModel):
+    """对比评估响应"""
+    evaluation_a: SideEvaluation = Field(..., description="结果 A 的评估")
+    evaluation_b: SideEvaluation = Field(..., description="结果 B 的评估")
+    dimension_deltas: list[DimensionDelta] = Field(default_factory=list, description="各维度差异")
+    winner: str = Field(..., description="胜出方: A / B / tie")
+    overall_delta: float = Field(..., description="加权总分差值 (A - B)")
+    reason: str = Field("", description="综合对比理由")
+    label_a: str = "A"
+    label_b: str = "B"
+    latency_seconds: float | None = Field(None, description="总耗时（秒）")

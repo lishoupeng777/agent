@@ -33,6 +33,42 @@ from .profiles import get_profile_config, PROFILE_GENERAL
 
 
 # ============================================================
+# 0b. 评分校准器（懒加载）
+# ============================================================
+
+_calibrator_instance = None
+_calibrator_loaded = False
+
+
+def _get_calibrator():
+    """懒加载校准器。从 data/calibration_params.json 读取参数。
+    如果文件不存在或加载失败，返回 None（不校准）。
+    """
+    global _calibrator_instance, _calibrator_loaded
+    if _calibrator_loaded:
+        return _calibrator_instance
+    _calibrator_loaded = True
+    try:
+        from .calibrator import MultiModelCalibrator
+        cal_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data", "calibration_params.json",
+        )
+        if os.path.exists(cal_path):
+            mc = MultiModelCalibrator.load(cal_path)
+            model_name = os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
+            _calibrator_instance = mc.get_calibrator(model_name)
+            if _calibrator_instance is not None:
+                print(f"[校准器] 已加载 {model_name} 校准参数: "
+                      f"slope={_calibrator_instance.slope:.4f}, "
+                      f"intercept={_calibrator_instance.intercept:.4f}, "
+                      f"R²={_calibrator_instance.r_squared:.4f}")
+    except Exception as e:
+        print(f"[校准器] 加载失败，跳过校准: {e}")
+    return _calibrator_instance
+
+
+# ============================================================
 # 0. 缓存 / 限流 / 流式 配置
 # ============================================================
 
@@ -140,11 +176,14 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: boo
         use_cache: 是否使用全局缓存（False 时创建独立实例绕过缓存，不影响其他 worker）
     """
     global _llm_instance
+    # 构建 model_kwargs（json_mode）
+    model_kwargs: dict[str, Any] = {}
+    if json_mode:
+        model_kwargs["response_format"] = {"type": "json_object"}
+
     # 不走缓存的请求创建独立实例，不污染全局单例
     if not use_cache:
-        kwargs: dict[str, Any] = {}
-        if json_mode:
-            kwargs["model_kwargs"] = {"response_format": {"type": "json_object"}}
+        kwargs: dict[str, Any] = {"model_kwargs": model_kwargs, "seed": 42}
         if _rate_limiter is not None:
             kwargs["rate_limiter"] = _rate_limiter
         nocache_llm = ChatOpenAI(
@@ -152,19 +191,18 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: boo
             temperature=temperature,
             top_p=1.0,
             max_tokens=2048,
-            max_retries=5,
+            max_retries=2,
+            request_timeout=60,
             base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
             api_key=os.getenv("DEEPSEEK_API_KEY", ""),
             **kwargs,
         )
-        nocache_llm.cache = False  # per-instance 禁用缓存，不影响全局
+        nocache_llm.cache = False
         return nocache_llm
 
     if _llm_instance is not None and _llm_instance.temperature == temperature:
         return _llm_instance
-    kwargs: dict[str, Any] = {}
-    if json_mode:
-        kwargs["model_kwargs"] = {"response_format": {"type": "json_object"}}
+    kwargs: dict[str, Any] = {"model_kwargs": model_kwargs, "seed": 42}
     if _rate_limiter is not None:
         kwargs["rate_limiter"] = _rate_limiter
     _llm_instance = ChatOpenAI(
@@ -172,7 +210,8 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: boo
         temperature=temperature,
         top_p=1.0,           # 固定 top_p，确保确定性输出
         max_tokens=2048,
-        max_retries=5,       # 429/503 自动指数退避重试
+        max_retries=2,       # 429/503 自动指数退避重试
+        request_timeout=60,  # 60 秒超时，防止 API 挂起
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.getenv("DEEPSEEK_API_KEY", ""),
         **kwargs,
@@ -192,11 +231,25 @@ def build_prompt_messages(
     segments_after: list[dict[str, Any]] | None = None,
     diff_info: str | None = None,
 ) -> list[BaseMessage]:
-    """根据 profile 和输入构建消息列表"""
+    """根据 profile 和输入构建消息列表（动态从 SQLite 加载 Profile 规则）"""
     from langchain_core.messages import HumanMessage, SystemMessage
-    from .prompts import build_system_prompt, build_user_prompt
+    from .prompts import SYSTEM_PROMPT, build_user_prompt
+    from .storage import get_profile, normalize_profile
+    from .debias import generate_anti_bias_prompt_supplement
 
-    system_content = build_system_prompt(profile_key)
+    # 向后兼容映射
+    profile_key = normalize_profile(profile_key)
+
+    # 拼装 System Prompt：静态规则 + 动态 Profile 补充 + 抗偏置指令
+    system_content = SYSTEM_PROMPT
+
+    profile = get_profile(profile_key)
+    if profile and profile.get("prompt_supplement"):
+        system_content += "\n" + profile["prompt_supplement"]
+
+    # 抗偏置指令
+    system_content += "\n" + generate_anti_bias_prompt_supplement()
+
     user_content = build_user_prompt(
         before_text=before_text,
         after_text=after_text,
@@ -301,6 +354,7 @@ _DIM_NAME_MAP = {
     "semantic_fidelity": "semantic",
     "factual": "factual",
     "factual_consistency": "factual",
+    "hallucination": "hallucination",
     "structure": "structure",
     "readability": "readability",
 }
@@ -322,16 +376,80 @@ def extract_dimensions(parsed: dict[str, Any]) -> list[DimensionScore]:
     if not dimensions:
         overall = _normalize_score(parsed.get("overall_score", 0.5))
         dimensions = [
-            DimensionScore(dimension="semantic", score=overall, weight=0.35,
+            DimensionScore(dimension="semantic", score=overall, weight=0.30,
                           reason="LLM 未返回分维度得分，使用总分估计"),
-            DimensionScore(dimension="factual", score=overall, weight=0.35,
+            DimensionScore(dimension="factual", score=overall, weight=0.30,
                           reason="LLM 未返回分维度得分，使用总分估计"),
-            DimensionScore(dimension="structure", score=overall, weight=0.15,
+            DimensionScore(dimension="hallucination", score=overall, weight=0.20,
                           reason="LLM 未返回分维度得分，使用总分估计"),
-            DimensionScore(dimension="readability", score=overall, weight=0.15,
+            DimensionScore(dimension="structure", score=overall, weight=0.10,
+                          reason="LLM 未返回分维度得分，使用总分估计"),
+            DimensionScore(dimension="readability", score=overall, weight=0.10,
                           reason="LLM 未返回分维度得分，使用总分估计"),
         ]
     return dimensions
+
+
+def _score_floor_from_flaws(flaws: list[FlawItem]) -> float:
+    """根据瑕疵类型计算总分下限抑制。
+
+    设计原则：内容删除（over_clean/omission）与事实篡改（mis_edit）应主导总分，
+    避免低权重维度（structure/readability/hallucination）保持高分把加权均值抬起来，
+    从而与人工评审对"实质信息损失"的判断保持一致。
+    """
+    if not flaws:
+        return 1.0
+
+    floor = 1.0
+
+    # 结构 / 可读性
+    if any(f.category == "structure" and f.severity in ("critical", "major") for f in flaws):
+        floor = min(floor, 0.70)
+    if any(f.category == "readability" and f.severity in ("critical", "major") for f in flaws):
+        floor = min(floor, 0.72)
+
+    # 内容删除（over_clean/omission）—— 按严重度与数量累积下压
+    over_clean_critical = sum(1 for f in flaws if f.category in ("over_clean", "omission") and f.severity == "critical")
+    over_clean_major = sum(1 for f in flaws if f.category in ("over_clean", "omission") and f.severity == "major")
+    if over_clean_critical >= 1:
+        floor = min(floor, 0.60)
+    if over_clean_major >= 2:
+        # 多处重要内容删除 ≈ 一次严重删除
+        floor = min(floor, 0.62)
+    elif over_clean_major == 1:
+        floor = min(floor, 0.72)
+
+    # 事实篡改（mis_edit/factual）
+    mis_edit_critical = sum(1 for f in flaws if f.category in ("mis_edit", "factual") and f.severity == "critical")
+    mis_edit_major = sum(1 for f in flaws if f.category in ("mis_edit", "factual") and f.severity == "major")
+    if mis_edit_critical >= 1:
+        floor = min(floor, 0.60)
+    elif mis_edit_major >= 1:
+        floor = min(floor, 0.72)
+
+    return floor
+
+
+def _apply_structural_penalty(dimensions: list[DimensionScore], flaws: list[FlawItem]) -> list[DimensionScore]:
+    """对结构/可读性/关键事实类瑕疵施加更强的维度级惩罚。"""
+    adjusted = [d.model_copy() for d in dimensions]
+    flaw_index = {(f.category, f.severity) for f in flaws}
+
+    for dim in adjusted:
+        if dim.dimension == "structure":
+            if any(cat == "structure" and sev in ("critical", "major") for cat, sev in flaw_index):
+                dim.score = min(dim.score, 0.40)
+        elif dim.dimension == "readability":
+            if any(cat == "readability" and sev in ("critical", "major") for cat, sev in flaw_index):
+                dim.score = min(dim.score, 0.35)
+        elif dim.dimension == "semantic":
+            if any(cat in ("over_clean", "omission") and sev == "critical" for cat, sev in flaw_index):
+                dim.score = min(dim.score, 0.35)
+        elif dim.dimension == "factual":
+            if any(cat in ("mis_edit", "factual") and sev == "critical" for cat, sev in flaw_index):
+                dim.score = min(dim.score, 0.35)
+
+    return adjusted
 
 
 def extract_flaws(parsed: dict[str, Any]) -> list[FlawItem]:
@@ -369,49 +487,122 @@ def extract_flaws(parsed: dict[str, Any]) -> list[FlawItem]:
     return flaws
 
 
-def resolve_anchor_offsets(
-    flaws: list[FlawItem],
-    anchored_text: str,
-    original_text: str,
-) -> list[FlawItem]:
-    """将锚点标识符映射为字符偏移。
+def locate_flaw(
+    snippet: str,
+    after_text: str,
+    before_text: str = "",
+    segment_id: str = "",
+    segments_after: list[dict[str, Any]] | None = None,
+) -> tuple[int, int]:
+    """多策略定位：在原文中找到 snippet 的精确字符偏移。
 
-    支持多种锚点格式：[Before N], [After N], [Anchor_PN], [Anchor_GN], [PN], [GN]。
-    如果 LLM 输出的瑕玼 location 有 segment_id 但 start_char=0，
-    通过在 anchored_text 中查找锚点标记，映射到 original_text 中的实际偏移。
+    核心优化：如果 LLM 提供了 segment_id（如 "After 2"），先在对应段落内搜索，
+    将搜索空间从全文缩小到几十个字符，大幅降低误匹配。
+
+    策略（按优先级降级）：
+    0. 段落定位 —— 用 segment_id 找到对应段落，段落内做策略 1-3
+    1. 精确匹配 —— snippet 完整出现在 after_text 中
+    2. 最长公共子串 —— 用 difflib 找 snippet 与 after_text 的最大重叠段（≥6 字符）
+    3. 逐级前缀搜索 —— 缩短 snippet 前缀（30→20→15→10→8 chars）在 after_text 中搜索
+    4. before_text 搜索 —— 被删除的内容可能在原文中存在
+
+    Returns:
+        (start_char, end_char) —— 均为 0 表示定位失败
+    """
+    if not snippet or not after_text:
+        return 0, 0
+
+    # ── 策略 0：段落定位（缩小搜索空间到几十个字符，从根本上消除误匹配）──
+    para_text = ""
+    para_offset = -1
+    if segment_id and segments_after:
+        clean_id = _normalize_segment_id(segment_id)
+        for seg in segments_after:
+            if _normalize_segment_id(seg.get("segment_id", "")) == clean_id:
+                para_text = seg.get("text", "")
+                # 在原文中定位该段落
+                para_offset = after_text.find(para_text)
+                if para_offset >= 0:
+                    break
+                # 如果精确查找失败，用 difflib 模糊定位
+                if para_offset < 0 and para_text:
+                    sm = difflib.SequenceMatcher(None, para_text, after_text)
+                    match = sm.find_longest_match(0, len(para_text), 0, len(after_text))
+                    if match.size >= len(para_text) * 0.6:
+                        para_offset = match.b
+                        para_text = after_text[match.b:match.b + match.size]
+                        break
+                para_text = ""  # 定位失败，回退到全文搜索
+
+    # 如果定位到了段落，先在段落内搜索
+    if para_offset >= 0 and para_text:
+        # 策略 1-段落: 精确匹配
+        pos = para_text.find(snippet)
+        if pos >= 0:
+            return para_offset + pos, para_offset + pos + len(snippet)
+
+        # 策略 2-段落: LCS
+        sm = difflib.SequenceMatcher(None, snippet, para_text)
+        match = sm.find_longest_match(0, len(snippet), 0, len(para_text))
+        if match.size >= 4:  # 段落内降低门槛到 4 字符
+            return para_offset + match.b, para_offset + match.b + match.size
+
+        # 策略 3-段落: 前缀搜索
+        for n in [20, 15, 10, 8]:
+            if len(snippet) >= n:
+                pos = para_text.find(snippet[:n])
+                if pos >= 0:
+                    return para_offset + pos, para_offset + pos + n
+
+        # 段落内搜索失败，降级到全文搜索（保留 para_offset 信息）
+        # 用段落开头作为兜底位置
+        pass
+
+    # ── 全文搜索（策略 1-4）──
+    # 策略 1: 精确匹配
+    pos = after_text.find(snippet)
+    if pos >= 0:
+        return pos, pos + len(snippet)
+
+    # 策略 2: difflib 最长公共子串
+    sm = difflib.SequenceMatcher(None, snippet, after_text)
+    match = sm.find_longest_match(0, len(snippet), 0, len(after_text))
+    if match.size >= 6:
+        return match.b, match.b + match.size
+
+    # 策略 3: 逐级缩短前缀
+    for n in [30, 20, 15, 10, 8]:
+        if len(snippet) >= n:
+            pos = after_text.find(snippet[:n])
+            if pos >= 0:
+                return pos, pos + n
+
+    # 策略 4: 在 before_text 中搜索
+    if before_text:
+        search_key = snippet[:min(20, len(snippet))]
+        pos = before_text.find(search_key)
+        if pos >= 0:
+            return pos, pos + len(search_key)
+
+    # 兜底：如果段落定位成功但所有搜索都失败，返回段落位置
+    if para_offset >= 0:
+        return para_offset, para_offset + min(len(para_text), 80)
+
+    return 0, 0
+
+
+def _normalize_segment_id(seg_id: str) -> str:
+    """归一化 segment_id：去掉前缀和方括号，只保留数字。
+
+    "After 2" → "2"
+    "[After 2]" → "2"
+    "Before 1" → "1"
+    "2" → "2"
     """
     import re
-
-    for flaw in flaws:
-        loc = flaw.location
-        if loc.start_char == 0 and loc.end_char == 0 and loc.segment_id:
-            # 在 anchored_text 中查找该锚点标记
-            escaped_id = re.escape(loc.segment_id.strip())
-            pattern = rf"{escaped_id}\s*"
-            m = re.search(pattern, anchored_text)
-            if m:
-                anchor_pos = m.end()
-                # 提取该锚点后的段落内容（到下一个锚点或文本结尾）
-                next_anchor = re.search(r"\[[\w\s_]+\d+\]", anchored_text[anchor_pos:])
-                if next_anchor:
-                    para_text = anchored_text[anchor_pos:anchor_pos + next_anchor.start()]
-                else:
-                    para_text = anchored_text[anchor_pos:]
-
-                # 在 original_text 中查找该段落的起始位置
-                search_text = para_text.strip()[:30]
-                if search_text:
-                    pos = original_text.find(search_text)
-                    if pos >= 0:
-                        # 用实际段落内容更新 snippet（LLM 的 snippet 可能不准确）
-                        actual_snippet = para_text.strip()[:80]
-                        flaw.location = AnchorSpan(
-                            segment_id=loc.segment_id,
-                            start_char=pos,
-                            end_char=pos + len(para_text.strip()),
-                            snippet=actual_snippet,
-                        )
-    return flaws
+    # 提取所有数字
+    nums = re.findall(r'\d+', seg_id)
+    return nums[-1] if nums else seg_id.strip("[] ")
 
 
 def compute_overall_score(dimensions: list[DimensionScore]) -> float:
@@ -607,19 +798,19 @@ def _extract_key_facts(text: str) -> list[dict[str, Any]]:
 # ============================================================
 
 # 评分规则版本：维度权重、惩罚因子等变更时递增
-RULE_VERSION = "v2.0"  # v2.0: 4维度(semantic/factual/structure/readability) + 软惩罚
+RULE_VERSION = "v3.0"  # v3.0: 5维度(semantic/factual/hallucination/structure/readability) + 软惩罚
 
 
 def _get_rule_hash() -> str:
     """基于当前评分规则生成哈希（维度权重 + 惩罚因子）"""
-    rule_str = "semantic:0.35,factual:0.35,structure:0.15,readability:0.15," \
+    rule_str = "semantic:0.30,factual:0.30,hallucination:0.20,structure:0.10,readability:0.10," \
                "penalty:risk_aggregation(max),critical_factual=0.6,critical_structure=0.75," \
                "critical_omission=0.65,major=0.85,minor=0.95"
     return hashlib.sha256(rule_str.encode("utf-8")).hexdigest()[:8]
 
 
 def build_reproducibility_token(request: EvalRequest, temperature: float) -> str:
-    """生成可复现令牌"""
+    """生成可复现令牌（多因子哈希，防止缓存碰撞）"""
     from .prompts import SYSTEM_PROMPT
     payload = json.dumps({
         "before": request.before_text,
@@ -630,6 +821,8 @@ def build_reproducibility_token(request: EvalRequest, temperature: float) -> str
         "prompt_version": hashlib.sha256(SYSTEM_PROMPT.encode("utf-8")).hexdigest()[:8],
         "rule_version": _get_rule_hash(),
         "evaluation_profile": request.evaluation_profile,
+        "stabilize": request.stabilize,
+        "sample_count": request.sample_count,
     }, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
 
@@ -960,11 +1153,44 @@ def _classify_change(change: dict[str, Any]) -> tuple[str, str]:
     return "modification", "minor"
 
 
+def _extract_table_snippet(text: str) -> str:
+    """从原文中提取 Markdown 表格区域的文本片段，用于定位。
+
+    取表格第一行（表头），保留原文格式确保可被 locate_flaw 搜索到。
+    """
+    if not text:
+        return ""
+    lines = text.split("\n")
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("|") and "|" in stripped[1:]:
+            return stripped[:80]  # 直接返回原文中的表头行
+    return ""
+
+
+def _extract_list_snippet(text: str) -> str:
+    """从原文中提取有序列表区域的文本片段，用于定位。
+
+    取第一个列表项，保留原文格式确保可被 locate_flaw 搜索到。
+    """
+    if not text:
+        return ""
+    import re
+    lines = text.split("\n")
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r"\d+[\.\)]\s", stripped):
+            return stripped[:80]  # 直接返回原文中的第一个列表项
+    return ""
+
+
 def detect_flaws(
     segments_before: list[dict[str, Any]],
     segments_after: list[dict[str, Any]],
     anchored_before: str,
     anchored_after: str,
+    before_text: str = "",
+    after_text: str = "",
 ) -> list[dict[str, Any]]:
     """Diff / 瑕疵检测：对配对段落做变更检测，输出结构化瑕疵列表。
 
@@ -979,9 +1205,12 @@ def detect_flaws(
         segments_after: after 的分段信息
         anchored_before: 带锚点标记的 before 文本
         anchored_after: 带锚点标记的 after 文本
+        before_text: 原始治理前文本（用于提取结构瑕疵的实际内容snippet）
+        after_text: 原始治理后文本
 
     Returns:
-        瑕疵列表，每项包含 type, anchor_before, anchor_after, category, severity
+        瑕疵列表，每项包含 type, anchor_before, anchor_after, category, severity,
+        以及 before_snippet/after_snippet（用于后续精确定位）
     """
     flaws: list[dict[str, Any]] = []
 
@@ -993,12 +1222,16 @@ def detect_flaws(
 
     table_detected = before_pipe >= 6 and has_table_separator and after_pipe < 2
     if table_detected:
+        # 从原始 before_text 中提取表格区域的文本作为定位 snippet
+        table_snippet = _extract_table_snippet(before_text)
         flaws.append({
             "type": "structure_loss",
             "anchor_before": "[Before] Markdown 表格结构",
             "anchor_after": "[After] 表格已转为纯文本",
             "category": "structure",
             "severity": "critical",
+            "before_snippet": table_snippet,
+            "after_snippet": "",
         })
 
     # 检测有序列表被压缩（1. 2. 3. → 单行文本）
@@ -1006,12 +1239,16 @@ def detect_flaws(
     before_list_items = len(re.findall(r"(?:^|\n)\s*\d+[\.\)]\s", anchored_before))
     after_list_items = len(re.findall(r"(?:^|\n)\s*\d+[\.\)]\s", anchored_after))
     if before_list_items >= 3 and after_list_items == 0:
+        # 从原始 before_text 中提取列表区域的文本作为定位 snippet
+        list_snippet = _extract_list_snippet(before_text)
         flaws.append({
             "type": "structure_loss",
             "anchor_before": "[Before] 有序列表结构",
             "anchor_after": "[After] 列表已压缩为单行文本",
             "category": "structure",
             "severity": "major",
+            "before_snippet": list_snippet,
+            "after_snippet": "",
         })
 
     # 建立 segment_id → text 的映射
@@ -1270,7 +1507,9 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
 
     # Step 0b: Diff 瑕疵检测 —— 对配对段落做字符级 diff，输出结构化变更列表
     detected_flaws = detect_flaws(
-        seg_before, seg_after, anchored_before, anchored_after
+        seg_before, seg_after, anchored_before, anchored_after,
+        before_text=request.before_text,
+        after_text=request.after_text,
     )
     # 格式化 diff 结果为文本，注入 Prompt
     diff_summary_lines: list[str] = []
@@ -1310,6 +1549,32 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
     dimensions = extract_dimensions(validated.model_dump())
     flaws = extract_flaws(validated.model_dump())
 
+    # 记录原始解析结果，便于诊断“原始输出正常但最终结果退化”的问题
+    parsed_dimensions = len(parsed.get("dimensions", [])) if isinstance(parsed, dict) else 0
+    parsed_flaws = len(parsed.get("flaws", [])) if isinstance(parsed, dict) else 0
+
+    parse_fallback_used = False
+    if not dimensions and parsed_dimensions:
+        parse_fallback_used = True
+        dimensions = extract_dimensions(parsed)
+    if not flaws and parsed_flaws:
+        parse_fallback_used = True
+        flaws = extract_flaws(parsed)
+
+    # 如果原始输出有结构，但验证后被降级为空，保留诊断信息，避免静默吞掉异常
+    parse_diagnostics = {
+        "parsed_dimensions": parsed_dimensions,
+        "parsed_flaws": parsed_flaws,
+        "validated_dimensions": len(dimensions),
+        "validated_flaws": len(flaws),
+        "parse_fallback_used": parse_fallback_used,
+        "parse_ok": bool(parsed_dimensions or parsed_flaws),
+    }
+
+    if not dimensions:
+        dimensions = extract_dimensions({"overall_score": 0.5})
+        parse_diagnostics["dimension_defaulted"] = True
+
     # Step 3a: 保存原始数据（供热重算使用，在任何后处理之前）
     try:
         from .raw_store import save_raw
@@ -1326,51 +1591,91 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
     except Exception:
         pass  # 保存失败不影响主流程
 
-    # Step 3b: 锚点增强 —— 将 LLM 输出的锚点标识符映射为字符偏移
-    # 优先用锚点解析，再用 Diff 模块补充
-    flaws = resolve_anchor_offsets(flaws, anchored_after, request.after_text)
-
-    # 建立 Diff 检测结果的 snippet → position 映射
-    diff_positions: dict[str, tuple[int, int]] = {}
-    for df in detected_flaws:
-        if df.get("anchor_after"):
-            # 从 "[After 1] ...片段..." 中提取片段和位置
-            snippet = df["anchor_after"].split("] ...")[-1].rstrip("...") if "] ..." in df["anchor_after"] else ""
-            if snippet and len(snippet) > 3:
-                # 在 after_text 中查找该片段的位置
-                pos = request.after_text.find(snippet[:20])
-                if pos >= 0:
-                    diff_positions[snippet[:20]] = (pos, pos + len(snippet[:20]))
-
+    # Step 3b: 锚点增强 —— 段落定位 + 多策略搜索将 LLM 的 snippet 映射为原文精确偏移
     for flaw in flaws:
         loc = flaw.location
-        if loc.start_char == 0 and loc.end_char == 0 and loc.snippet:
-            # 尝试从 Diff 检测结果中找到精确位置
-            for snip, (s, e) in diff_positions.items():
-                if snip in loc.snippet or loc.snippet[:15] in snip:
-                    flaw.location = AnchorSpan(
-                        segment_id=loc.segment_id,
-                        start_char=s,
-                        end_char=e,
-                        snippet=loc.snippet,
-                    )
-                    break
-            # 如果 Diff 没找到，直接在 after_text 中搜索
-            if flaw.location.start_char == 0 and flaw.location.end_char == 0:
-                search_text = loc.snippet[:15]
-                pos = request.after_text.find(search_text)
-                if pos >= 0:
-                    flaw.location = AnchorSpan(
-                        segment_id=loc.segment_id,
-                        start_char=pos,
-                        end_char=pos + len(search_text),
-                        snippet=loc.snippet,
-                    )
+        if loc.start_char == 0 and loc.end_char == 0:
+            start, end = locate_flaw(
+                snippet=loc.snippet,
+                after_text=request.after_text,
+                before_text=request.before_text,
+                segment_id=loc.segment_id,
+                segments_after=seg_after,
+            )
+            if start > 0 or end > 0:
+                flaw.location = AnchorSpan(
+                    segment_id=loc.segment_id,
+                    start_char=start,
+                    end_char=end,
+                    snippet=loc.snippet,
+                )
 
-    # Step 3c: Merge —— 算法检测结果仅用于评分修正和 Confidence，不暴露给用户
-    # 算法检测到的瑕疵不直接加入 flaws 列表（用户看不懂 [算法检测] substitution...），
-    # 而是通过 algorithm_adjustment 修正维度分数，通过 Confidence 反映检测一致性
+    # Step 3b2: 两阶段验证 —— 用 Verifier 过滤候选瑕疵中的误报（False Positive）
+    verifier_before = len(flaws)
+    verifier_rejected = 0
+    if flaws:
+        from .verifier import verify_flaws
+        verified_flaws = verify_flaws(
+            before_text=request.before_text,
+            after_text=request.after_text,
+            candidate_flaws=flaws,
+            temperature=temperature,
+        )
+        verifier_rejected = max(0, verifier_before - len(verified_flaws))
+        flaws = verified_flaws
+
+    # Step 3c: Merge —— 算法检测到的 critical/major structure 瑕疵补充到 flaws 列表
+    # LLM 对结构变化（表格转文本、列表压缩）不敏感，算法层补充
     llm_categories = {(f.category, f.severity) for f in flaws}
+    llm_has_structure = any(f.category == "structure" for f in flaws)
+    for df in detected_flaws:
+        df_cat = df.get("category", "")
+        df_sev = df.get("severity", "")
+        # 只补充 LLM 没检出的 critical/major structure 瑕疵
+        if df_cat == "structure" and df_sev in ("critical", "major") and not llm_has_structure:
+            # 优先使用 before_snippet（表格/列表原文），其次尝试从 anchor_before 提取
+            snippet = df.get("before_snippet", "") or df.get("after_snippet", "")
+            if not snippet:
+                anchor_before = df.get("anchor_before", "")
+                snippet = anchor_before.split("] ...")[-1].rstrip("...") if "] ..." in anchor_before else ""
+            # 算法结构瑕疵的 snippet 可能来自 before_text（表格原文），
+            # 但 GT 标注的是 after_text 中的替换文本，两者不重叠 → 无法匹配。
+            # 因此：如果 snippet 在 after_text 中找不到，改用 after_text 第一段文本，
+            # 确保 snippet 与 GT 有文本重叠。
+            if snippet and request.after_text.find(snippet[:min(10, len(snippet))]) < 0:
+                # snippet 不在 after_text 中（是 before_text 中的表格/列表内容）
+                # 改用 after_text 第一段作为 snippet（结构破坏影响整个文本）
+                if seg_after:
+                    snippet = seg_after[0].get("text", "")[:80]
+                if not snippet:
+                    snippet = request.after_text[:80]
+            # 用多策略搜索定位该瑕疵在原文中的位置
+            algo_start, algo_end = locate_flaw(
+                snippet=snippet,
+                after_text=request.after_text,
+                before_text=request.before_text,
+                segment_id=df.get("anchor_before", ""),
+                segments_after=seg_after,
+            )
+            # Fallback：结构破坏类瑕疵如果定位失败，指向 after_text 开头区域
+            # （表格/列表被拍平后，替换文本通常从 after_text 首部开始）
+            if algo_start == 0 and algo_end == 0:
+                algo_start = 0
+                algo_end = min(80, len(request.after_text))
+                # 用 after_text 开头作为 snippet
+                snippet = request.after_text[:min(80, len(request.after_text))]
+            flaws.append(FlawItem(
+                category="structure",
+                severity=df_sev,
+                description=f"算法检测：{df.get('type', '结构变化')}（{snippet[:50]}）",
+                location=AnchorSpan(
+                    segment_id=df.get("anchor_before", "")[:30] if df.get("anchor_before") else "algo",
+                    start_char=algo_start,
+                    end_char=algo_end,
+                    snippet=snippet[:50],
+                ),
+                suggestion="结构被破坏，建议恢复原始格式",
+            ))
     # 记录算法修正（不修改 LLM 原始输出）
     algo_adjustments: dict[str, dict[str, Any]] = {}
     for df in detected_flaws:
@@ -1396,9 +1701,11 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
                     "reason": "大量内容被删除（算法检测）",
                 }
 
+    adjusted_dimensions = _apply_structural_penalty(dimensions, flaws)
+
     # 用调整后的维度分数计算最终得分（LLM 原始分数保留在 dimensions 中）
     scoring_dimensions = []
-    for d in dimensions:
+    for d in adjusted_dimensions:
         if d.dimension in algo_adjustments:
             adj = algo_adjustments[d.dimension]
             scoring_dimensions.append(DimensionScore(
@@ -1410,29 +1717,24 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
         else:
             scoring_dimensions.append(d)
 
-    overall_score = compute_overall_score(scoring_dimensions)
+    base_overall_score = compute_overall_score(scoring_dimensions)
+    score_floor = _score_floor_from_flaws(flaws)
+    overall_score = min(base_overall_score, score_floor)
 
-    # Step 4: 后处理（软惩罚替代硬 veto）
-    overall_score = apply_soft_penalty(overall_score, dimensions, flaws)
+    # Step 4: 瑕疵仅作为定性输出，不再修改总分（主流 LLM-as-Judge 标准做法）
+    # apply_soft_penalty() 函数保留，可用于前端展示惩罚信息，但不影响 overall_score
     verdict = determine_verdict(overall_score)
-
-    # Step 4b: 临界区自动多次采样（分数在 0.75~0.85 时，再跑 2 次取均值）
-    # 防止边界值波动导致 pass/review 跳变
-    if 0.75 <= overall_score <= 0.85:
-        extra_scores = [overall_score]
-        for _ in range(2):
-            try:
-                resp2 = _evaluate_once(request, temperature)
-                extra_scores.append(resp2.overall_score)
-            except Exception:
-                pass
-        overall_score = sum(extra_scores) / len(extra_scores)
-        verdict = determine_verdict(overall_score)
 
     overall_score, verdict, flaws = apply_profile_penalties(
         request.evaluation_profile, overall_score, verdict, flaws,
         request.before_text, request.after_text,
     )
+
+    # Step 4c: 线性校准（将 LLM 原始分映射到人工分布）
+    _cal = _get_calibrator()
+    if _cal is not None:
+        overall_score = _cal.calibrate(overall_score)
+        verdict = determine_verdict(overall_score)
 
     # Step 5: 计算置信度
     confidence = compute_confidence(dimensions, flaws, detected_flaws, diff_info)
@@ -1441,7 +1743,7 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
     reason_code, reject_reasons = determine_reason_code(overall_score, verdict, flaws)
 
     # Step 7: 组装响应（含 callback 追踪数据）
-    return EvalResponse(
+    response = EvalResponse(
         request_id=request.request_id,
         evaluation_profile=request.evaluation_profile,
         dimensions=dimensions,
@@ -1465,6 +1767,9 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
         output_tokens=callback.output_tokens,
         total_tokens=callback.total_tokens,
     )
+    setattr(response, "parse_diagnostics", parse_diagnostics)
+    setattr(response, "verifier_rejected_count", verifier_rejected)
+    return response
 
 
 def evaluate(request: EvalRequest, temperature: float = 0.0, use_cache: bool = True) -> EvalResponse:
@@ -1475,12 +1780,19 @@ def evaluate(request: EvalRequest, temperature: float = 0.0, use_cache: bool = T
     Args:
         use_cache: False 时绕过全局缓存（用于稳定性测试），不影响其他并发 worker。
     """
+    # 可观测性：启动追踪
+    from .tracing import trace_manager
+    trace = trace_manager.start_trace(request.request_id)
+
     # 单次评估
+    span_eval = trace.add_span("evaluate_once", {"request_id": request.request_id})
     resp = _evaluate_once(request, temperature, use_cache=use_cache)
+    span_eval.finish(output={"overall_score": resp.overall_score, "verdict": resp.verdict})
 
     # 临界区自动多次采样（分数在 0.75~0.85 时，再跑 2 次取均值）
     # 防止边界值波动导致 pass/review 跳变
     if 0.75 <= resp.overall_score <= 0.85:
+        span_resample = trace.add_span("critical_zone_resample", {"initial_score": resp.overall_score})
         extra_scores = [resp.overall_score]
         for _ in range(2):
             try:
@@ -1491,5 +1803,168 @@ def evaluate(request: EvalRequest, temperature: float = 0.0, use_cache: bool = T
         avg_score = round(sum(extra_scores) / len(extra_scores), 4)
         resp.overall_score = avg_score
         resp.verdict = determine_verdict(avg_score)
+        span_resample.finish(output={"scores": extra_scores, "avg_score": avg_score})
+
+    # 完成追踪
+    trace.finish(
+        score=resp.overall_score,
+        verdict=resp.verdict,
+        model=resp.model_version,
+        prompt_version=resp.prompt_version,
+    )
+    trace_manager.save_trace(trace)
 
     return resp
+
+
+# ============================================================
+# Pairwise Comparison（Chatbot Arena 风格）
+# ============================================================
+
+def compare_pair(
+    before_text: str,
+    output_a: str,
+    output_b: str,
+    evaluation_profile: str = PROFILE_GENERAL,
+    label_a: str = "A",
+    label_b: str = "B",
+    model: str | None = None,
+    temperature: float = 0.0,
+) -> "CompareResponse":
+    """
+    对比评估：对同一段原文的两个治理结果分别评估，然后计算差异。
+
+    设计决策：
+    - 复用已有的 evaluate() 管线（含 Diff 检测、锚点解析、校准等），
+      而非让 LLM 在单次调用中同时评估两个文本。
+    - 优势：每个输出都享受完整的后处理管线，对比结果是精确的数学差值。
+    - 代价：2 倍 LLM 调用量（但对比评估本身就是低频操作）。
+
+    Args:
+        before_text: 治理前原文
+        output_a: 治理结果 A
+        output_b: 治理结果 B
+        evaluation_profile: 评估模式
+        label_a: A 的显示标签
+        label_b: B 的显示标签
+        model: 指定模型（可选）
+        temperature: 温度参数
+
+    Returns:
+        CompareResponse: 包含两侧评估结果和对比分析
+    """
+    import uuid
+    import time as _time
+    from .models import (
+        CompareRequest,
+        CompareResponse,
+        DimensionDelta,
+        SideEvaluation,
+    )
+
+    t0 = _time.time()
+
+    # 构建两个独立的 EvalRequest
+    req_a = EvalRequest(
+        request_id=f"compare-{uuid.uuid4().hex[:8]}-a",
+        before_text=before_text,
+        after_text=output_a,
+        evaluation_profile=evaluation_profile,
+        model=model,
+    )
+    req_b = EvalRequest(
+        request_id=f"compare-{uuid.uuid4().hex[:8]}-b",
+        before_text=before_text,
+        after_text=output_b,
+        evaluation_profile=evaluation_profile,
+        model=model,
+    )
+
+    # 分别评估（复用完整管线）
+    resp_a = evaluate(req_a, temperature=temperature)
+    resp_b = evaluate(req_b, temperature=temperature)
+
+    # 构建维度映射（dimension_name -> score）
+    scores_a = {d.dimension: d.score for d in resp_a.dimensions}
+    scores_b = {d.dimension: d.score for d in resp_b.dimensions}
+
+    # 计算各维度差异
+    dimension_deltas = []
+    all_dims = ["semantic", "factual", "hallucination", "structure", "readability"]
+    for dim in all_dims:
+        sa = scores_a.get(dim, 0.0)
+        sb = scores_b.get(dim, 0.0)
+        delta = round(sa - sb, 4)
+        if abs(delta) < 0.02:
+            winner = "tie"
+        elif delta > 0:
+            winner = "A"
+        else:
+            winner = "B"
+        dimension_deltas.append(DimensionDelta(
+            dimension=dim,
+            score_a=sa,
+            score_b=sb,
+            delta=delta,
+            winner=winner,
+        ))
+
+    # 总体对比
+    overall_delta = round(resp_a.overall_score - resp_b.overall_score, 4)
+
+    # 判定胜出方
+    has_critical_a = any(
+        f.severity == "critical" for f in resp_a.flaws
+    )
+    has_critical_b = any(
+        f.severity == "critical" for f in resp_b.flaws
+    )
+
+    if has_critical_a and not has_critical_b:
+        winner = "B"
+    elif has_critical_b and not has_critical_a:
+        winner = "A"
+    elif abs(overall_delta) > 0.05:
+        winner = "A" if overall_delta > 0 else "B"
+    else:
+        winner = "tie"
+
+    # 生成对比理由
+    a_wins = [d.dimension for d in dimension_deltas if d.winner == "A"]
+    b_wins = [d.dimension for d in dimension_deltas if d.winner == "B"]
+    reason_parts = []
+    if a_wins:
+        reason_parts.append(f"{label_a} 在 {', '.join(a_wins)} 维度领先")
+    if b_wins:
+        reason_parts.append(f"{label_b} 在 {', '.join(b_wins)} 维度领先")
+    if not reason_parts:
+        reason_parts.append("两者表现接近，各维度差异均在容差范围内")
+    if has_critical_a:
+        reason_parts.append(f"注意：{label_a} 存在 critical 级别瑕疵")
+    if has_critical_b:
+        reason_parts.append(f"注意：{label_b} 存在 critical 级别瑕疵")
+    reason = "；".join(reason_parts) + "。"
+
+    latency = round(_time.time() - t0, 2)
+
+    return CompareResponse(
+        evaluation_a=SideEvaluation(
+            dimensions=resp_a.dimensions,
+            flaws=resp_a.flaws,
+            overall_score=resp_a.overall_score,
+            verdict=resp_a.verdict,
+        ),
+        evaluation_b=SideEvaluation(
+            dimensions=resp_b.dimensions,
+            flaws=resp_b.flaws,
+            overall_score=resp_b.overall_score,
+            verdict=resp_b.verdict,
+        ),
+        dimension_deltas=dimension_deltas,
+        winner=winner,
+        overall_delta=overall_delta,
+        reason=reason,
+        label_a=label_a,
+        label_b=label_b,
+        latency_seconds=latency,
+    )

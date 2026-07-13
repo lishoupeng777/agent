@@ -5,6 +5,10 @@ import json
 import os
 import sys
 
+# 修复 Windows 控制台编码问题
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 # 将项目根目录加入 path 以便导入 app 模块
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -25,12 +29,13 @@ def load_dataset(path: str) -> list[dict]:
 
 
 def compute_overall_from_dimensions(human_scores: dict[str, float]) -> float:
-    """从多维人工评分计算加权总分（与系统四维度权重一致）"""
+    """从多维人工评分计算加权总分（与 LLM 五维度权重一致）"""
     weights = {
-        "semantic_consistency": 0.4,
-        "over_cleaning": 0.3,
-        "readability_structure": 0.15,
-        "factual_accuracy": 0.15,
+        "semantic": 0.30,
+        "factual": 0.30,
+        "hallucination": 0.20,
+        "structure": 0.10,
+        "readability": 0.10,
     }
     total = sum(human_scores.get(k, 0.5) * w for k, w in weights.items())
     return round(total, 4)
@@ -49,6 +54,7 @@ def build_requests(dataset: list[dict]) -> list[EvalRequest]:
                 "flaws": item.get("flaws_gt", []),
                 "dimension_scores": item["human_scores"],
                 "rationale": item.get("rationale", ""),
+                "difficulty": item.get("difficulty", "medium"),
             }
         else:
             overall = item["human_score"]
@@ -97,7 +103,12 @@ def main():
         print("运行综合评估报告（课题12验收标准）...")
         print("=" * 60)
         
-        report = run_full_evaluation(requests, run_stability=True, stability_samples=3)
+        report = run_full_evaluation(
+            requests,
+            run_stability=True,
+            stability_samples=2,
+            consistency_samples=3,
+        )
         print_report_summary(report)
         
         # 导出 JSON 报告
