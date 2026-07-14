@@ -2001,10 +2001,23 @@ function drawScatterPlot(scatter) {
         ctx.fillText(v.toFixed(2), pad - 5, y + 4);
     }
 
-    // 数据点
+    // 数据点（重叠点自动错开：坐标相近的点做环形微偏移，确保每条样本都可见）
+    const seen = {};  // 量化坐标 → 已出现次数，用于计算错开偏移
     scatter.forEach(p => {
-        const x = pad + p.human * (W - 2 * pad);
-        const y = H - pad - p.llm * (H - 2 * pad);
+        const baseX = pad + p.human * (W - 2 * pad);
+        const baseY = H - pad - p.llm * (H - 2 * pad);
+        // 按 6px 网格量化，落在同一格的点判定为重叠
+        const key = Math.round(baseX / 6) + ',' + Math.round(baseY / 6);
+        const dupIndex = seen[key] || 0;
+        seen[key] = dupIndex + 1;
+        // 第 1 个点不偏移，之后每个点沿环形均匀错开 7px
+        let x = baseX, y = baseY;
+        if (dupIndex > 0) {
+            const angle = dupIndex * (Math.PI * 2 / 6);  // 每 60° 一个
+            const radius = 7 + Math.floor((dupIndex - 1) / 6) * 7;  // 满 6 个后扩一圈
+            x = baseX + Math.cos(angle) * radius;
+            y = baseY + Math.sin(angle) * radius;
+        }
         ctx.beginPath();
         ctx.arc(x, y, p.outlier ? 6 : 4, 0, Math.PI * 2);
         ctx.fillStyle = p.outlier ? '#ef4444' : '#4f46e5';
@@ -2013,6 +2026,17 @@ function drawScatterPlot(scatter) {
             ctx.strokeStyle = '#ef4444';
             ctx.lineWidth = 2;
             ctx.stroke();
+        }
+        // 重叠错开的点用细虚线连回真实坐标，避免误读位置
+        if (dupIndex > 0) {
+            ctx.strokeStyle = '#c7cdd6';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.beginPath();
+            ctx.moveTo(baseX, baseY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
     });
 }

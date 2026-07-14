@@ -487,6 +487,57 @@ def extract_flaws(parsed: dict[str, Any]) -> list[FlawItem]:
     return flaws
 
 
+def _dedup_flaws_by_location(flaws: list[FlawItem]) -> list[FlawItem]:
+    """合并"同类别 + 同定位"的重复瑕疵，消除拆分型误报。
+
+    LLM 常把一处删除/改动按行/按项拆成多条上报（例：删掉整张会员等级表，
+    却对每个等级各报一条 over_clean），而人工/金标视为 1 条。这类冗余在
+    many-to-one 匹配下全被计为 FP，压低 Precision/F1。
+
+    去重策略（严格，避免误伤真瑕疵）：
+    - 仅当 category 相同 **且**（snippet 相同 或 字符区间重叠）才判为重复。
+    - 不同 snippet 且区间不重叠的瑕疵一律保留（如多处独立 mis_edit 不合并）。
+    - 保留同组中信息最完整的一条（severity 最重优先，其次描述最长）。
+
+    该步只删冗余条目、不新增/不改总分，因此不影响一致性(Pearson)、稳定性(W)、
+    锚点 Recall；仅通过减少 FP 提升瑕疵 F1。
+    """
+    if len(flaws) <= 1:
+        return flaws
+
+    _sev_rank = {"critical": 3, "major": 2, "minor": 1}
+
+    def _overlaps(a: FlawItem, b: FlawItem) -> bool:
+        # snippet 完全相同 → 同处
+        sa, sb = a.location.snippet.strip(), b.location.snippet.strip()
+        if sa and sa == sb:
+            return True
+        # 字符区间重叠（两端都已定位时才判断）
+        a0, a1 = a.location.start_char, a.location.end_char
+        b0, b1 = b.location.start_char, b.location.end_char
+        if (a0 or a1) and (b0 or b1) and a1 > a0 and b1 > b0:
+            return max(a0, b0) < min(a1, b1)
+        return False
+
+    groups: list[list[FlawItem]] = []
+    for f in flaws:
+        placed = False
+        for g in groups:
+            if g[0].category == f.category and any(_overlaps(f, m) for m in g):
+                g.append(f)
+                placed = True
+                break
+        if not placed:
+            groups.append([f])
+
+    merged: list[FlawItem] = []
+    for g in groups:
+        # 组内选信息最完整的代表：severity 最重，其次描述最长
+        rep = max(g, key=lambda x: (_sev_rank.get(x.severity, 0), len(x.description or "")))
+        merged.append(rep)
+    return merged
+
+
 def locate_flaw(
     snippet: str,
     after_text: str,
@@ -1609,6 +1660,11 @@ def _evaluate_once(request: EvalRequest, temperature: float = 0.0, use_cache: bo
                     end_char=end,
                     snippet=loc.snippet,
                 )
+
+    # Step 3b1: 同处去重 —— 合并"同类别 + 同定位"的重复瑕疵（拆分型误报）
+    # 在锚点增强之后（已有 start/end 可判区间重叠）、Verifier 之前执行，
+    # 既降误报又减少送入 Verifier 的条数。
+    flaws = _dedup_flaws_by_location(flaws)
 
     # Step 3b2: 两阶段验证 —— 用 Verifier 过滤候选瑕疵中的误报（False Positive）
     verifier_before = len(flaws)
