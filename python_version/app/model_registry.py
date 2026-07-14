@@ -153,8 +153,10 @@ def register_default_models() -> None:
     """注册所有可用模型适配器。
 
     默认注册 DeepSeek，其他模型按环境变量可用性注册。
+    同时自动发现并注册 litellm 支持的模型。
     """
     from .adapters import DeepSeekAdapter, MimoAdapter, GPTAdapter
+    from .adapters import discover_available_litellm_models, LITELLM_MODEL_CATALOG
     import os
 
     registry = get_registry()
@@ -168,3 +170,15 @@ def register_default_models() -> None:
     # GPT（如果配置了 API Key）
     if os.getenv("GPT_API_KEY"):
         registry.register("gpt", GPTAdapter())
+
+    # LiteLLM 自动发现：根据 .env 中的 API Key 注册可用模型
+    litellm_models = discover_available_litellm_models()
+    for short_name, adapter in litellm_models.items():
+        # 避免与已有模型冲突（如 gpt-4o 与 gpt adapter）
+        if short_name not in registry._adapters:
+            registry.register(short_name, adapter)
+            display = LITELLM_MODEL_CATALOG[short_name].get("display", short_name)
+            print(f"[ModelRegistry] LiteLLM 自动注册: {short_name} ({display})")
+
+    if litellm_models:
+        print(f"[ModelRegistry] LiteLLM 共注册 {len(litellm_models)} 个模型")

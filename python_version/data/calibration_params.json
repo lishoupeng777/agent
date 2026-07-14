@@ -1,0 +1,10 @@
+{
+  "deepseek-v4-flash": {
+    "model_name": "deepseek-v4-flash",
+    "slope": 0.977566,
+    "intercept": -0.014809,
+    "r_squared": 0.7990,
+    "n_samples": 25,
+    "is_fitted": true
+  }
+}

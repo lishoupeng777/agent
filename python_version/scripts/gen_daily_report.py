@@ -271,9 +271,9 @@ def build_story():
         ("图2", "eval_dataset.json 数据集结构截图",
          "在 VS Code 中打开 data/eval_dataset.json，展开第一条样本的完整字段结构。\n"
          "【操作】展开 JSON 树至 human_label 层级，截图后插入此处。"),
-        ("图3", "Streamlit 评估界面截图（参考）",
-         "启动 Streamlit 应用（streamlit run app.py），输入一组测试文本后的评估结果页面。\n"
-         "【操作】运行应用，填入 sample_03 文本对，点击"开始评估"，截图结果区域后插入此处。"),
+        ("图3", "前端评估界面截图",
+         "启动 FastAPI 服务（python main.py），在浏览器打开 http://localhost:8081，输入一组测试文本后的评估结果页面。\n"
+         "【操作】启动服务，填入 sample_03 文本对，点击"开始评估"，截图结果区域后插入此处。"),
     ]
 
     for fig_no, fig_title, fig_desc in fig_items:

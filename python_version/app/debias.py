@@ -176,9 +176,9 @@ def compute_bias_mitigation_score(
 def generate_anti_bias_prompt_supplement() -> str:
     """
     生成抗偏置的 Prompt 补充指令。
-    
+
     可在 System Prompt 后追加，提醒 LLM 避免常见偏置。
-    
+
     Returns:
         str: 抗偏置补充指令
     """
@@ -187,8 +187,213 @@ def generate_anti_bias_prompt_supplement() -> str:
 1. **长度无关**：评估时不应因治理后文本变短就默认扣分，也不因变长就默认加分。
    关键是判断：删掉的是噪音还是有效信息？增加的是冗余还是必要补充？
 2. **位置无关**：不应只关注文本开头而忽略结尾，反之亦然。全文每一部分都应被同等重视。
-3. **格式无关**：由表格转为文本不一定算结构损坏（如果语义和可读性未受损害）；
-   但表格结构被粗暴破坏导致信息难以对比则必须标注。
+3. **格式无关**：对于单行或极简单的键值对，转换为文本不应过度扣分。
+   但若原文为多行多列的复杂 Markdown 表格（如包含多项指标对比的表格），
+   治理后被直接拍平成一段散文（导致原本清晰的结构化对比关系丧失），
+   则必须判定为严重的结构损坏（structure ≤ 0.4）。
 4. **领域无关**：不应因话题专业/通俗而产生评分偏见。
 5. **长度补偿**：对于长度差异过大的文本对，需在 reason 中说明是否考虑了长度因素。
+6. **内容公平**：不应因文本涉及性别、种族、宗教、年龄、政治立场、地域等话题而产生评分偏见。
+   评估标准应完全基于信息保真度，与话题内容无关。
 """
+
+
+# ============================================================
+# 内容偏置检测（Content Bias Detection）
+# 检测治理过程中是否对涉及受保护属性的内容存在系统性差异处理
+# ============================================================
+
+# 受保护属性关键词词典（中文）
+_BIAS_KEYWORDS: dict[str, list[str]] = {
+    "gender": [
+        "男性", "女性", "性别", "男女", "女权", "男权", "性别歧视",
+        "性别平等", "男女平等", "职场性别", "性别偏", "女性权益",
+        "男性权益", " transgender", "跨性别", "非二元",
+    ],
+    "race": [
+        "种族", "民族", "肤色", "黑人", "白人", "黄种人", "亚裔",
+        "非裔", "少数民族", "汉族", "民族歧视", "种族歧视",
+        "民族平等", "种族平等", "排外",
+    ],
+    "religion": [
+        "宗教", "佛教", "道教", "基督教", "天主教", "伊斯兰教", "穆斯林",
+        "清真", "信仰", "教会", "寺庙", "教堂", "经文", "圣经",
+        "古兰经", "宗教自由", "信仰自由", "邪教",
+    ],
+    "age": [
+        "年龄", "老年", "青年", "少年", "儿童", "退休", "老龄化",
+        "年轻人", "老年人", "中年人", "90后", "00后", "80后",
+        "年龄歧视", "就业年龄", "法定年龄", "未成年",
+    ],
+    "political": [
+        "政治", "党派", "选举", "投票", "政策", "意识形态", "左派",
+        "右派", "保守", "自由派", "民主", "专制", "体制", "改革",
+        "维稳", "舆论", "审查", "言论自由",
+    ],
+    "regional": [
+        "地域", "地区", "省份", "城市", "农村", "城乡", "东部",
+        "西部", "南方", "北方", "一线城市", "偏远地区", "发达地区",
+        "欠发达", "地域歧视", "户籍", "外地人", "本地人",
+    ],
+}
+
+
+def detect_content_bias(
+    before_text: str,
+    after_text: str,
+) -> dict[str, Any]:
+    """统一内容偏置检测入口。
+
+    检测治理前后文本中是否涉及受保护属性话题，
+    并分析治理过程是否对这些话题的内容存在差异处理。
+
+    Args:
+        before_text: 治理前文本
+        after_text: 治理后文本
+
+    Returns:
+        dict: 包含各类型偏置检测结果和综合风险评估
+    """
+    results = {}
+    for bias_type in _BIAS_KEYWORDS:
+        results[bias_type] = _detect_single_content_bias(
+            bias_type, before_text, after_text
+        )
+
+    # 综合风险评估
+    risk_scores = []
+    triggered_types = []
+    for bias_type, result in results.items():
+        if result.get("detected"):
+            triggered_types.append(bias_type)
+            risk_scores.append(result.get("risk_score", 0))
+
+    if not triggered_types:
+        overall_risk = "low"
+        overall_desc = "文本未涉及受保护属性话题，内容偏置风险低"
+    elif max(risk_scores) >= 0.7:
+        overall_risk = "high"
+        overall_desc = f"文本涉及敏感话题（{', '.join(triggered_types)}），存在较高内容偏置风险"
+    elif max(risk_scores) >= 0.4:
+        overall_risk = "medium"
+        overall_desc = f"文本涉及受保护属性话题（{', '.join(triggered_types)}），需关注评估公平性"
+    else:
+        overall_risk = "low"
+        overall_desc = "文本虽涉及受保护属性话题，但偏置风险较低"
+
+    return {
+        "bias_types": results,
+        "overall_risk": overall_risk,
+        "overall_description": overall_desc,
+        "triggered_types": triggered_types,
+        "mitigation": _content_bias_mitigation(triggered_types) if triggered_types else None,
+    }
+
+
+def _detect_single_content_bias(
+    bias_type: str,
+    before_text: str,
+    after_text: str,
+) -> dict[str, Any]:
+    """检测单类内容偏置。
+
+    策略：
+    1. 检查文本中是否包含该类型关键词
+    2. 如果包含，分析治理前后相关内容是否被差异处理
+    3. 计算风险分数（0~1）
+
+    Args:
+        bias_type: 偏置类型
+        before_text: 治理前文本
+        after_text: 治理后文本
+
+    Returns:
+        dict: 检测结果
+    """
+    keywords = _BIAS_KEYWORDS.get(bias_type, [])
+    if not keywords:
+        return {"detected": False, "risk_score": 0.0}
+
+    # 检查关键词命中
+    before_hits = [kw for kw in keywords if kw in before_text]
+    after_hits = [kw for kw in keywords if kw in after_text]
+
+    if not before_hits and not after_hits:
+        return {
+            "detected": False,
+            "risk_score": 0.0,
+            "description": f"文本未涉及{bias_type}相关话题",
+        }
+
+    # 分析治理过程中的差异处理
+    before_count = len(before_hits)
+    after_count = len(after_hits)
+
+    # 计算关键词保留率
+    if before_count > 0:
+        retention_rate = after_count / before_count
+    else:
+        retention_rate = 1.0 if after_count > 0 else 0.0
+
+    # 检查是否有新增的敏感内容
+    new_keywords = [kw for kw in after_hits if kw not in before_hits]
+    removed_keywords = [kw for kw in before_hits if kw not in after_hits]
+
+    # 风险评分
+    risk_score = 0.0
+
+    # 关键词被大量删除 → 可能是过度清洗涉及敏感话题
+    if retention_rate < 0.5 and before_count >= 2:
+        risk_score += 0.4
+
+    # 新增了原文没有的敏感内容 → 可能是幻觉或偏置注入
+    if new_keywords:
+        risk_score += 0.3
+
+    # 文本涉及敏感话题但治理后完全删除 → 高风险
+    if before_count >= 3 and after_count == 0:
+        risk_score += 0.3
+
+    # 基础风险：涉及敏感话题本身就有一定风险
+    risk_score += 0.1 * min(before_count, 3)
+
+    risk_score = min(risk_score, 1.0)
+
+    # 生成描述
+    desc_parts = [f"文本涉及{bias_type}相关话题（命中 {before_count} 个关键词）"]
+    if removed_keywords:
+        desc_parts.append(f"治理后删除了: {', '.join(removed_keywords[:3])}")
+    if new_keywords:
+        desc_parts.append(f"治理后新增了: {', '.join(new_keywords[:3])}")
+    if retention_rate < 0.5:
+        desc_parts.append(f"关键词保留率仅 {retention_rate*100:.0f}%")
+
+    return {
+        "detected": True,
+        "risk_score": round(risk_score, 3),
+        "description": "；".join(desc_parts),
+        "before_hits": before_hits,
+        "after_hits": after_hits,
+        "retention_rate": round(retention_rate, 3),
+        "removed_keywords": removed_keywords,
+        "new_keywords": new_keywords,
+    }
+
+
+def _content_bias_mitigation(triggered_types: list[str]) -> str:
+    """生成内容偏置缓解建议。"""
+    type_names = {
+        "gender": "性别",
+        "race": "种族/民族",
+        "religion": "宗教",
+        "age": "年龄",
+        "political": "政治",
+        "regional": "地域",
+    }
+    names = [type_names.get(t, t) for t in triggered_types]
+    return (
+        f"文本涉及 {', '.join(names)} 等敏感话题，建议：\n"
+        "1. 确认评估时未因话题敏感性而产生评分偏见\n"
+        "2. 检查治理后文本是否公平对待所有相关群体\n"
+        "3. 验证敏感信息的删除/修改是否基于保真度标准而非内容审查"
+    )

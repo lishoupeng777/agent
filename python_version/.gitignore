@@ -13,6 +13,8 @@ env/
 
 # Environment variables (contains API keys!)
 .env
+.env.*
+*.env.backup
 
 # IDE
 .vscode/

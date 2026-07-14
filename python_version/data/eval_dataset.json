@@ -6,12 +6,14 @@
     "after_text": "新华社北京3月15日电（记者张三）近日，国务院办公厅印发了《关于进一步优化营商环境降低市场主体制度性交易成本的意见》。意见指出，要进一步破除隐性门槛，推动降低市场主体准入成本；进一步规范涉企收费，推动减轻市场主体经营负担；进一步优化涉企服务，推动降低市场主体办事成本。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理"
+    "rationale": "仅去除多余空格，内容完全一致，属于规范化的良好治理",
+    "difficulty": "easy"
   },
   {
     "id": "sample_002",
@@ -33,12 +35,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.3,
-      "over_cleaning": 0.15,
-      "readability_structure": 0.7,
-      "factual_accuracy": 0.2
+      "semantic": 0.3,
+      "factual": 0.18,
+      "structure": 0.7,
+      "readability": 0.7,
+      "hallucination": 0.5
     },
-    "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺"
+    "rationale": "三个具体升级要点被压缩为一句话，语义和事实严重丢失，但句子本身通顺",
+    "difficulty": "hard"
   },
   {
     "id": "sample_003",
@@ -72,12 +76,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.9,
-      "over_cleaning": 0.9,
-      "readability_structure": 0.95,
-      "factual_accuracy": 0.15
+      "semantic": 0.9,
+      "factual": 0.45,
+      "structure": 0.95,
+      "readability": 0.95,
+      "hallucination": 0.78
     },
-    "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低"
+    "rationale": "结构和表达未变，未做清洗，但核心数值被篡改，事实准确性极低",
+    "difficulty": "medium"
   },
   {
     "id": "sample_004",
@@ -86,12 +92,14 @@
     "after_text": "尊敬的客户您好！您的订单[NO.20240315-88921]已发货。预计送达时间：2024年3月18日下午。如有问题请致电400-888-9999。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升"
+    "rationale": "仅规范化空格和标点，内容完全保留，可读性略有提升",
+    "difficulty": "easy"
   },
   {
     "id": "sample_005",
@@ -113,12 +121,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.9,
-      "over_cleaning": 0.8,
-      "readability_structure": 0.25,
-      "factual_accuracy": 0.95
+      "semantic": 0.9,
+      "factual": 0.89,
+      "structure": 0.25,
+      "readability": 0.25,
+      "hallucination": 1.0
     },
-    "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性"
+    "rationale": "数据基本保留，但表格结构被完全破坏，丧失了对比性和结构化可读性",
+    "difficulty": "medium"
   },
   {
     "id": "sample_006",
@@ -127,12 +137,14 @@
     "after_text": "人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，旨在创建能够模拟人类智能的系统。深度学习是当前AI研究的核心方法之一，已在计算机视觉、自然语言处理等领域取得突破性进展。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "完全无改动，四个维度均为满分"
+    "rationale": "完全无改动，四个维度均为满分",
+    "difficulty": "easy"
   },
   {
     "id": "sample_007",
@@ -154,12 +166,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.65,
-      "over_cleaning": 0.3,
-      "readability_structure": 0.15,
-      "factual_accuracy": 0.7
+      "semantic": 0.65,
+      "factual": 0.54,
+      "structure": 0.15,
+      "readability": 0.15,
+      "hallucination": 0.73
     },
-    "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解"
+    "rationale": "事实大致保留但过度缩写导致可读性极差，'登录信'、'立联'等不规范表达影响理解",
+    "difficulty": "hard"
   },
   {
     "id": "sample_008",
@@ -168,12 +182,14 @@
     "after_text": "本次会议纪要如下：第一，项目进度正常；第二，预算需要追加20%；第三，人力资源缺口已填补。与会人员：张三、李四、王五。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "统一标点符号，内容完全保留，可读性提升"
+    "rationale": "统一标点符号，内容完全保留，可读性提升",
+    "difficulty": "easy"
   },
   {
     "id": "sample_009",
@@ -195,12 +211,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.7,
-      "over_cleaning": 0.35,
-      "readability_structure": 0.8,
-      "factual_accuracy": 0.45
+      "semantic": 0.7,
+      "factual": 0.41,
+      "structure": 0.8,
+      "readability": 0.8,
+      "hallucination": 0.68
     },
-    "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界"
+    "rationale": "核心战略方向保留，但具体措施（智能制造、碳中和、15亿营收）被删除，属于合理精简与过度清洗的边界",
+    "difficulty": "medium"
   },
   {
     "id": "sample_010",
@@ -234,12 +252,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.7,
-      "over_cleaning": 0.8,
-      "readability_structure": 0.9,
-      "factual_accuracy": 0.15
+      "semantic": 0.7,
+      "factual": 0.41,
+      "structure": 0.9,
+      "readability": 0.9,
+      "hallucination": 0.68
     },
-    "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改"
+    "rationale": "机构名缩写丢失法定全称，技术参数±1100→±1000属于核心事实误改",
+    "difficulty": "medium"
   },
   {
     "id": "sample_011",
@@ -273,12 +293,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.3,
-      "over_cleaning": 0.2,
-      "readability_structure": 0.65,
-      "factual_accuracy": 0.9
+      "semantic": 0.3,
+      "factual": 0.62,
+      "structure": 0.65,
+      "readability": 0.65,
+      "hallucination": 0.64
     },
-    "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降"
+    "rationale": "法律条文引用、限定语、兜底条款均被删除，法律精度严重下降",
+    "difficulty": "hard"
   },
   {
     "id": "sample_012",
@@ -287,12 +309,14 @@
     "after_text": "客户投诉记录：张**（身份证：***）于2024年3月10日致电400-800-1234反映，其在门店购买的产品存在质量问题，要求退款。客服专员李**已受理，工单编号：WO20240310-8821。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留"
+    "rationale": "合理的隐私脱敏处理，个人信息被遮蔽但业务信息完整保留",
+    "difficulty": "easy"
   },
   {
     "id": "sample_013",
@@ -314,12 +338,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.5,
-      "over_cleaning": 0.55,
-      "readability_structure": 0.5,
-      "factual_accuracy": 0.8
+      "semantic": 0.5,
+      "factual": 0.7,
+      "structure": 0.5,
+      "readability": 0.5,
+      "hallucination": 0.77
     },
-    "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对"
+    "rationale": "材料名称保留但编号结构和括号说明丢失，可读性下降，不易逐项核对",
+    "difficulty": "hard"
   },
   {
     "id": "sample_014",
@@ -328,12 +354,14 @@
     "after_text": "根据公司内部审计结果，第三季度各部门费用支出合规率达到98.3%，较上季度提升2.1个百分点。其中研发部门费用报销合规率最高，达到99.8%；销售部门合规率相对较低，为96.5%，已启动专项整改。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "完全无改动，四个维度均为满分"
+    "rationale": "完全无改动，四个维度均为满分",
+    "difficulty": "easy"
   },
   {
     "id": "sample_015",
@@ -342,12 +370,14 @@
     "after_text": "2024年一季度，公司营业收入为32.6亿元，同比增长8.4%；归母净利润为4.2亿元，同比增长12.3%。每股收益为0.85元。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 1.0,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 1.0
     },
-    "rationale": "仅去除多余空格，数据和内容完全保留"
+    "rationale": "仅去除多余空格，数据和内容完全保留",
+    "difficulty": "easy"
   },
   {
     "id": "sample_016",
@@ -356,12 +386,14 @@
     "after_text": "本系统采用微服务架构（Microservices Architecture），核心组件包括：API网关、服务注册中心、负载均衡器。系统支持水平扩展，峰值QPS可达50,000。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 0.95,
-      "over_cleaning": 0.9,
-      "readability_structure": 0.9,
-      "factual_accuracy": 0.95
+      "semantic": 0.95,
+      "factual": 0.93,
+      "structure": 0.9,
+      "readability": 0.9,
+      "hallucination": 1.0
     },
-    "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好"
+    "rationale": "英文术语翻译为中文，信息基本保留，对中文读者更友好",
+    "difficulty": "easy"
   },
   {
     "id": "sample_017",
@@ -383,12 +415,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.75,
-      "over_cleaning": 0.4,
-      "readability_structure": 0.8,
-      "factual_accuracy": 0.45
+      "semantic": 0.75,
+      "factual": 0.43,
+      "structure": 0.8,
+      "readability": 0.8,
+      "hallucination": 0.71
     },
-    "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降"
+    "rationale": "政策目标和量化标准被删除（50%压缩比例、规定时间等），核心框架保留但精度下降",
+    "difficulty": "medium"
   },
   {
     "id": "sample_018",
@@ -410,12 +444,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 0.9,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 0.9,
+      "readability": 0.9,
+      "hallucination": 1.0
     },
-    "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降"
+    "rationale": "内容完全保留，仅段落顺序调整，逻辑连贯性略有下降",
+    "difficulty": "easy"
   },
   {
     "id": "sample_019",
@@ -424,12 +460,14 @@
     "after_text": "合同签署日期为2024-03-15，有效期至2025-03-15。项目启动会议定于2024-04-01召开，预计2025-03-31前完成验收。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "over_cleaning": 1.0,
-      "readability_structure": 0.9,
-      "factual_accuracy": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 0.9,
+      "readability": 0.9,
+      "hallucination": 1.0
     },
-    "rationale": "日期格式统一为ISO格式，内容完全保留，规范性提升"
+    "rationale": "日期格式统一为ISO格式，内容完全保留，规范性提升",
+    "difficulty": "easy"
   },
   {
     "id": "sample_020",
@@ -463,12 +501,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.5,
-      "over_cleaning": 0.25,
-      "readability_structure": 0.7,
-      "factual_accuracy": 0.35
+      "semantic": 0.5,
+      "factual": 0.31,
+      "structure": 0.7,
+      "readability": 0.7,
+      "hallucination": 0.54
     },
-    "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降"
+    "rationale": "法律限定条件大量丢失（时间范围、获悉方式、认定标准、书面要求），保密信息定义的精确性严重下降",
+    "difficulty": "hard"
   },
   {
     "id": "sample_021",
@@ -477,12 +517,14 @@
     "after_text": "本系统采用AES-256加密算法，对用户数据进行加密处理，并支持TLS 1.3协议，确保数据在传输过程中不会被第三方窃取。此外，平台还支持多因素身份认证、异常登录检测以及日志审计功能。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "factual_accuracy": 1.0,
-      "readability_structure": 0.98,
-      "over_cleaning": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 0.98,
+      "readability": 0.98,
+      "hallucination": 1.0
     },
-    "rationale": "仅去除了重复词汇和冗余表达，没有造成任何事实或语义损失，可读性明显提升。"
+    "rationale": "仅去除了重复词汇和冗余表达，没有造成任何事实或语义损失，可读性明显提升。",
+    "difficulty": "easy"
   },
   {
     "id": "sample_022",
@@ -504,12 +546,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.78,
-      "factual_accuracy": 0.2,
-      "readability_structure": 1.0,
-      "over_cleaning": 0.95
+      "semantic": 0.78,
+      "factual": 0.5,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 0.76
     },
-    "rationale": "文本结构和表达保持一致，但关键财务数据被篡改，属于严重事实错误。"
+    "rationale": "文本结构和表达保持一致，但关键财务数据被篡改，属于严重事实错误。",
+    "difficulty": "medium"
   },
   {
     "id": "sample_023",
@@ -518,12 +562,14 @@
     "after_text": "该项目计划总投资150000万元，预计建设周期24个月，建成后年产值可达80亿元。",
     "flaws_gt": [],
     "human_scores": {
-      "semantic_consistency": 1.0,
-      "factual_accuracy": 1.0,
-      "readability_structure": 0.98,
-      "over_cleaning": 1.0
+      "semantic": 1.0,
+      "factual": 1.0,
+      "structure": 0.98,
+      "readability": 0.98,
+      "hallucination": 1.0
     },
-    "rationale": "15亿元与150000万元完全等价，仅进行了单位转换，不属于事实错误。"
+    "rationale": "15亿元与150000万元完全等价，仅进行了单位转换，不属于事实错误。",
+    "difficulty": "easy"
   },
   {
     "id": "sample_024",
@@ -545,12 +591,14 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.72,
-      "factual_accuracy": 0.88,
-      "readability_structure": 1.0,
-      "over_cleaning": 0.45
+      "semantic": 0.72,
+      "factual": 0.708,
+      "structure": 1.0,
+      "readability": 1.0,
+      "hallucination": 0.86
     },
-    "rationale": "删除了原文明确列举的重要信息，属于典型过度治理，但未篡改已有事实。"
+    "rationale": "删除了原文明确列举的重要信息，属于典型过度治理，但未篡改已有事实。",
+    "difficulty": "medium"
   },
   {
     "id": "sample_025",
@@ -572,11 +620,13 @@
       }
     ],
     "human_scores": {
-      "semantic_consistency": 0.95,
-      "factual_accuracy": 0.98,
-      "readability_structure": 0.45,
-      "over_cleaning": 0.95
+      "semantic": 0.95,
+      "factual": 0.968,
+      "structure": 0.45,
+      "readability": 0.45,
+      "hallucination": 1.0
     },
-    "rationale": "所有数据均保留，但结构化表格被破坏，对信息对比和阅读效率产生明显影响。"
+    "rationale": "所有数据均保留，但结构化表格被破坏，对信息对比和阅读效率产生明显影响。",
+    "difficulty": "medium"
   }
 ]

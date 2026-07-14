@@ -1,6 +1,6 @@
 # 🛡️ 内容保真度与治理质量评估智能体 (LLM-as-Judge)
 
-> 基于 DeepSeek + LangChain + Streamlit 构建的文本治理质量自动评估系统
+> 基于 DeepSeek + LangChain + FastAPI 构建的文本治理质量自动评估系统
 
 ---
 
@@ -15,9 +15,7 @@ cd python_version
 # 安装依赖
 pip install -r requirements.txt
 # 配置 API Key（创建 .env 文件，写入 DEEPSEEK_API_KEY=sk-xxx）
-# 启动 Streamlit 演示版
-streamlit run app.py
-# 或启动 FastAPI 后端
+# 启动 FastAPI 后端
 python main.py
 ```
 
@@ -27,7 +25,6 @@ python main.py
 shixun/
 ├── README.md
 ├── python_version/
-│   ├── app.py                  # Streamlit 可视化演示应用
 │   ├── main.py                 # FastAPI 服务入口
 │   ├── run_calibration.py      # 校准测试脚本
 │   ├── run.bat                 # Windows 一键启动脚本
@@ -49,16 +46,18 @@ shixun/
 │   └── tests/                  # 测试用例
 ```
 
-## 两种运行方式
+## 运行方式
 
-| 方式 | 命令 | 端口 |
-|------|------|------|
-| Streamlit 演示版 | `streamlit run app.py` | 8501 |
-| FastAPI 后端版 | `python main.py` | 8081 |
+```bash
+cd python_version
+python main.py    # 启动 FastAPI 后端，端口 8081
+```
+
+前端页面：`static/index.html`，启动后端后访问 `http://localhost:8081`
 
 ## 技术栈
 
-Python · DeepSeek · LangChain · Streamlit · FastAPI · Pydantic
+Python · DeepSeek · LangChain · FastAPI · Pydantic · LiteLLM
 
 ## 文档
 

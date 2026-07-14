@@ -15,6 +15,10 @@ import dspy
 from pydantic import BaseModel, Field
 
 
+# 缓存优化后的 evaluator（由 /optimize 端点设置）
+_optimized_evaluator = None
+
+
 # ============================================================
 # 1. 配置 DSPy LM
 # ============================================================
@@ -230,11 +234,19 @@ def dataset_to_examples(dataset_path: str) -> list[dspy.Example]:
 
     examples = []
     for item in data:
+        # 从 human_scores 维度计算总分
+        hs = item.get("human_scores", {})
+        if hs:
+            weights = {"semantic": 0.35, "factual": 0.35, "structure": 0.15, "readability": 0.15}
+            overall = round(sum(hs.get(k, 0.5) * w for k, w in weights.items()), 4)
+        else:
+            overall = item.get("human_score", 0.5)
+
         ex = dspy.Example(
             before_text=item["before_text"],
             after_text=item["after_text"],
             evaluation_profile="general",
-            human_score=item["human_score"],
+            human_score=overall,
         ).with_inputs("before_text", "after_text", "evaluation_profile")
         examples.append(ex)
 

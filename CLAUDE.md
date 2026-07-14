@@ -13,9 +13,6 @@ pip install -r requirements.txt
 # Create .env with API key
 echo DEEPSEEK_API_KEY=sk-xxx > .env
 
-# Run Streamlit UI (port 8501)
-streamlit run app.py
-
 # Run FastAPI backend (port 8081)
 python main.py
 
@@ -30,13 +27,9 @@ There is no automated test suite with pytest. `tests/test_evaluate.py` is a stan
 
 ## Architecture
 
-There are **two parallel implementations** that share no code:
+There is **one primary implementation**:
 
-**1. FastAPI backend** (`main.py` + `app/`) — a proper REST API with structured Pydantic models, six endpoints under `/api/v1`, and a plain HTML frontend at `static/index.html`. This is the production path.
-
-**2. Streamlit app** (`app.py`) — a self-contained single-file UI that reimplements the LLM call, prompt, and JSON parsing inline. It has its own separate system prompt (two-dimension scoring: `semantic_consistency_score` + `readability_structure_score`) that differs from the FastAPI backend's four-dimension prompt.
-
-When making changes, be deliberate about which implementation you're targeting — a change to `app/prompts.py` does not affect `app.py` and vice versa.
+**FastAPI backend** (`main.py` + `app/`) — a REST API with structured Pydantic models, endpoints under `/api/v1`, and a plain HTML frontend at `static/index.html`.
 
 ### FastAPI backend internals (`app/`)
 
@@ -54,5 +47,3 @@ The evaluation flow: `routes.py` → `engine.py` → `prompts.py` → DeepSeek A
 ### LLM configuration
 
 The backend reads three env vars: `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL` (default `https://api.deepseek.com/v1`), `DEEPSEEK_MODEL` (default `deepseek-chat`). These are loaded via `python-dotenv` from `.env` at startup.
-
-The Streamlit app hardcodes `deepseek-chat` and `https://api.deepseek.com/v1` and takes the key from the sidebar input (falling back to `DEEPSEEK_API_KEY` env var).

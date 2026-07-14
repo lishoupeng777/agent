@@ -84,7 +84,7 @@ add_styled_paragraph(doc, '研发计划书', bold=True, size=18,
 
 info_lines = [
     ('课题', '大模型内容安全与质量评估 / 数据治理前后文本比对'),
-    ('技术栈', 'Python + DeepSeek (LLM-as-Judge) + LangChain + Streamlit'),
+    ('技术栈', 'Python + DeepSeek (LLM-as-Judge) + LangChain + FastAPI'),
     ('制定日期', '2026-06-23'),
     ('研发周期', '2026-06-26 ~ 2026-07-10（10 个工作日）'),
     ('版本', 'v1.0'),
@@ -143,7 +143,7 @@ r = p.add_run(
     '→ Prompt 构建（System Prompt 约束 + User Template 拼接）\n'
     '→ DeepSeek API（ChatOpenAI, temperature=0.0）\n'
     '→ JSON 解析与清洗（去 think 标签 + 异常兜底）\n'
-    '→ Streamlit 可视化（Metric 卡片 / DataFrame 瑕疵表 / Pass-Fail 徽章）'
+    '→ 前端页面展示（Metric 卡片 / DataFrame 瑕疵表 / Pass-Fail 徽章）'
 )
 r.font.size = Pt(10)
 

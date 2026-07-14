@@ -13,7 +13,10 @@ sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dotenv import load_dotenv
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+# 测试优先读 .env.test（DeepSeek 官方 API，稳定可靠），没有才回退到 .env（网页用的千问免费额度）
+_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_env_test = os.path.join(_root, ".env.test")
+load_dotenv(_env_test if os.path.exists(_env_test) else os.path.join(_root, ".env"))
 
 from app.models import EvalRequest
 from app.engine import evaluate

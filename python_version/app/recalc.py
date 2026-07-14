@@ -19,12 +19,13 @@ from .raw_store import load_all_raw
 @dataclass
 class RecalcParams:
     """重算参数（用户可调）"""
-    # 维度权重（自动归一化）
+    # 维度权重（自动归一化，与当前 Prompt 五维度一致）
     dimension_weights: dict[str, float] = field(default_factory=lambda: {
-        "semantic": 0.35,
-        "factual": 0.35,
-        "structure": 0.15,
-        "readability": 0.15,
+        "semantic": 0.30,
+        "factual": 0.30,
+        "hallucination": 0.20,
+        "structure": 0.10,
+        "readability": 0.10,
     })
     # 惩罚系数（severity -> 惩罚因子，越小扣分越多）
     penalty_factors: dict[str, float] = field(default_factory=lambda: {

@@ -190,7 +190,7 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: boo
             model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
             temperature=temperature,
             top_p=1.0,
-            max_tokens=2048,
+            max_tokens=4096,  # 金标实测输出最大 3825 token（gold_v1），4096 留余量防截断
             max_retries=2,
             request_timeout=60,
             base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
@@ -209,7 +209,7 @@ def create_llm(temperature: float = 0.0, json_mode: bool = False, use_cache: boo
         model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
         temperature=temperature,
         top_p=1.0,           # 固定 top_p，确保确定性输出
-        max_tokens=2048,
+        max_tokens=4096,     # 金标实测输出最大 3825 token（gold_v1），4096 留余量防截断
         max_retries=2,       # 429/503 自动指数退避重试
         request_timeout=60,  # 60 秒超时，防止 API 挂起
         base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
@@ -1805,12 +1805,22 @@ def evaluate(request: EvalRequest, temperature: float = 0.0, use_cache: bool = T
     if 0.75 <= resp.overall_score <= 0.85:
         span_resample = trace.add_span("critical_zone_resample", {"initial_score": resp.overall_score})
         extra_scores = [resp.overall_score]
-        for _ in range(2):
+
+        # 两次补采样并发执行（原为串行），临界区墙钟从 3× 单次降至 2× 单次。
+        # 全局限流器（InMemoryRateLimiter）会把总请求速率压在阈值内，不会打爆 API。
+        from concurrent.futures import ThreadPoolExecutor
+
+        def _resample() -> float | None:
             try:
-                resp2 = _evaluate_once(request, temperature, use_cache=use_cache)
-                extra_scores.append(resp2.overall_score)
+                return _evaluate_once(request, temperature, use_cache=use_cache).overall_score
             except Exception:
-                pass
+                return None
+
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            for score in ex.map(lambda _: _resample(), range(2)):
+                if score is not None:
+                    extra_scores.append(score)
+
         avg_score = round(sum(extra_scores) / len(extra_scores), 4)
         resp.overall_score = avg_score
         resp.verdict = determine_verdict(avg_score)

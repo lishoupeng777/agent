@@ -507,8 +507,10 @@
     <div class="tabs">
         <button class="tab-btn active" data-tab="evaluate">📝 核心评估</button>
         <button class="tab-btn" data-tab="batch">📦 批量评估</button>
+        <button class="tab-btn" data-tab="compare">⚔️ 对比评估</button>
         <button class="tab-btn" data-tab="calibrate">🎯 一致性校准</button>
         <button class="tab-btn" data-tab="metrics">📐 指标计算</button>
+        <button class="tab-btn" data-tab="experiments">📈 实验追踪</button>
         <button class="tab-btn" data-tab="about">ℹ️ 使用说明</button>
     </div>
 
@@ -520,9 +522,9 @@
             <div class="form-group">
                 <label>📋 评估模式</label>
                 <select id="evalProfile" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
-                    <option value="general">通用文本</option>
-                    <option value="government_notice_strict">政务通告/公告（严格保真）</option>
-                    <option value="legal_strict">法规合同/条款（严格保真）</option>
+                    <option value="relaxed">宽松模式 — 日常/娱乐/创意</option>
+                    <option value="medium" selected>普通模式 — 说明文/邮件/汇报</option>
+                    <option value="strict">严格模式 — 法律/政务/财务/医疗</option>
                 </select>
             </div>
 
@@ -630,23 +632,27 @@
                 <p style="font-size:12px;color:#6b7280;margin-bottom:8px;">拖动滑块调整权重，后端自动归一化（总和始终为 1）</p>
                 <div class="row" style="margin-bottom:12px;">
                     <div class="form-group">
-                        <label>semantic（语义一致性）: <span id="wSemanticVal">0.35</span></label>
-                        <input type="range" id="wSemantic" min="0" max="100" value="35" style="width:100%;" oninput="updateWeightDisplay()">
+                        <label>semantic_fidelity（语义保真度）: <span id="wSemanticVal">0.30</span></label>
+                        <input type="range" id="wSemantic" min="0" max="100" value="30" style="width:100%;" oninput="updateWeightDisplay()">
                     </div>
                     <div class="form-group">
-                        <label>factual（事实准确性）: <span id="wFactualVal">0.35</span></label>
-                        <input type="range" id="wFactual" min="0" max="100" value="35" style="width:100%;" oninput="updateWeightDisplay()">
+                        <label>factual_consistency（事实一致性）: <span id="wFactualVal">0.30</span></label>
+                        <input type="range" id="wFactual" min="0" max="100" value="30" style="width:100%;" oninput="updateWeightDisplay()">
                     </div>
                 </div>
                 <div class="row" style="margin-bottom:12px;">
                     <div class="form-group">
-                        <label>structure（结构质量）: <span id="wStructureVal">0.15</span></label>
-                        <input type="range" id="wStructure" min="0" max="100" value="15" style="width:100%;" oninput="updateWeightDisplay()">
+                        <label>hallucination（幻觉检测）: <span id="wHallucinationVal">0.20</span></label>
+                        <input type="range" id="wHallucination" min="0" max="100" value="20" style="width:100%;" oninput="updateWeightDisplay()">
                     </div>
                     <div class="form-group">
-                        <label>readability（可读性）: <span id="wReadabilityVal">0.15</span></label>
-                        <input type="range" id="wReadability" min="0" max="100" value="15" style="width:100%;" oninput="updateWeightDisplay()">
+                        <label>structure（结构质量）: <span id="wStructureVal">0.10</span></label>
+                        <input type="range" id="wStructure" min="0" max="100" value="10" style="width:100%;" oninput="updateWeightDisplay()">
                     </div>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label>readability（可读性）: <span id="wReadabilityVal">0.10</span></label>
+                    <input type="range" id="wReadability" min="0" max="100" value="10" style="width:100%;" oninput="updateWeightDisplay()">
                 </div>
 
                 <h4 style="margin-bottom:8px;">惩罚系数</h4>
@@ -739,7 +745,8 @@
 
             <div class="form-group">
                 <label>最大并发数</label>
-                <input type="number" id="batchConcurrency" value="3" min="1" max="10" style="width:100px;" />
+                <input type="number" id="batchConcurrency" value="4" min="1" max="10" style="width:100px;" />
+                <small style="color:#888;margin-left:4px;">最大10，建议4~6（过高会触发API限流429）</small>
             </div>
 
             <button class="btn btn-primary" id="btnBatchSubmit" onclick="doBatchSubmit()">🚀 提交批量评估</button>
@@ -774,6 +781,116 @@
             <div class="batch-download-bar" id="batchDownloads">
                 <button class="btn-download" onclick="downloadBatchJson()">📄 下载 JSON 报告</button>
                 <button class="btn-download" onclick="downloadBatchCsv()">📊 下载结果 CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 标签页：对比评估（Pairwise） ==================== -->
+    <div class="tab-content" id="tab-compare">
+        <div class="card">
+            <h3><span class="icon">⚔️</span> 对比评估 —— Chatbot Arena 风格</h3>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+                输入同一段原文和两个不同的治理结果，系统分别评估后逐维度对比差异，给出偏好判定。
+            </p>
+
+            <div class="form-group">
+                <label>📋 评估模式</label>
+                <select id="cmpProfile" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
+                    <option value="medium">普通模式 — 说明文/邮件/汇报</option>
+                    <option value="strict">严格模式 — 法律/政务/财务/医疗</option>
+                    <option value="relaxed">宽松模式 — 日常/娱乐/创意</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>🤖 评估模型</label>
+                <select id="cmpModel" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fafafa;">
+                    <option value="">DeepSeek V4 Flash（默认）</option>
+                    <option value="mimo">小米 Mimo 2.5 Pro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><span class="required">*</span> 治理前原文</label>
+                <textarea class="large" id="cmpBefore" placeholder="请输入治理前的原始文本……"></textarea>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理结果 A</label>
+                    <textarea class="large" id="cmpOutputA" placeholder="请输入治理结果 A……"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><span class="required">*</span> 治理结果 B</label>
+                    <textarea class="large" id="cmpOutputB" placeholder="请输入治理结果 B……"></textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>A 的标签</label>
+                    <input type="text" id="cmpLabelA" value="治理方案 A" placeholder="如：DeepSeek" />
+                </div>
+                <div class="form-group">
+                    <label>B 的标签</label>
+                    <input type="text" id="cmpLabelB" value="治理方案 B" placeholder="如：Mimo" />
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" id="cmpSubmitBtn" onclick="submitCompare()">⚔️ 开始对比评估</button>
+                <button class="btn btn-secondary" onclick="clearCompareForm()">清空</button>
+            </div>
+
+            <div class="error-msg" id="cmpError"></div>
+
+            <div class="loading" id="cmpLoading">
+                <div class="spinner"></div>
+                <div>正在进行对比评估（需调用 2 次 LLM）……</div>
+            </div>
+        </div>
+
+        <!-- 对比结果 -->
+        <div class="card result-card" id="cmpResultCard">
+            <h3><span class="icon">📊</span> 对比结果</h3>
+
+            <!-- 胜出判定 -->
+            <div style="text-align:center;margin-bottom:20px;">
+                <div id="cmpWinnerBadge" class="verdict-badge verdict-pass" style="font-size:20px;padding:10px 28px;"></div>
+                <div id="cmpReason" style="margin-top:10px;font-size:14px;color:var(--text-secondary);"></div>
+                <div id="cmpLatency" style="margin-top:6px;font-size:12px;color:#9ca3af;"></div>
+            </div>
+
+            <!-- 总分对比 -->
+            <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:20px;">
+                <div class="stat-item">
+                    <div class="stat-value" id="cmpScoreA" style="color:var(--primary);">-</div>
+                    <div class="stat-label" id="cmpScoreALabel">结果 A 总分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cmpDelta" style="color:var(--text-secondary);">-</div>
+                    <div class="stat-label">差值 (A - B)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cmpScoreB" style="color:#7c3aed;">-</div>
+                    <div class="stat-label" id="cmpScoreBLabel">结果 B 总分</div>
+                </div>
+            </div>
+
+            <!-- 维度对比柱状图 -->
+            <h4 style="font-size:15px;margin-bottom:12px;">各维度对比</h4>
+            <div id="cmpDimensionBars"></div>
+
+            <!-- 瑕疵对比 -->
+            <div class="row" style="margin-top:20px;">
+                <div>
+                    <h4 style="font-size:14px;margin-bottom:8px;" id="cmpFlawsTitleA">结果 A 瑕疵</h4>
+                    <div id="cmpFlawsA"></div>
+                </div>
+                <div>
+                    <h4 style="font-size:14px;margin-bottom:8px;" id="cmpFlawsTitleB">结果 B 瑕疵</h4>
+                    <div id="cmpFlawsB"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -933,6 +1050,80 @@
         </div>
     </div>
 
+    <!-- ==================== 标签页：实验追踪 ==================== -->
+    <div class="tab-content" id="tab-experiments">
+        <div class="card">
+            <h3><span class="icon">📈</span> 实验追踪 —— 评估历史与趋势</h3>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+                自动记录每次评估的维度分数、模型、耗时、Token 消耗等元数据。支持 MLflow / W&B 集成。
+            </p>
+
+            <!-- 统计卡片 -->
+            <div class="stats-row" id="expStatsRow">
+                <div class="stat-item">
+                    <div class="stat-value" id="expTotalRuns">-</div>
+                    <div class="stat-label">总评估次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="expAvgScore">-</div>
+                    <div class="stat-label">平均总分</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="expAvgLatency">-</div>
+                    <div class="stat-label">平均延迟(s)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="expTotalTokens">-</div>
+                    <div class="stat-label">总 Token 消耗</div>
+                </div>
+            </div>
+
+            <!-- 判定分布 -->
+            <div style="margin-top:16px;display:flex;gap:12px;align-items:center;" id="expVerdictDist">
+                <span style="font-weight:600;font-size:13px;">判定分布：</span>
+                <span id="expPassCount" class="status-tag status-tag--pass">Pass: 0</span>
+                <span id="expReviewCount" class="status-tag status-tag--warn">Review: 0</span>
+                <span id="expFailCount" class="status-tag status-tag--fail">Fail: 0</span>
+            </div>
+
+            <div class="btn-row" style="margin-top:16px;">
+                <button class="btn btn-primary" onclick="loadExperiments()">刷新数据</button>
+            </div>
+        </div>
+
+        <!-- 趋势图 -->
+        <div class="card">
+            <h3><span class="icon">📊</span> 分数趋势</h3>
+            <div id="expTrendChart" style="height:200px;display:flex;align-items:end;gap:2px;padding:16px 0;overflow-x:auto;">
+                <div style="color:var(--text-secondary);font-size:13px;width:100%;text-align:center;">点击"刷新数据"加载趋势图</div>
+            </div>
+        </div>
+
+        <!-- 实验记录表 -->
+        <div class="card">
+            <h3><span class="icon">📋</span> 实验记录</h3>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;" id="expTable">
+                    <thead>
+                        <tr style="background:#f9fafb;border-bottom:2px solid var(--border);">
+                            <th style="padding:10px 8px;text-align:left;font-weight:600;">时间</th>
+                            <th style="padding:10px 8px;text-align:left;font-weight:600;">模型</th>
+                            <th style="padding:10px 8px;text-align:left;font-weight:600;">模式</th>
+                            <th style="padding:10px 8px;text-align:center;font-weight:600;">总分</th>
+                            <th style="padding:10px 8px;text-align:center;font-weight:600;">判定</th>
+                            <th style="padding:10px 8px;text-align:center;font-weight:600;">瑕疵数</th>
+                            <th style="padding:10px 8px;text-align:center;font-weight:600;">延迟(s)</th>
+                            <th style="padding:10px 8px;text-align:center;font-weight:600;">Tokens</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expTableBody">
+                        <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--text-secondary);">点击"刷新数据"加载记录</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== 标签页5：使用说明 ==================== -->
     <div class="tab-content" id="tab-about">
         <div class="card">
@@ -941,18 +1132,19 @@
                 本系统是一个基于大语言模型（LLM）的<strong>内容质量评估智能体</strong>，用于判断文本治理（清洗、规范化等）的质量。
             </p>
             <p style="margin-bottom:12px;">
-                从以下<strong>四个维度</strong>对比治理前后文本，给出科学评分：
+                从以下<strong>五个维度</strong>对比治理前后文本，给出科学评分：
             </p>
             <ul style="padding-left:24px;margin-bottom:12px;">
-                <li><strong>语义一致性</strong>（权重 0.4）—— 治理后是否保留了原意？信息是否丢失？</li>
-                <li><strong>过度清洗/误改识别</strong>（权重 0.3）—— 是否误删有效信息或错误改写？</li>
-                <li><strong>可读性</strong>（权重 0.15）—— 句子是否通顺、段落是否连贯？</li>
-                <li><strong>结构质量</strong>（权重 0.15）—— 格式是否规范、层次是否清晰？</li>
+                <li><strong>语义保真度</strong>（权重 0.30）—— 治理后是否保留了原意？信息是否丢失？</li>
+                <li><strong>事实一致性</strong>（权重 0.30）—— 是否发生事实篡改或关键事实丢失？</li>
+                <li><strong>幻觉检测</strong>（权重 0.20）—— 是否凭空编造了原文没有的信息？</li>
+                <li><strong>结构质量</strong>（权重 0.10）—— 表格/列表/段落等结构化信息是否被破坏？</li>
+                <li><strong>可读性</strong>（权重 0.10）—— 句子是否通顺、排版是否规范？</li>
             </ul>
             <p><strong>综合判定：</strong></p>
             <ul style="padding-left:24px;">
-                <li>≥ 0.8 → <span style="color:#10b981;font-weight:700;">通过 (pass)</span></li>
-                <li>0.5~0.8 → <span style="color:#f59e0b;font-weight:700;">需复审 (review)</span></li>
+                <li>≥ 0.82 → <span style="color:#10b981;font-weight:700;">通过 (pass)</span></li>
+                <li>0.5~0.82 → <span style="color:#f59e0b;font-weight:700;">需复审 (review)</span></li>
                 <li>< 0.5 → <span style="color:#ef4444;font-weight:700;">不通过 (fail)</span></li>
             </ul>
         </div>
@@ -1005,7 +1197,7 @@
         <div class="card">
             <h3><span class="icon">🛠️</span> 技术栈</h3>
             <p>后端：Python + FastAPI + LangChain</p>
-            <p>模型：DeepSeek V4 Flash（固定，确保评测一致性）</p>
+            <p>模型：DeepSeek V4 Flash（默认），支持通过下拉框切换其他模型（Mimo、GPT 等）</p>
             <p>前端：纯 HTML/CSS/JS（本页面）</p>
             <p>端口：8081</p>
         </div>
@@ -1017,6 +1209,46 @@
 // ==================== 全局状态 ====================
 const API_BASE = '/api/v1';
 let lastEvalFlaws = []; // 存储最近一次评估的瑕玼结果
+
+// ==================== 动态加载模型列表 ====================
+async function loadModels() {
+    try {
+        const res = await fetch(API_BASE + '/models');
+        if (!res.ok) return;
+        const data = await res.json();
+        const models = data.models || [];
+        const defaultModel = data.default || '';
+
+        // 填充所有 model select 元素
+        const selects = ['evalModel', 'cmpModel'];
+        selects.forEach(function(id) {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            // 保留第一个默认选项
+            const firstOpt = sel.options[0];
+            sel.innerHTML = '';
+            if (firstOpt) sel.appendChild(firstOpt);
+
+            models.forEach(function(m) {
+                if (m.id === defaultModel) return; // 默认模型已在第一位
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.display;
+                sel.appendChild(opt);
+            });
+
+            // 更新默认选项文本
+            if (firstOpt) {
+                const defModel = models.find(function(m) { return m.id === defaultModel; });
+                if (defModel) firstOpt.textContent = defModel.display;
+            }
+        });
+    } catch(e) {
+        console.warn('加载模型列表失败:', e);
+    }
+}
+// 页面加载时获取模型列表
+document.addEventListener('DOMContentLoaded', loadModels);
 
 // ==================== 标签页切换 ====================
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1147,7 +1379,7 @@ async function doBatchSubmit() {
     btn.disabled = true;
     loading.classList.add('active');
 
-    const concurrency = parseInt(document.getElementById('batchConcurrency').value) || 3;
+    const concurrency = parseInt(document.getElementById('batchConcurrency').value) || 4;
 
     try {
         const res = await fetch(API_BASE + '/batch/submit?max_concurrency=' + concurrency, {
@@ -1400,15 +1632,17 @@ function downloadBatchCsv() {
 function updateWeightDisplay() {
     const wS = parseInt(document.getElementById('wSemantic').value) / 100;
     const wF = parseInt(document.getElementById('wFactual').value) / 100;
+    const wH = parseInt(document.getElementById('wHallucination').value) / 100;
     const wT = parseInt(document.getElementById('wStructure').value) / 100;
     const wR = parseInt(document.getElementById('wReadability').value) / 100;
 
     document.getElementById('wSemanticVal').textContent = wS.toFixed(2);
     document.getElementById('wFactualVal').textContent = wF.toFixed(2);
+    document.getElementById('wHallucinationVal').textContent = wH.toFixed(2);
     document.getElementById('wStructureVal').textContent = wT.toFixed(2);
     document.getElementById('wReadabilityVal').textContent = wR.toFixed(2);
 
-    const sum = wS + wF + wT + wR;
+    const sum = wS + wF + wH + wT + wR;
     const sumEl = document.getElementById('wSumDisplay');
     sumEl.textContent = `（当前总和：${sum.toFixed(2)}，后端自动归一化）`;
     sumEl.style.color = Math.abs(sum - 1.0) < 0.01 ? '#6b7280' : '#f59e0b';
@@ -1429,6 +1663,7 @@ async function doRecalculate() {
         dimension_weights: {
             semantic: parseInt(document.getElementById('wSemantic').value) / 100,
             factual: parseInt(document.getElementById('wFactual').value) / 100,
+            hallucination: parseInt(document.getElementById('wHallucination').value) / 100,
             structure: parseInt(document.getElementById('wStructure').value) / 100,
             readability: parseInt(document.getElementById('wReadability').value) / 100,
         },
@@ -1495,8 +1730,8 @@ function renderEvalResult(data) {
     document.getElementById('evalRid').textContent = data.request_id;
 
     // 评估模式
-    const profileLabels = {general:'通用文本',government_notice_strict:'政务通告/公告（严格保真）',legal_strict:'法规合同/条款（严格保真）'};
-    const profileUsed = profileLabels[data.evaluation_profile] || data.evaluation_profile || 'general';
+    const profileLabels = {relaxed:'宽松模式',medium:'普通模式',strict:'严格模式',general:'普通模式',government_notice_strict:'严格模式',legal_strict:'严格模式'};
+    const profileUsed = profileLabels[data.evaluation_profile] || data.evaluation_profile || 'medium';
 
     document.getElementById('evalOverall').textContent = data.overall_score.toFixed(4);
     document.getElementById('evalOverall').style.color = getScoreColor(data.overall_score);
@@ -1905,6 +2140,273 @@ async function doAnchorMetrics() {
 function showError(id, msg) {
     const el = document.getElementById(id);
     if (el) { el.textContent = '[警告] ' + msg; el.classList.add('active'); }
+}
+
+// ==================== 对比评估（Pairwise） ====================
+
+function clearCompareForm() {
+    document.getElementById('cmpBefore').value = '';
+    document.getElementById('cmpOutputA').value = '';
+    document.getElementById('cmpOutputB').value = '';
+    document.getElementById('cmpLabelA').value = 'A';
+    document.getElementById('cmpLabelB').value = 'B';
+    document.getElementById('cmpResultCard').classList.remove('active');
+    document.getElementById('cmpError').classList.remove('active');
+}
+
+async function submitCompare() {
+    const before = document.getElementById('cmpBefore').value.trim();
+    const outputA = document.getElementById('cmpOutputA').value.trim();
+    const outputB = document.getElementById('cmpOutputB').value.trim();
+    const labelA = document.getElementById('cmpLabelA').value.trim() || 'A';
+    const labelB = document.getElementById('cmpLabelB').value.trim() || 'B';
+    const profile = document.getElementById('cmpProfile').value;
+    const model = document.getElementById('cmpModel').value || null;
+
+    if (!before || !outputA || !outputB) {
+        showError('cmpError', '请填写原文和两个治理结果');
+        return;
+    }
+
+    const btn = document.getElementById('cmpSubmitBtn');
+    const loading = document.getElementById('cmpLoading');
+    const errEl = document.getElementById('cmpError');
+    errEl.classList.remove('active');
+    btn.disabled = true;
+    loading.classList.add('active');
+
+    try {
+        const res = await fetch(API_BASE + '/compare', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                before_text: before,
+                output_a: outputA,
+                output_b: outputB,
+                evaluation_profile: profile,
+                label_a: labelA,
+                label_b: labelB,
+                model: model
+            })
+        });
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || 'HTTP ' + res.status);
+        }
+        const data = await res.json();
+        renderCompareResult(data, labelA, labelB);
+    } catch(e) {
+        showError('cmpError', '对比评估失败：' + e.message);
+    } finally {
+        btn.disabled = false;
+        loading.classList.remove('active');
+    }
+}
+
+function renderCompareResult(data, labelA, labelB) {
+    const card = document.getElementById('cmpResultCard');
+    card.classList.add('active');
+
+    // 胜出判定
+    const badge = document.getElementById('cmpWinnerBadge');
+    const winner = data.winner;
+    if (winner === 'tie') {
+        badge.textContent = '平局 (Tie)';
+        badge.className = 'verdict-badge verdict-review';
+    } else if (winner === 'A') {
+        badge.textContent = labelA + ' 胜出';
+        badge.className = 'verdict-badge verdict-pass';
+    } else {
+        badge.textContent = labelB + ' 胜出';
+        badge.className = 'verdict-badge verdict-fail';
+    }
+
+    document.getElementById('cmpReason').textContent = data.reason || '';
+    document.getElementById('cmpLatency').textContent =
+        data.latency_seconds ? '耗时 ' + data.latency_seconds.toFixed(1) + ' 秒' : '';
+
+    // 总分对比
+    const scoreA = data.evaluation_a.overall_score;
+    const scoreB = data.evaluation_b.overall_score;
+    document.getElementById('cmpScoreA').textContent = scoreA.toFixed(3);
+    document.getElementById('cmpScoreB').textContent = scoreB.toFixed(3);
+    document.getElementById('cmpScoreALabel').textContent = labelA + ' 总分';
+    document.getElementById('cmpScoreBLabel').textContent = labelB + ' 总分';
+    document.getElementById('cmpFlawsTitleA').textContent = labelA + ' 瑕疵';
+    document.getElementById('cmpFlawsTitleB').textContent = labelB + ' 瑕疵';
+
+    const delta = data.overall_delta;
+    const deltaEl = document.getElementById('cmpDelta');
+    deltaEl.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(3);
+    deltaEl.style.color = delta > 0.02 ? 'var(--pass)' : delta < -0.02 ? 'var(--fail)' : 'var(--text-secondary)';
+
+    // 维度对比柱状图
+    const dimNames = {
+        semantic: '语义保真度',
+        factual: '事实一致性',
+        hallucination: '幻觉检测',
+        structure: '逻辑结构',
+        readability: '可读性'
+    };
+    const barsContainer = document.getElementById('cmpDimensionBars');
+    barsContainer.innerHTML = '';
+
+    (data.dimension_deltas || []).forEach(function(d) {
+        const name = dimNames[d.dimension] || d.dimension;
+        const sa = d.score_a, sb = d.score_b;
+        const dDelta = d.delta;
+        const w = d.winner;
+
+        let winTag = '';
+        if (w === 'A') winTag = '<span style="color:var(--pass);font-weight:700;font-size:12px;">' + labelA + ' 领先</span>';
+        else if (w === 'B') winTag = '<span style="color:#7c3aed;font-weight:700;font-size:12px;">' + labelB + ' 领先</span>';
+        else winTag = '<span style="color:var(--text-secondary);font-size:12px;">持平</span>';
+
+        const barHtml = '<div style="margin-bottom:14px;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                '<span style="font-weight:600;font-size:13px;">' + name + '</span>' +
+                winTag +
+            '</div>' +
+            '<div style="display:flex;gap:4px;align-items:center;">' +
+                '<span style="width:48px;text-align:right;font-size:13px;font-weight:700;color:var(--primary);">' + sa.toFixed(2) + '</span>' +
+                '<div style="flex:1;display:flex;height:10px;border-radius:5px;overflow:hidden;background:#e5e7eb;">' +
+                    '<div style="width:' + (sa * 50) + '%;background:var(--primary);border-radius:5px 0 0 5px;transition:width 0.5s;"></div>' +
+                    '<div style="width:' + (sb * 50) + '%;background:#7c3aed;border-radius:0 5px 5px 0;transition:width 0.5s;"></div>' +
+                '</div>' +
+                '<span style="width:48px;font-size:13px;font-weight:700;color:#7c3aed;">' + sb.toFixed(2) + '</span>' +
+            '</div>' +
+            '<div style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:2px;">' +
+                '差值: ' + (dDelta >= 0 ? '+' : '') + dDelta.toFixed(3) +
+            '</div>' +
+        '</div>';
+        barsContainer.innerHTML += barHtml;
+    });
+
+    // 瑕疵列表
+    renderCmpFlaws('cmpFlawsA', data.evaluation_a.flaws || []);
+    renderCmpFlaws('cmpFlawsB', data.evaluation_b.flaws || []);
+
+    // 滚动到结果
+    card.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function renderCmpFlaws(containerId, flaws) {
+    const el = document.getElementById(containerId);
+    if (!flaws.length) {
+        el.innerHTML = '<div class="no-flaws">无瑕疵</div>';
+        return;
+    }
+    const catNames = {over_clean: '过度清洗', mis_edit: '错误编辑', readability: '可读性', structure: '结构'};
+    const sevNames = {critical: '严重', major: '重要', minor: '轻微'};
+    el.innerHTML = flaws.map(function(f) {
+        return '<div class="flaw-item ' + (f.severity || '') + '">' +
+            '<div class="flaw-header">' +
+                '<span class="flaw-category cat-' + (f.category || '') + '">' + (catNames[f.category] || f.category) + '</span>' +
+                '<span class="flaw-severity sev-' + (f.severity || '') + '">' + (sevNames[f.severity] || f.severity) + '</span>' +
+            '</div>' +
+            '<div class="flaw-desc">' + (f.description || '') + '</div>' +
+            (f.location && f.location.snippet ? '<div class="flaw-snippet">' + f.location.snippet + '</div>' : '') +
+            (f.suggestion ? '<div class="flaw-suggestion">建议：' + f.suggestion + '</div>' : '') +
+        '</div>';
+    }).join('');
+}
+
+// ==================== 实验追踪 ====================
+
+async function loadExperiments() {
+    try {
+        // 并行请求统计和记录
+        const [statsRes, recordsRes, trendRes] = await Promise.all([
+            fetch(API_BASE + '/experiments/stats'),
+            fetch(API_BASE + '/experiments?limit=50'),
+            fetch(API_BASE + '/experiments/trend?limit=50'),
+        ]);
+
+        if (!statsRes.ok || !recordsRes.ok) throw new Error('请求失败');
+
+        const stats = await statsRes.json();
+        const recordsData = await recordsRes.json();
+        const trendData = trendRes.ok ? await trendRes.json() : {trend: []};
+
+        // 统计卡片
+        document.getElementById('expTotalRuns').textContent = stats.total || 0;
+        document.getElementById('expAvgScore').textContent = stats.avg_score ? stats.avg_score.toFixed(3) : '-';
+        document.getElementById('expAvgLatency').textContent = stats.avg_latency ? stats.avg_latency.toFixed(1) : '-';
+        document.getElementById('expTotalTokens').textContent = stats.total_tokens ? stats.total_tokens.toLocaleString() : '-';
+
+        // 判定分布
+        const v = stats.verdicts || {};
+        document.getElementById('expPassCount').textContent = 'Pass: ' + (v.pass || 0);
+        document.getElementById('expReviewCount').textContent = 'Review: ' + (v.review || 0);
+        document.getElementById('expFailCount').textContent = 'Fail: ' + (v.fail || 0);
+
+        // 趋势图（CSS 柱状图）
+        renderExpTrend(trendData.trend || []);
+
+        // 记录表
+        renderExpTable(recordsData.records || []);
+
+    } catch(e) {
+        console.warn('加载实验数据失败:', e);
+    }
+}
+
+function renderExpTrend(trend) {
+    const container = document.getElementById('expTrendChart');
+    if (!trend.length) {
+        container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;width:100%;text-align:center;">暂无实验数据</div>';
+        return;
+    }
+
+    const maxH = 160;
+    container.innerHTML = trend.map(function(t) {
+        const h = Math.max(4, t.overall_score * maxH);
+        const color = t.verdict === 'pass' ? 'var(--pass)' : t.verdict === 'review' ? 'var(--review)' : 'var(--fail)';
+        const ts = t.timestamp ? new Date(t.timestamp).toLocaleDateString('zh-CN', {month:'short',day:'numeric'}) : '';
+        return '<div style="display:flex;flex-direction:column;align-items:center;min-width:24px;" title="' + ts + ' | ' + (t.overall_score||0).toFixed(3) + '">' +
+            '<span style="font-size:10px;color:var(--text-secondary);">' + (t.overall_score||0).toFixed(2) + '</span>' +
+            '<div style="width:16px;height:' + h + 'px;background:' + color + ';border-radius:3px 3px 0 0;transition:height 0.3s;"></div>' +
+            '<span style="font-size:9px;color:#9ca3af;margin-top:2px;">' + ts + '</span>' +
+        '</div>';
+    }).join('');
+}
+
+function renderExpTable(records) {
+    const tbody = document.getElementById('expTableBody');
+    if (!records.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--text-secondary);">暂无实验记录</td></tr>';
+        return;
+    }
+
+    const profileNames = {
+        general: '通用',
+        government_notice_strict: '政务',
+        legal_strict: '法规',
+    };
+
+    tbody.innerHTML = records.map(function(r) {
+        const ts = r.timestamp ? new Date(r.timestamp).toLocaleString('zh-CN', {hour12:false}) : '-';
+        const model = (r.model_version || '-').substring(0, 20);
+        const profile = profileNames[r.evaluation_profile] || r.evaluation_profile || '-';
+        const score = (r.overall_score || 0).toFixed(3);
+        const scoreColor = r.overall_score >= 0.8 ? 'var(--pass)' : r.overall_score >= 0.5 ? 'var(--review)' : 'var(--fail)';
+        const verdict = r.verdict || '-';
+        const verdictClass = verdict === 'pass' ? 'status-tag--pass' : verdict === 'review' ? 'status-tag--warn' : 'status-tag--fail';
+        const flaws = r.flaw_count || 0;
+        const latency = r.latency_seconds ? r.latency_seconds.toFixed(1) : '-';
+        const tokens = r.total_tokens || '-';
+
+        return '<tr style="border-bottom:1px solid var(--border);">' +
+            '<td style="padding:8px;font-size:12px;color:var(--text-secondary);">' + ts + '</td>' +
+            '<td style="padding:8px;font-size:12px;">' + model + '</td>' +
+            '<td style="padding:8px;font-size:12px;">' + profile + '</td>' +
+            '<td style="padding:8px;text-align:center;font-weight:700;color:' + scoreColor + ';">' + score + '</td>' +
+            '<td style="padding:8px;text-align:center;"><span class="status-tag ' + verdictClass + '">' + verdict + '</span></td>' +
+            '<td style="padding:8px;text-align:center;">' + flaws + '</td>' +
+            '<td style="padding:8px;text-align:center;">' + latency + '</td>' +
+            '<td style="padding:8px;text-align:center;">' + tokens + '</td>' +
+        '</tr>';
+    }).join('');
 }
 </script>
 

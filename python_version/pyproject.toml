@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fidelity-eval"
+version = "1.0.0"
+description = "内容保真度与治理质量评估智能体 — LLM-as-Judge SDK"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "李首澎"},
+]
+keywords = ["llm", "evaluation", "judge", "text-governance", "fidelity"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "langchain>=1.3.0",
+    "langchain-core>=1.4.0",
+    "langchain-openai>=1.3.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "scikit-learn>=1.2.0",
+    "dspy>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "httpx>=0.24",
+]
+langfuse = [
+    "langfuse>=2.0.0",
+]
+
+[project.scripts]
+fidelity-eval = "fidelity_eval.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/lishoupeng/fidelity-eval"
+Issues = "https://github.com/lishoupeng/fidelity-eval/issues"
+
+[tool.setuptools.packages.find]
+include = ["fidelity_eval*", "app*"]

@@ -217,8 +217,8 @@ def build_story():
          "操作：在终端执行 python run_calibration.py，截图完整控制台输出（含 Pearson r、MAE 等指标），粘贴至此处。"),
         ("图2", "eval_dataset.json 数据集结构截图",
          "操作：在 VS Code 中打开 data/eval_dataset.json，展开至 human_label 层级，截图后粘贴至此处。"),
-        ("图3", "Streamlit 评估界面截图",
-         "操作：运行 streamlit run app.py，填入 sample_03 文本对，点击开始评估，截图结果区域后粘贴至此处。"),
+        ("图3", "前端评估界面截图",
+         "操作：运行 python main.py 启动服务，在浏览器打开 http://localhost:8081，填入 sample_03 文本对，点击开始评估，截图结果区域后粘贴至此处。"),
     ]
     for fig_id, fig_title, fig_desc in figs:
         ph = Table(

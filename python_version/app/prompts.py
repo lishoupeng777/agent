@@ -1,220 +1,92 @@
-"""System / User Prompt 模板 —— 面向治理保真度评估的专用 Prompt 设计"""
+"""System / User Prompt 模板 —— 面向治理保真度评估
+
+SYSTEM_PROMPT 只保留共性规则（维度定义、评分尺度、瑕玼规范）。
+Profile 补充规则由 storage.py 的 eval_profiles 表动态注入。
+"""
 from __future__ import annotations
 
 from typing import Any, Optional
 
 # ============================================================
-# System Prompt
+# System Prompt（共性部分，所有模式共享）
 # ============================================================
+
 SYSTEM_PROMPT = """你是一个专业的内容保真度与治理质量评估智能体（LLM-as-Judge）。
-你的任务是：比对治理前后的文本，评估治理质量。
+请严格按以下五个维度进行[先推理、后评分]，每个维度独立打分（0.0~1.0）：
 
-你必须严格按以下四个维度打分，并输出 JSON 格式结果：
+1. **语义保真度（semantic_fidelity）**（权重 0.30）：治理后是否完整保留了原文信息？
+   - 辅助/修饰信息删除：只扣此维度（保留率 70-90% <= 0.7；50-70% <= 0.5；<50% <= 0.3）。
+   - **【连带惩罚】**：若核心数字、金额、量化阈值、比例等高价值指标被篡改/删除，此维度与 factual_consistency 必须连带扣分且均不得高于 0.6。
 
-1. **语义保真度（semantic_fidelity）**（权重 0.35）：治理后文本是否完整保留了原文的信息？是否有信息被遗漏、删除、泛化？
-   - 核心问题：信息是否"丢了"
-   - 信息被删除、被泛化、被遗漏 → 扣此维度
-   - 注意：信息被"删除"是保真度问题，不是事实问题
+2. **事实一致性（factual_consistency）**（权重 0.30）：是否发生事实篡改或关键事实丢失？
+   - 核心数值、日期、名称篡改/无中生有：扣此维度（仅 1 处篡改该维度也不得高于 0.6）。
+   - 合规脱敏（如姓名/身份证遮蔽）不属于事实错误，不扣分。
 
-2. **事实一致性（factual_consistency）**（权重 0.35）：治理后文本是否篡改了原文的事实？是否无中生有或歪曲了原有事实？
-   - 核心问题：事实是否"被改错了"
-   - 数值被改、日期被改、名称被改、无中生有 → 扣此维度
-   - 注意：信息被"删除"不算事实篡改，只有"改错了"才算
+3. **幻觉检测（hallucination）**（权重 0.20）：是否凭空编造了原文没有的信息、限制条件或结论？
+   - 所有信息均在原文有据可查：此维度给 0.9~1.0。
 
-3. **逻辑结构保真度（structure）**（权重 0.15）：信息之间的逻辑关系是否保持？包括：因果关系、并列关系、层级关系、表格/列表等结构化组织方式是否被破坏？
+4. **逻辑结构保真度（structure）**（权重 0.10）：信息间的因果、并列、层级及结构化方式是否被破坏？
+   - 表格拍平为散文/逗号句：structure 限制在 0.3~0.4。
+   - 有序列表压缩为单句：structure 限制在 0.5~0.6。
+   - 段落顺序颠倒：必须判定为结构瑕疵并扣分。
+	   - **【段落顺序检测】**：逐一比对 [Before N] 和 [After N] 的编号对应关系。
+	     如果 [Before 1] 的内容出现在 [After 2]、[Before 2] 出现在 [After 1]，
+	     说明段落被调换，必须判定为 structure 瑕疵（即使内容完全保留）。
 
-4. **可读性（readability）**（权重 0.15）：句子是否通顺？排版是否规范？标点符号是否正确？
+5. **可读性（readability）**（权重 0.10）：句子通顺度、排版与标点规范。
+   - **【警惕流畅性偏见】**：通顺不等于正确。语法完美但内容空洞的文字，readability 可给高分，但前两个维度必须降至最低。
+   - 过度缩写导致"电报体"：readability 限制在 0.2~0.3。
 
-**【评分标准】**
-- 每个维度独立打分 0.0~1.0，不要因为某个维度差就影响其他维度的评分。
-- 四个维度相互独立、互不影响。信息删除只扣 semantic_fidelity，不扣 factual_consistency。
-- 你的任务是如实反映每个维度的状况，最终总分由系统自动计算。
-- 不需要输出 overall_score，系统会根据四个维度加权计算。
+**【评分尺度参考】**
+- 0.9~1.0：优秀，该维度几乎无问题
+- 0.7~0.9：良好，有 1-2 处轻微问题
+- 0.5~0.7：一般，有多处明显问题
+- 0.3~0.5：较差，核心内容受到较大影响
+- 0.0~0.3：严重，核心内容几乎完全丧失
 
-**【semantic_fidelity 与 factual_consistency 的边界】**
-- "删除了安全警告" → 只扣 semantic_fidelity（信息缺失），不扣 factual_consistency
-- "把5分钟改成50分钟" → 只扣 factual_consistency（事实篡改），不扣 semantic_fidelity
-- "删除了安全警告"且"把5分钟改成50分钟" → 两个维度各自独立扣分
-- "删除了举例和修饰语，但核心信息保留" → semantic_fidelity 不低于 0.6
+**【瑕玼拆分与定位规范】**
+- 按独立实体/指标/条款拆分瑕玼，不同对象必须拆分为多条。
+- 优先使用文本中显式标注的锚点编号（如 [Before 1]、[Anchor_P1]）作为 segment_id。
+- 若无显式锚点或无法确定位置，start_char 和 end_char 填 0，
+  snippet 必须是从**治理后文本（AFTER）中逐字原样截取**的子串，
+	  不得改写、摘要、缩写、或自己组织语言。截取长度不少于 15 个字符（含中文），
+	  越长越好（20~40 字最佳），确保该子串在 AFTER 文本中唯一且可通过搜索精确定位。
+	  如果瑕疵涉及被删除的内容，snippet 填删除位置附近的 AFTER 文本片段。
 
-**【约束词删除检测 — 必须重点关注】**
-以下词汇属于政策/法规/合同中的约束条件，一旦被删除或泛化，semantic_fidelity 必须降低：
-- 限定性副词：不得、必须、应当、禁止、严禁、需要
-- 数量约束：不少于、不超过、至少、最多、最低、最高、以上、以下、以内
-- 政策阈值：50%以内、30%以上、不低于X%、压缩至X%
-- 时间约束：之前、之后、之日起、届满前、有效期内
-- 范围约束：仅限、限于、原则上、除...外
+**【数值拆分示例（按独立实体/指标）】**
+原文：营收125.8亿元，增长23.5%；净利18.6亿元，增长31.2%
+改后：营收128.5亿元，增长23.6%；净利18.6亿元，增长31.3%
+→ 应拆为 2 条独立的 mis_edit：
+  (1) 营业收入从125.8亿改为128.5亿，增长率从23.5%改为23.6%（同一实体营收的关联数据归为一条）
+  (2) 净利润增长率从31.2%改为31.3%（独立实体净利单列一条）
+  原则：不同实体/指标必须拆分，同一实体的关联数值可合并。
 
-如果治理后文本删除了上述约束词，即使"大意保留"，也属于信息保真度缺失，semantic_fidelity ≤ 0.4。
+**【over_clean vs structure 边界 — 先判结构再判内容】**
+- 信息被删除（内容层面）→ over_clean：数字、日期、专有名词、限制条件被删。
+- 结构被破坏（形式层面）→ structure：表格→散文、字段→流水、列表→单句、段落调换。
+- **【结构优先】**：若 before 是字段化/表格/列表结构，after 被拍平为简短散文，
+  主瑕玼必须判 structure，不要拆成 N 条 over_clean（信息压缩是结构破坏的结果）。
+  例：before「设备：X | 型号：Y | 原值：Z」→ after「一台旧设备已报废」
+  ✅ 1 条 structure    ❌ 3 条 over_clean（名称被删、型号被删、原值被删）
 
-**【定义条款变更检测 — 必须重点关注】**
-以下属于法律/合同中的定义性内容，删除或改变会改变法律含义：
-- 主体限定：甲方、乙方、出租人、承租人、用人单位、劳动者
-- 方式限定：书面、口头、电子、当面、以书面形式
-- 时间限定：签署前后、生效之日起、届满前、履行期间
-- 认定标准：明确标注为、视为、认定为、符合...条件的
-- 保密级别：保密、机密、绝密、内部、敏感
+**【通顺陷阱】** 句子通顺≠没有内容损失。原文列举 4 项→改后剩 2 项，即使流畅也必须标 over_clean。
 
-如果治理后文本删除或泛化了定义条款中的限定词，属于保真度缺失，semantic_fidelity ≤ 0.4。
+**【hallucination vs mis_edit — 先找原文依据】**
+- mis_edit：before 有实体X→after 实体X的值被篡改（原文有依据，但值变了）。
+- hallucination：after 中出现了 before 完全没有任何依据的新概念/数据（凭空编造）。
+- 例：before「净利18.6亿」→ after「净利18.6亿，市占率32.7%」
+  「市占率32.7%」= hallucination（原文无此指标），不是 mis_edit。
+- 如果 LLM 不确定是否原文有依据，应标为 hallucination。
 
-**【瑕疵严重程度判定标准】**
-- **critical**：数量级变化（120万→12万）、核心数据完全篡改、关键日期/法律条款被改、大量内容被删除（>30%）
-- **major**：数值有明显偏差（如 18.6%→16.8%，差 1.8 个百分点）、重要信息丢失但非关键
-- **minor**：数值微小偏差（如 3268→3269，差 1 人）、表述微调、标点/空格变化
-- **不要因为"数字被改了"就一律标 critical**，要看改动幅度和影响
-
-**【信息结构保真度重点关注】**
-- 表格转为纯文本 → 结构化信息的对比性和可读性丧失 → structure ≤ 0.3
-- 有序列表被压缩为单句 → 层级关系被扁平化 → structure ≤ 0.4
-- 因果/递进关系被打乱 → 逻辑结构受损 → structure ≤ 0.5
-- 段落被合并但信息关系和层级保持 → structure ≥ 0.7
-- 仅格式微调（标点/空格/换行）不影响信息结构 → structure ≥ 0.9
-
+**【合规脱敏豁免】**
+仅对敏感个人信息进行合理脱敏（姓名化为"张**"、身份证打码等），各维度不扣分。
 """
 
 
 # ============================================================
-# Profile-specific prompt 补充规则
+# User Prompt 模板（CoT 优先：reason 在 score 之前）
 # ============================================================
-# 设计说明：不同领域对事实错误的容忍度不同。
-# - 通用文本：数字微调（如 3268→3269）可能是笔误，容忍度较高
-# - 政府公告：日期、金额、罚款区间必须精确，错一个字可能改变法律效力
-# - 法律文书：责任主体、义务、条件、例外条款必须逐字保留
-# Profile 通过调整 Prompt 中的判定标准来适配不同领域，
-# 而非改变四维度权重或惩罚因子（评分框架保持统一）。
 
-_PROFILE_SUPPLEMENTS: dict[str, str] = {
-    "government_notice_strict": """
-**【政务通告严格保真模式 — 已启用】**
-
-本次评估对象为政务通告/公告/通知类文本，适用更严格的保真标准。
-
-以下信息属于关键事实，删除、泛化或区间抹平**不能视为高保真**：
-- 生效日期、失效日期、截止日期、有效期
-- 办理时限、报告时限、响应时限
-- 金额、罚款区间、收费标准
-- 百分比、数量门槛、面积/重量/身高等阈值
-- 适用范围、区域范围、对象范围
-- 豁免对象、例外对象
-- 处罚措施、责任后果
-
-具体示例：
-- 将"罚款 2000~5000 元"改成"处罚款" → 属于显著信息损失，至少标为 major
-- 将"有效期至 2027年5月31日"删除 → 属于关键信息删失，标为 critical
-- 将"肩高 61 厘米或体重 30 公斤"改成"大型犬" → 属于阈值丢失，标为 major 以上
-- 将"投诉量增长 42.3%"删除 → 属于数据删失，标为 major
-
-**【实体名称严格性 — 政务模式】**
-政务通告中出现的机构名、单位名必须使用法定全称，缩写属于严重事实错误：
-- "国家电网有限公司"→"国网公司" → factual_consistency ≤ 0.3, 标为 critical
-- "南方电网有限责任公司"→"南网公司" → factual_consistency ≤ 0.3, 标为 critical
-- "中华人民共和国教育部"→"教育部" → 仅限口语化场景，政务文本中仍属不规范
-技术参数必须精确，不得四舍五入或近似：
-- ±1100千伏→±1000千伏 → factual_consistency ≤ 0.2, 标为 critical
-- 肩高61厘米→大型犬 → 属于阈值丢失，标为 critical
-""",
-
-    "legal_strict": """
-**【法规合同严格保真模式 — 已启用】**
-
-本次评估对象为法规、合同、条款、协议、制度规范类文本，适用更严格的保真标准。
-
-以下信息属于关键事实，删除或模糊化**不能视为高保真**：
-- 责任主体（谁承担义务/责任）
-- 义务与禁止性规定（必须做什么、不得做什么）
-- 条件触发（在什么条件下生效/适用）
-- 例外条款（什么情况除外）
-- 法律后果或违约后果（违反后承担什么责任）
-
-具体规则：
-- 删除责任主体 → 至少标为 major
-- 弱化义务或禁止性规定 → 至少标为 major
-- 删除条件限制 → 至少标为 major
-- 删除或弱化法律后果 → 标为 critical
-- "维持大意"不足以视为高保真，关键条款边界必须精确保留
-
-**【定义条款严格性 — 法律模式】**
-法律文本中的定义条款必须逐字保留，任何限定词删除都属于定义弱化：
-- "书面同意"→"同意" → 删除了方式限定，semantic_fidelity ≤ 0.3, 标为 critical
-- "明确标注为保密"→"相关信息" → 删除了认定标准，semantic_fidelity ≤ 0.3, 标为 critical
-- "签署前后"→ 删除 → 删除了时间范围限定，semantic_fidelity ≤ 0.4, 标为 major
-- "以书面或口头形式获悉"→ 删除 → 删除了获悉方式限定，semantic_fidelity ≤ 0.4, 标为 major
-- 编号结构（1）（2）（3）被压缩为逗号连接 → 结构降级，structure ≤ 0.4
-""",
-}
-
-_PROFILE_FEW_SHOTS: dict[str, str] = {
-    "government_notice_strict": """
-示例4：政务通告关键事实丢失（应给低分）
-输入：
-- 原文：根据《养犬管理条例》，重点管理区内禁止饲养肩高超过61厘米或体重超过30公斤的犬只。违反规定的，处2000元以上5000元以下罚款。本通告自发布之日起施行，有效期至2027年5月31日。
-- 治理后：根据相关规定，重点管理区内禁止饲养大型犬。违反规定的将予以处罚。
-正确输出：
-{
-  "dimensions": [
-    {"dimension": "semantic_fidelity", "score": 0.2, "weight": 0.4, "reason": "关键事实大量丢失：犬只判定阈值、罚款区间、有效期均被删除"},
-    {"dimension": "factual_consistency", "score": 0.8, "weight": 0.3, "reason": "保留的事实信息无篡改，但存在信息缺失"},
-    {"dimension": "readability", "score": 0.8, "weight": 0.15, "reason": "句子通顺"},
-    {"dimension": "structure", "score": 0.6, "weight": 0.15, "reason": "结构基本完整但信息密度大幅下降"}
-  ],
-  "overall_score": 0.25,
-  "flaws": [
-    {"category": "over_clean", "severity": "critical", "description": "犬只判定阈值（肩高61cm/体重30kg）被删除", "location": {"segment_id": "1", "start_char": 0, "end_char": 50, "snippet": "肩高超过61厘米或体重超过30公斤"}},
-    {"category": "over_clean", "severity": "critical", "description": "罚款区间（2000~5000元）被泛化为'处罚'", "location": {"segment_id": "1", "start_char": 80, "end_char": 120, "snippet": "2000元以上5000元以下"}},
-    {"category": "mis_edit", "severity": "critical", "description": "有效期截止日被删除", "location": {"segment_id": "1", "start_char": 130, "end_char": 160, "snippet": "有效期至2027年5月31日"}}
-  ]
-}
-""",
-
-    "legal_strict": """
-示例5：法律条款责任后果弱化（应给低分）
-输入：
-- 原文：承租人未经出租人书面同意，不得将租赁物转租给第三方。违反本条规定的，出租人有权解除合同并要求承租人支付违约金人民币伍万元整。
-- 治理后：承租人不得擅自转租租赁物。违反规定的，出租人可解除合同。
-正确输出：
-{
-  "dimensions": [
-    {"dimension": "semantic_fidelity", "score": 0.3, "weight": 0.4, "reason": "关键法律要件丢失：书面同意要求、违约金金额被删除"},
-    {"dimension": "factual_consistency", "score": 0.9, "weight": 0.3, "reason": "保留的事实信息无篡改，但存在信息缺失"},
-    {"dimension": "readability", "score": 0.9, "weight": 0.15, "reason": "句子通顺"},
-    {"dimension": "structure", "score": 0.7, "weight": 0.15, "reason": "结构完整"}
-  ],
-  "overall_score": 0.30,
-  "flaws": [
-    {"category": "mis_edit", "severity": "critical", "description": "违约金（伍万元整）被删除，法律后果被弱化", "location": {"segment_id": "1", "start_char": 60, "end_char": 100, "snippet": "违约金人民币伍万元整"}},
-    {"category": "over_clean", "severity": "major", "description": "书面同意要求被简化为'擅自'", "location": {"segment_id": "1", "start_char": 0, "end_char": 30, "snippet": "未经出租人书面同意"}}
-  ]
-}
-""",
-}
-
-
-def build_system_prompt(evaluation_profile: str = "general") -> str:
-    """返回 System Prompt（含 profile-specific 规则与抗偏置指令）"""
-    from .debias import generate_anti_bias_prompt_supplement
-    from .profiles import get_profile_config
-
-    prompt = SYSTEM_PROMPT
-
-    # 叠加 profile-specific 补充规则
-    supplement = _PROFILE_SUPPLEMENTS.get(evaluation_profile, "")
-    if supplement:
-        prompt += "\n" + supplement
-
-    # 叠加 profile-specific few-shot
-    extra_few_shot = _PROFILE_FEW_SHOTS.get(evaluation_profile, "")
-    if extra_few_shot:
-        prompt += "\n" + extra_few_shot
-
-    # 叠加抗偏置指令
-    prompt += "\n" + generate_anti_bias_prompt_supplement()
-
-    return prompt
-
-
-# ============================================================
-# User Prompt 模板
-# ============================================================
 USER_PROMPT_TEMPLATE = """请评估以下治理前后文本对：
 
 === 治理前原文（BEFORE） ===
@@ -223,75 +95,77 @@ USER_PROMPT_TEMPLATE = """请评估以下治理前后文本对：
 === 治理后文本（AFTER） ===
 {after_text}
 
-=== 分段锚点信息（供定位参考） ===
+=== 分段锚点信息 ===
 {before_segments_info}
 {after_segments_info}
 
-=== 算法预检变更（Diff 检测结果，供参考） ===
+=== 算法预检变更 ===
 {diff_info}
 
-请按以下 JSON 格式输出评估结果：
+请严格按以下 JSON 格式输出评估结果。
+**注意：所有 flaw.location.snippet 必须是从上面 AFTER 文本中逐字原样复制的原文片段，不少于 20 个字符。**
 
 ```json
 {{
   "dimensions": [
     {{
       "dimension": "semantic_fidelity",
-      "score": 0.0~1.0,
-      "weight": 0.35,
-      "reason": "评分理由（关注信息是否完整保留）"
+      "weight": 0.30,
+      "reason": "先推理：核算信息保留率，分析是否有核心信息丢失或限定范围泛化",
+      "score": 0.0~1.0
     }},
     {{
       "dimension": "factual_consistency",
-      "score": 0.0~1.0,
-      "weight": 0.35,
-      "reason": "评分理由（关注事实是否被篡改）"
+      "weight": 0.30,
+      "reason": "先推理：逐项核对数值、日期、名称等关键事实是否被改错、误删或无中生有",
+      "score": 0.0~1.0
+    }},
+    {{
+      "dimension": "hallucination",
+      "weight": 0.20,
+      "reason": "先推理：检查后文中是否有任何原文中完全无法找到依据的凭空编造信息",
+      "score": 0.0~1.0
     }},
     {{
       "dimension": "structure",
-      "score": 0.0~1.0,
-      "weight": 0.15,
-      "reason": "评分理由"
+      "weight": 0.10,
+      "reason": "先推理：比对段落顺序、列表层级、表格降级等结构/逻辑保真度状况",
+      "score": 0.0~1.0
     }},
     {{
       "dimension": "readability",
-      "score": 0.0~1.0,
-      "weight": 0.15,
-      "reason": "评分理由"
+      "weight": 0.10,
+      "reason": "先推理：分析句子连贯度及排版，警惕因过度删词导致出现难读的电报体",
+      "score": 0.0~1.0
     }}
   ],
   "flaws": [
     {{
-      "category": "over_clean|mis_edit|readability|structure",
+      "category": "over_clean|mis_edit|readability|structure|hallucination",
       "severity": "critical|major|minor",
-      "description": "瑕疵描述（可解释）",
+      "description": "详细证明该瑕玼的存在，客观说明扣分逻辑",
+      "suggestion": "具体的修复改进建议",
       "location": {{
-        "before_anchor": "治理前锚点编号（如 [Before 1] 或 [Anchor_P1]）",
-        "after_anchor": "治理后锚点编号（如 [After 1] 或 [Anchor_G1]）",
-        "snippet": "相关原文片段（10-20字）"
-      }},
-      "suggestion": "修复建议（可选）"
+        "segment_id": "使用文本中的段落编号（如 After 2、seg_001 等）",
+        "start_char": 0,
+        "end_char": 0,
+        "snippet": "从 AFTER 文本中逐字原样截取的 20-40 字片段，不得改写或摘要，越长越好以确保唯一性"
+      }}
     }}
   ]
 }}
 ```
 
 注意：
-- 如果无瑕疵，flaws 为空列表 []
-- **算法预检已标记的瑕疵（见"算法预检变更"部分）必须在你的 flaws 中体现**。如果算法检测到 structure/critical，你的 structure 评分应 <= 0.3，且 flaws 中必须包含对应条目。你是"裁判"（Reviewer），不是"发现者"（Discoverer），算法已经帮你发现了变更，你需要做的是判断严重程度
+- 如果无瑕玼，flaws 为空列表 []
 - 务必保证 JSON 格式正确，可被直接解析
-- **瑕疵拆分规则（object-aware）：**
-  1. 每条 flaw 必须对应一个独立的信息对象或治理风险
-  2. 信息对象包括：实体（公司、人物、机构）、指标（金额、比例、数量）、字段（属性、参数、配置项）、条款（法律依据、限制条件、规则说明）、章节结构（标题、段落、列表层级）
-  3. 如果多个错误影响同一个信息对象，并且属于同一种治理风险，应合并为一条 flaw
-  4. 如果错误影响不同的信息对象，即使 category 相同、出现在同一句话、文本位置相邻、错误表现形式类似，也必须拆分为多个 flaw
-  5. 不允许为了减少 flaw 数量而合并不同对象的问题
-  6. 不允许为了增加检测覆盖而拆分同一个对象的重复描述
-  7. 拆分优先级：信息对象 > 影响范围 > 严重程度 > 错误类别 > 文本位置
-- **遗漏检查（必须执行）：** 完成瑕疵识别后，分别重新检查以下四类是否存在遗漏：(1) over_clean：是否存在信息删除、泛化、缩写导致的信息丢失？(2) mis_edit：是否存在事实、数字、名称、参数的错误变更？(3) structure：是否存在段落顺序、列表层级、结构化组织方式的变化？(4) readability：是否存在表达质量下降、语句不通顺？不得因发现某一类明显错误而停止搜索其他类别
-- **锚点定位用文本中的锚点标记**：用治理前/后文本中已有的锚点编号（如 [Before N]、[Anchor_P1]、[Anchor_G1] 等）定位，不要自己猜字符位置
-- snippet 是错误发生处的原文片段（10-20 字），用于人工快速定位
-- **维度评分必须正交**：信息删除只扣 semantic_fidelity，事实篡改只扣 factual_consistency，不要重复扣分
+- **维度评分必须正交**：事实篡改只扣 factual_consistency，凭空编造只扣 hallucination
+
+**【输出前自检 — 逐段比对】**
+在提交 JSON 之前，快速完成以下三步检查（不写入 JSON，仅用于自我校验）：
+1. 段落编号对应：逐段比对 [Before N] 和 [After N]，编号对应关系是否一致？有无调换？
+2. 内容删减复核：after 是否明显短于 before？被缩短的部分中，所有数字、专有名词、列举项是否都已核对？
+3. 通顺陷阱自查：是否有"句子读起来没问题，但具体信息被删了"的情况？如有，补标为 over_clean。
 """
 
 
@@ -302,11 +176,7 @@ def build_user_prompt(
     segments_after: Optional[list[dict[str, Any]]] = None,
     diff_info: Optional[str] = None,
 ) -> str:
-    """
-    构建 User Prompt。
-
-    使用 safe_format 避免文本中的 { } 导致 format() 报错。
-    """
+    """构建 User Prompt"""
     before_segments_info = _format_segments(segments_before, "before")
     after_segments_info = _format_segments(segments_after, "after")
     return _safe_format(
@@ -320,10 +190,7 @@ def build_user_prompt(
 
 
 def _safe_format(template: str, **kwargs: str) -> str:
-    """
-    安全的字符串替换：用占位符替换后再用 str.replace，
-    避免用户文本中的 { } 导致 format() 抛出 KeyError。
-    """
+    """安全的字符串替换"""
     result = template
     for key, value in kwargs.items():
         placeholder = "{" + key + "}"
